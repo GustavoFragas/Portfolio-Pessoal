@@ -12,20 +12,21 @@
 
 ### 1. ✅ Certificados Atualizados
 **Antes:** 7 certificados (alguns fictícios)  
-**Agora:** 11 certificados REAIS com PDFs
+**Agora:** 12 certificados REAIS (11 PDFs + 1 Credly)
 
 **Certificados Adicionados:**
-1. ✅ Certificação B2 - Inglês Avançado (LingoPass)
-2. ✅ Versionamento de Código com Git e GitHub (DIO)
-3. ✅ Sintaxe Básica com .NET C# (DIO)
-4. ✅ Sintaxe e Tipos de Dados em C# (DIO)
-5. ✅ Operadores Aritméticos em C# (DIO)
-6. ✅ Tipos de Operadores em C# (DIO)
-7. ✅ Conhecendo a Organização de um Programa C# (DIO)
-8. ✅ Conhecendo as Estruturas de Repetição em C# (DIO)
-9. ✅ Array e Listas em C# (DIO)
-10. ✅ Propriedades, Métodos e Construtores com C# (DIO)
-11. ✅ Comentários e Boas Práticas em C# (DIO)
+1. ✅ Certificação B2 - Inglês Avançado (LingoPass) - PDF
+2. ✅ Versionamento de Código com Git e GitHub (DIO) - PDF
+3. ✅ Sintaxe Básica com .NET C# (DIO) - PDF
+4. ✅ Sintaxe e Tipos de Dados em C# (DIO) - PDF
+5. ✅ Operadores Aritméticos em C# (DIO) - PDF
+6. ✅ Tipos de Operadores em C# (DIO) - PDF
+7. ✅ Conhecendo a Organização de um Programa C# (DIO) - PDF
+8. ✅ Conhecendo as Estruturas de Repetição em C# (DIO) - PDF
+9. ✅ Array e Listas em C# (DIO) - PDF
+10. ✅ Propriedades, Métodos e Construtores com C# (DIO) - PDF
+11. ✅ Comentários e Boas Práticas em C# (DIO) - PDF
+12. ✅ **Notion Certified Admin (Notion/Credly)** - Badge Online ⭐
 
 **Certificados Removidos:**
 - ❌ Python Fundamentals (não existe)
@@ -38,8 +39,9 @@
 - 📁 `client/public/certificates/` - PDFs para o site
 
 **Funcionalidade:**
-- ✅ Botão "Ver Certificado" abre o PDF em nova aba
-- ✅ Todos os 11 certificados funcionando
+- ✅ Botão "Ver Certificado" abre o PDF em nova aba (11 PDFs)
+- ✅ Botão "Ver Certificado" abre badge do Credly (Notion)
+- ✅ Todos os 12 certificados funcionando
 
 ---
 
