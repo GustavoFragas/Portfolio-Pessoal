@@ -43,7 +43,7 @@ export default function Projects() {
           {projects.map((project) => (
             <div
               key={project.id}
-              className="bg-gray-800 rounded-lg overflow-hidden hover:scale-105 hover:shadow-xl hover:shadow-blue-500/20 transition-all duration-300"
+              className="bg-gray-800 rounded-lg overflow-hidden hover:scale-105 hover:shadow-2xl hover:shadow-blue-500/30 transition-all duration-300 border border-gray-700 hover:border-blue-500/50"
             >
               <div className="h-48 bg-gradient-to-br from-blue-500/20 to-purple-600/20 flex items-center justify-center">
                 <div className="text-6xl">💻</div>

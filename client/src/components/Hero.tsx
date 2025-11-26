@@ -29,9 +29,9 @@ export default function Hero({ profile }: HeroProps) {
 
   return (
     <section id="home" className="min-h-screen flex items-center justify-center px-4 py-20">
-      <div className="max-w-4xl mx-auto text-center">
+      <div className="max-w-4xl mx-auto text-center animate-fade-in">
         <div className="mb-8">
-          <div className="w-48 h-48 mx-auto mb-6 rounded-full bg-gradient-to-r from-blue-500 to-purple-600 p-1 hover:scale-105 transition-transform duration-300">
+          <div className="w-48 h-48 mx-auto mb-6 rounded-full bg-gradient-to-r from-blue-500 to-purple-600 p-1 hover:scale-110 transition-all duration-300 shadow-lg hover:shadow-2xl hover:shadow-purple-500/50">
             <img 
               src="/images/profile.jpg" 
               alt={profile.name}

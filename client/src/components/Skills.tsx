@@ -94,7 +94,7 @@ export default function Skills() {
                 return (
                   <div
                     key={category}
-                    className="min-w-[calc(33.33%-1.5rem)] bg-gray-800 rounded-lg p-6 hover:scale-105 hover:bg-gray-750 transition-all duration-300 cursor-pointer"
+                    className="min-w-[calc(33.33%-1.5rem)] bg-gray-800 rounded-lg p-6 hover:scale-105 hover:shadow-xl hover:shadow-blue-500/20 transition-all duration-300 cursor-pointer border border-gray-700 hover:border-blue-500/50"
                   >
                     <h3 className="text-xl font-semibold mb-4 text-blue-400">
                       {category}

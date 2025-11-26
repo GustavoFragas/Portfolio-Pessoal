@@ -1,15 +1,17 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useState, lazy, Suspense } from 'react';
 import { profileApi } from './services/api';
 import type { Profile } from './types';
 import Sidebar from './components/Sidebar';
 import Hero from './components/Hero';
 import About from './components/About';
-import Skills from './components/Skills';
-import Projects from './components/Projects';
-import ExperienceSection from './components/Experience';
-import EducationSection from './components/Education';
-import Certificates from './components/Certificates';
-import Contact from './components/Contact';
+
+// Lazy loading para componentes abaixo da dobra
+const Skills = lazy(() => import('./components/Skills'));
+const Projects = lazy(() => import('./components/Projects'));
+const ExperienceSection = lazy(() => import('./components/Experience'));
+const EducationSection = lazy(() => import('./components/Education'));
+const Certificates = lazy(() => import('./components/Certificates'));
+const Contact = lazy(() => import('./components/Contact'));
 
 function App() {
   const [profile, setProfile] = useState<Profile | null>(null);
@@ -69,12 +71,14 @@ function App() {
       <main className="flex-1 lg:ml-64">
         <Hero profile={profile} />
         <About profile={profile} />
-        <Skills />
-        <Projects />
-        <ExperienceSection />
-        <EducationSection />
-        <Certificates />
-        <Contact profile={profile} />
+        <Suspense fallback={<div className="py-20 text-center text-gray-400">Carregando...</div>}>
+          <Skills />
+          <Projects />
+          <ExperienceSection />
+          <EducationSection />
+          <Certificates />
+          <Contact profile={profile} />
+        </Suspense>
         
         <footer className="py-8 text-center text-gray-400 border-t border-gray-800">
           <p>© 2025 Gustavo Fragas Cunha. Todos os direitos reservados.</p>

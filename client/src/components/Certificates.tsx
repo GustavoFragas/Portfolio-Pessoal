@@ -89,12 +89,12 @@ export default function Certificates() {
               {certificates.map((cert) => (
                 <div
                   key={cert.id}
-                  className="min-w-[calc(33.33%-1rem)] bg-gray-800 rounded-lg p-6 hover:scale-105 hover:shadow-xl hover:shadow-purple-500/20 transition-all duration-300"
+                  className="min-w-[calc(33.33%-1rem)] bg-gray-800 rounded-lg p-6 hover:scale-105 hover:shadow-2xl hover:shadow-purple-500/30 transition-all duration-300 flex flex-col border border-gray-700 hover:border-purple-500/50"
                 >
                   <div className="flex items-center justify-center h-16 mb-4">
                     <div className="text-4xl">🏆</div>
                   </div>
-                  <h3 className="text-lg font-bold mb-2 text-center">{cert.name}</h3>
+                  <h3 className="text-lg font-bold mb-2 text-center min-h-[3.5rem] flex items-center justify-center">{cert.name}</h3>
                   <p className="text-blue-400 text-center mb-2">{cert.issuer}</p>
                   <p className="text-sm text-gray-400 text-center mb-4">
                     {formatDate(cert.issueDate)}
@@ -103,7 +103,14 @@ export default function Certificates() {
                     href={cert.credentialUrl}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="flex items-center justify-center gap-2 text-purple-400 hover:text-purple-300 transition-colors"
+                    onClick={(e) => {
+                      // Forçar abertura em nova aba para PDFs
+                      if (cert.credentialUrl.endsWith('.pdf')) {
+                        e.preventDefault();
+                        window.open(cert.credentialUrl, '_blank');
+                      }
+                    }}
+                    className="flex items-center justify-center gap-2 text-purple-400 hover:text-purple-300 transition-colors mt-auto"
                   >
                     <FaExternalLinkAlt /> Ver Certificado
                   </a>
