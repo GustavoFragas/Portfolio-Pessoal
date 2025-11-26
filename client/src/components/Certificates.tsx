@@ -81,29 +81,29 @@ export default function Certificates() {
           )}
 
           {/* Certificates Horizontal Scroll */}
-          <div className="overflow-hidden px-2">
+          <div className="overflow-hidden">
             <div
               className="flex gap-6 transition-transform duration-500 ease-in-out"
-              style={{ transform: `translateX(-${currentIndex * 34}%)` }}
+              style={{ transform: `translateX(-${currentIndex * 33.33}%)` }}
             >
               {certificates.map((cert) => (
                 <div
                   key={cert.id}
-                  className="min-w-[calc(33.33%-0.5rem)] flex-shrink-0 bg-gray-800 rounded-lg p-6 hover:scale-105 hover:shadow-2xl hover:shadow-purple-500/30 transition-all duration-300 flex flex-col border border-gray-700 hover:border-purple-500/50"
+                  className="min-w-[calc(33.33%-1rem)] flex-shrink-0 bg-gray-800 rounded-lg p-6 hover:shadow-2xl hover:shadow-purple-500/30 transition-shadow duration-300 flex flex-col border border-gray-700 hover:border-purple-500/50"
                 >
                   <div className="flex items-center justify-center h-16 mb-4">
                     <div className="text-4xl">🏆</div>
                   </div>
-                  <h3 className="text-base font-bold mb-2 text-center min-h-[4rem] flex items-center justify-center px-2 leading-tight">{cert.name}</h3>
-                  <p className="text-blue-400 text-center mb-2 text-sm">{cert.issuer}</p>
-                  <p className="text-xs text-gray-400 text-center mb-4">
+                  <h3 className="text-lg font-bold mb-2 text-center min-h-[3.5rem] flex items-center justify-center leading-snug px-1">{cert.name}</h3>
+                  <p className="text-blue-400 text-center mb-2">{cert.issuer}</p>
+                  <p className="text-sm text-gray-400 text-center mb-4">
                     {formatDate(cert.issueDate)}
                   </p>
                   <a
                     href={cert.credentialUrl}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="flex items-center justify-center gap-2 text-purple-400 hover:text-purple-300 transition-colors mt-auto text-sm"
+                    className="flex items-center justify-center gap-2 text-purple-400 hover:text-purple-300 transition-colors mt-auto"
                   >
                     <FaExternalLinkAlt /> Ver Certificado
                   </a>
