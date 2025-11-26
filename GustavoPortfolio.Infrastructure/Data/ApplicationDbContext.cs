@@ -135,7 +135,7 @@ public class ApplicationDbContext : DbContext
                 Title = "Portfólio Pessoal Fullstack",
                 Description = "Portfólio profissional desenvolvido com arquitetura Clean Architecture, demonstrando habilidades em .NET e React. API RESTful com Swagger e frontend responsivo com design moderno.",
                 TechStack = ".NET 9, React, TypeScript, TailwindCSS, Entity Framework",
-                RepoUrl = "https://github.com/GustavoFragas",
+                RepoUrl = "https://github.com/GustavoFragas/Portfolio-Pessoal",
                 DemoUrl = null,
                 ImageUrl = "/images/projects/portfolio.jpg",
                 CreatedAt = new DateTime(2025, 11, 1)
@@ -158,65 +158,101 @@ public class ApplicationDbContext : DbContext
             new Certificate
             {
                 Id = Guid.NewGuid(),
-                Name = "Certificado de Proficiência em Inglês - Nível B2",
+                Name = "Certificação B2 - Inglês Avançado",
                 Issuer = "LingoPass",
-                IssueDate = new DateTime(2025, 3, 15),
-                CredentialUrl = "https://www.lingopass.com.br/",
+                IssueDate = new DateTime(2025, 8, 15),
+                CredentialUrl = "/certificates/Lingopass certificate B2 Advanced.pdf",
                 LogoUrl = "/images/certificates/lingopass.png"
             },
             new Certificate
             {
                 Id = Guid.NewGuid(),
-                Name = "Formação .NET Developer",
-                Issuer = "Digital Innovation One (DIO)",
-                IssueDate = new DateTime(2025, 8, 20),
-                CredentialUrl = "https://www.dio.me/",
-                LogoUrl = "/images/certificates/dio.png"
-            },
-            new Certificate
-            {
-                Id = Guid.NewGuid(),
-                Name = "Git e GitHub",
+                Name = "Versionamento de Código com Git e GitHub",
                 Issuer = "Digital Innovation One (DIO)",
                 IssueDate = new DateTime(2025, 7, 10),
-                CredentialUrl = "https://www.dio.me/",
+                CredentialUrl = "/certificates/Versionamento de Código com Git e GitHub.pdf",
                 LogoUrl = "/images/certificates/dio.png"
             },
             new Certificate
             {
                 Id = Guid.NewGuid(),
-                Name = "MySQL Database",
+                Name = "Sintaxe Básica com .NET C#",
                 Issuer = "Digital Innovation One (DIO)",
-                IssueDate = new DateTime(2025, 9, 5),
-                CredentialUrl = "https://www.dio.me/",
+                IssueDate = new DateTime(2025, 7, 15),
+                CredentialUrl = "/certificates/Sintaxe Básica com .NET C#.pdf",
                 LogoUrl = "/images/certificates/dio.png"
             },
             new Certificate
             {
                 Id = Guid.NewGuid(),
-                Name = "Python Fundamentals",
+                Name = "Sintaxe e Tipos de Dados em C#",
                 Issuer = "Digital Innovation One (DIO)",
-                IssueDate = new DateTime(2025, 6, 15),
-                CredentialUrl = "https://www.dio.me/",
+                IssueDate = new DateTime(2025, 7, 18),
+                CredentialUrl = "/certificates/Sintaxe e Tipos de Dados em C#.pdf",
                 LogoUrl = "/images/certificates/dio.png"
             },
             new Certificate
             {
                 Id = Guid.NewGuid(),
-                Name = "Notion Admin Certification",
-                Issuer = "Notion",
-                IssueDate = new DateTime(2025, 10, 20),
-                CredentialUrl = "https://www.notion.so/",
-                LogoUrl = "/images/certificates/notion.png"
+                Name = "Operadores Aritméticos em C#",
+                Issuer = "Digital Innovation One (DIO)",
+                IssueDate = new DateTime(2025, 7, 20),
+                CredentialUrl = "/certificates/Operadores Aritméticos em C#.pdf",
+                LogoUrl = "/images/certificates/dio.png"
             },
             new Certificate
             {
                 Id = Guid.NewGuid(),
-                Name = "Notion Essentials Badge",
-                Issuer = "Notion",
-                IssueDate = new DateTime(2025, 9, 15),
-                CredentialUrl = "https://www.notion.so/",
-                LogoUrl = "/images/certificates/notion.png"
+                Name = "Tipos de Operadores em C#",
+                Issuer = "Digital Innovation One (DIO)",
+                IssueDate = new DateTime(2025, 7, 22),
+                CredentialUrl = "/certificates/Tipos de Operadores em C#.pdf",
+                LogoUrl = "/images/certificates/dio.png"
+            },
+            new Certificate
+            {
+                Id = Guid.NewGuid(),
+                Name = "Conhecendo a Organização de um Programa C#",
+                Issuer = "Digital Innovation One (DIO)",
+                IssueDate = new DateTime(2025, 7, 25),
+                CredentialUrl = "/certificates/Conhecendo a Organização de um Programa C#.pdf",
+                LogoUrl = "/images/certificates/dio.png"
+            },
+            new Certificate
+            {
+                Id = Guid.NewGuid(),
+                Name = "Conhecendo as Estruturas de Repetição em C#",
+                Issuer = "Digital Innovation One (DIO)",
+                IssueDate = new DateTime(2025, 7, 28),
+                CredentialUrl = "/certificates/Conhecendo as Estruturas de Repetição em C#.pdf",
+                LogoUrl = "/images/certificates/dio.png"
+            },
+            new Certificate
+            {
+                Id = Guid.NewGuid(),
+                Name = "Array e Listas em C#",
+                Issuer = "Digital Innovation One (DIO)",
+                IssueDate = new DateTime(2025, 8, 1),
+                CredentialUrl = "/certificates/Array e Listas em C#.pdf",
+                LogoUrl = "/images/certificates/dio.png"
+            },
+            new Certificate
+            {
+                Id = Guid.NewGuid(),
+                Name = "Propriedades, Métodos e Construtores com C#",
+                Issuer = "Digital Innovation One (DIO)",
+                IssueDate = new DateTime(2025, 8, 5),
+                CredentialUrl = "/certificates/Propriedades, Métodos e Construtores com C#.pdf",
+                LogoUrl = "/images/certificates/dio.png"
+            },
+            new Certificate
+            {
+                Id = Guid.NewGuid(),
+                Name = "Comentários e Boas Práticas em C#",
+                Issuer = "Digital Innovation One (DIO)",
+                IssueDate = new DateTime(2025, 8, 8),
+                CredentialUrl = "/certificates/Comentários e Boas Práticas em C#.pdf",
+                LogoUrl = "/images/certificates/dio.png"
             }
         );
 

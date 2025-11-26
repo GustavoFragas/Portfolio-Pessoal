@@ -105,7 +105,7 @@ export default function Certificates() {
                     rel="noopener noreferrer"
                     className="flex items-center justify-center gap-2 text-purple-400 hover:text-purple-300 transition-colors"
                   >
-                    <FaExternalLinkAlt /> Ver Credencial
+                    <FaExternalLinkAlt /> Ver Certificado
                   </a>
                 </div>
               ))}
