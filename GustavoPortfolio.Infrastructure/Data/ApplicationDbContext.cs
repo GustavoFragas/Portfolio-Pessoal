@@ -253,6 +253,15 @@ public class ApplicationDbContext : DbContext
                 IssueDate = new DateTime(2025, 8, 8),
                 CredentialUrl = "/certificates/Comentários e Boas Práticas em C#.pdf",
                 LogoUrl = "/images/certificates/dio.png"
+            },
+            new Certificate
+            {
+                Id = Guid.NewGuid(),
+                Name = "Notion Certified Admin",
+                Issuer = "Notion",
+                IssueDate = new DateTime(2025, 10, 15),
+                CredentialUrl = "https://www.credly.com/badges/b42ef774-8d31-4ede-bd53-2166f9b30946",
+                LogoUrl = "/certificates/notion-certified-admin.png"
             }
         );
 
