@@ -29,15 +29,11 @@ export default function Certificates() {
   };
 
   const nextSlide = () => {
-    if (currentIndex < certificates.length - 1) {
-      setCurrentIndex((prev) => prev + 1);
-    }
+    setCurrentIndex((prev) => (prev + 1) % certificates.length);
   };
 
   const prevSlide = () => {
-    if (currentIndex > 0) {
-      setCurrentIndex((prev) => prev - 1);
-    }
+    setCurrentIndex((prev) => (prev - 1 + certificates.length) % certificates.length);
   };
 
   if (loading) {
@@ -63,16 +59,14 @@ export default function Certificates() {
             <>
               <button
                 onClick={prevSlide}
-                disabled={currentIndex === 0}
-                className="absolute left-0 top-1/2 -translate-y-1/2 -translate-x-4 z-10 p-3 bg-gray-700 rounded-full hover:bg-gray-600 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                className="absolute left-0 top-1/2 -translate-y-1/2 -translate-x-4 z-10 p-3 bg-gray-700 rounded-full hover:bg-gray-600 transition-colors"
                 aria-label="Previous"
               >
                 <FaChevronLeft />
               </button>
               <button
                 onClick={nextSlide}
-                disabled={currentIndex >= certificates.length - 3}
-                className="absolute right-0 top-1/2 -translate-y-1/2 translate-x-4 z-10 p-3 bg-gray-700 rounded-full hover:bg-gray-600 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                className="absolute right-0 top-1/2 -translate-y-1/2 translate-x-4 z-10 p-3 bg-gray-700 rounded-full hover:bg-gray-600 transition-colors"
                 aria-label="Next"
               >
                 <FaChevronRight />
@@ -89,14 +83,14 @@ export default function Certificates() {
               {certificates.map((cert) => (
                 <div
                   key={cert.id}
-                  className="min-w-[calc(33.33%-1rem)] flex-shrink-0 bg-gray-800 rounded-lg p-6 hover:shadow-2xl hover:shadow-purple-500/30 transition-shadow duration-300 flex flex-col border border-gray-700 hover:border-purple-500/50"
+                  className="min-w-[calc(33.33%-1rem)] max-w-[calc(33.33%-1rem)] flex-shrink-0 bg-gray-800 rounded-lg p-6 hover:shadow-2xl hover:shadow-purple-500/30 transition-shadow duration-300 flex flex-col border border-gray-700 hover:border-purple-500/50 h-[320px]"
                 >
                   <div className="flex items-center justify-center h-16 mb-4">
                     <div className="text-4xl">🏆</div>
                   </div>
-                  <h3 className="text-lg font-bold mb-2 text-center min-h-[3.5rem] flex items-center justify-center leading-snug px-1">{cert.name}</h3>
-                  <p className="text-blue-400 text-center mb-2">{cert.issuer}</p>
-                  <p className="text-sm text-gray-400 text-center mb-4">
+                  <h3 className="text-base font-bold mb-2 text-center flex items-center justify-center leading-tight px-2 flex-grow-0">{cert.name}</h3>
+                  <p className="text-blue-400 text-center mb-2 text-sm">{cert.issuer}</p>
+                  <p className="text-xs text-gray-400 text-center mb-4">
                     {formatDate(cert.issueDate)}
                   </p>
                   <a
