@@ -179,7 +179,7 @@ public class ApplicationDbContext : DbContext
                 Name = "Sintaxe Básica com .NET C#",
                 Issuer = "Digital Innovation One (DIO)",
                 IssueDate = new DateTime(2025, 7, 15),
-                CredentialUrl = "/certificates/Sintaxe Básica com .NET C#.pdf",
+                CredentialUrl = "/certificates/Sintaxe Básica com .NET CSharp.pdf",
                 LogoUrl = "/images/certificates/dio.png"
             },
             new Certificate
@@ -188,7 +188,7 @@ public class ApplicationDbContext : DbContext
                 Name = "Sintaxe e Tipos de Dados em C#",
                 Issuer = "Digital Innovation One (DIO)",
                 IssueDate = new DateTime(2025, 7, 18),
-                CredentialUrl = "/certificates/Sintaxe e Tipos de Dados em C#.pdf",
+                CredentialUrl = "/certificates/Sintaxe e Tipos de Dados em CSharp.pdf",
                 LogoUrl = "/images/certificates/dio.png"
             },
             new Certificate
@@ -197,7 +197,7 @@ public class ApplicationDbContext : DbContext
                 Name = "Operadores Aritméticos em C#",
                 Issuer = "Digital Innovation One (DIO)",
                 IssueDate = new DateTime(2025, 7, 20),
-                CredentialUrl = "/certificates/Operadores Aritméticos em C#.pdf",
+                CredentialUrl = "/certificates/Operadores Aritméticos em CSharp.pdf",
                 LogoUrl = "/images/certificates/dio.png"
             },
             new Certificate
@@ -206,7 +206,7 @@ public class ApplicationDbContext : DbContext
                 Name = "Tipos de Operadores em C#",
                 Issuer = "Digital Innovation One (DIO)",
                 IssueDate = new DateTime(2025, 7, 22),
-                CredentialUrl = "/certificates/Tipos de Operadores em C#.pdf",
+                CredentialUrl = "/certificates/Tipos de Operadores em CSharp.pdf",
                 LogoUrl = "/images/certificates/dio.png"
             },
             new Certificate
@@ -215,7 +215,7 @@ public class ApplicationDbContext : DbContext
                 Name = "Conhecendo a Organização de um Programa C#",
                 Issuer = "Digital Innovation One (DIO)",
                 IssueDate = new DateTime(2025, 7, 25),
-                CredentialUrl = "/certificates/Conhecendo a Organização de um Programa C#.pdf",
+                CredentialUrl = "/certificates/Conhecendo a Organização de um Programa CSharp.pdf",
                 LogoUrl = "/images/certificates/dio.png"
             },
             new Certificate
@@ -224,7 +224,7 @@ public class ApplicationDbContext : DbContext
                 Name = "Conhecendo as Estruturas de Repetição em C#",
                 Issuer = "Digital Innovation One (DIO)",
                 IssueDate = new DateTime(2025, 7, 28),
-                CredentialUrl = "/certificates/Conhecendo as Estruturas de Repetição em C#.pdf",
+                CredentialUrl = "/certificates/Conhecendo as Estruturas de Repetição em CSharp.pdf",
                 LogoUrl = "/images/certificates/dio.png"
             },
             new Certificate
@@ -233,7 +233,7 @@ public class ApplicationDbContext : DbContext
                 Name = "Array e Listas em C#",
                 Issuer = "Digital Innovation One (DIO)",
                 IssueDate = new DateTime(2025, 8, 1),
-                CredentialUrl = "/certificates/Array e Listas em C#.pdf",
+                CredentialUrl = "/certificates/Array e Listas em CSharp.pdf",
                 LogoUrl = "/images/certificates/dio.png"
             },
             new Certificate
@@ -242,7 +242,7 @@ public class ApplicationDbContext : DbContext
                 Name = "Propriedades, Métodos e Construtores com C#",
                 Issuer = "Digital Innovation One (DIO)",
                 IssueDate = new DateTime(2025, 8, 5),
-                CredentialUrl = "/certificates/Propriedades, Métodos e Construtores com C#.pdf",
+                CredentialUrl = "/certificates/Propriedades, Métodos e Construtores com CSharp.pdf",
                 LogoUrl = "/images/certificates/dio.png"
             },
             new Certificate
@@ -251,7 +251,7 @@ public class ApplicationDbContext : DbContext
                 Name = "Comentários e Boas Práticas em C#",
                 Issuer = "Digital Innovation One (DIO)",
                 IssueDate = new DateTime(2025, 8, 8),
-                CredentialUrl = "/certificates/Comentários e Boas Práticas em C#.pdf",
+                CredentialUrl = "/certificates/Comentários e Boas Práticas em CSharp.pdf",
                 LogoUrl = "/images/certificates/dio.png"
             },
             new Certificate
