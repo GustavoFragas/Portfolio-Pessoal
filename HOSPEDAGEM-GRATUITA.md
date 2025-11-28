@@ -1,5 +1,34 @@
 # 🚀 Guia de Hospedagem GRATUITA - Portfolio Fullstack
 
+## 📌 Status atual (hoje)
+
+- ✅ **PASSO 1 (Frontend na Vercel)** concluído
+  - Projeto importado da GitHub
+  - Build configurado com `Root Directory = client`
+  - Variável `VITE_API_BASE_URL = http://localhost:5167` criada
+  - Frontend publicado em `https://portfolio-pessoal-ten-lovat.vercel.app/`
+- ✅ **Web App da API criado na Azure**
+  - Nome: `portfolio-api-gustavo` (Free F1, Linux, .NET 10 LTS)
+  - CI/CD configurado com GitHub Actions para o repositório `Portfolio-Pessoal`
+- ⚠️ **Deploy da API na Azure ainda com erro de runtime**
+  - Build e deploy no GitHub Actions estão verdes
+  - Ao acessar a URL da API aparece "Application Error"
+
+### O que falta fazer amanhã
+
+1. Abrir os **logs de aplicação (Log stream / Diagnose and solve problems)** do Web App e identificar o erro de runtime.
+2. Ajustar o código ou configuração da API conforme o erro (por exemplo, versão de .NET, caminho, configuração de hosting).
+3. Confirmar que o Swagger abre em:
+   - `https://portfolio-api-gustavo-....azurewebsites.net/swagger`
+4. Configurar as **Application Settings** no Web App (se ainda não estiverem):
+   - `ASPNETCORE_ENVIRONMENT = Production`
+   - `UseInMemoryDatabase = true`
+5. Atualizar na **Vercel** a variável:
+   - `VITE_API_BASE_URL = https://portfolio-api-gustavo-....azurewebsites.net`
+6. Fazer **Redeploy** do frontend na Vercel e testar o site completo (dados, certificados, navegação).
+
+---
+
 ## 🎯 Objetivo
 Hospedar seu portfolio **100% GRÁTIS** com URLs profissionais para compartilhar no LinkedIn e GitHub.
 
@@ -8,12 +37,12 @@ Hospedar seu portfolio **100% GRÁTIS** com URLs profissionais para compartilhar
 ## 📋 O Que Você Vai Ter
 
 **Frontend:** `https://seu-nome.vercel.app` (Grátis para sempre)  
-**Backend API:** `https://seu-nome.up.railway.app` (Grátis com $5 crédito/mês)  
+**Backend API:** `https://seu-nome.azurewebsites.net` (Azure App Service Free)  
 **GitHub:** `https://github.com/GustavoFragas/Portfolio-Pessoal` ✅ Já está pronto!
 
 ---
 
-## 🌐 PASSO 1: Hospedar Frontend (Vercel) - 100% GRÁTIS
+## 🌐 PASSO 1: Hospedar Frontend (Vercel) - 100% GRÁTIS ✅ **(JÁ CONCLUÍDO)**
 
 ### Por que Vercel?
 - ✅ **Grátis para sempre** (sem cartão de crédito)
@@ -58,63 +87,82 @@ Na tela de configuração, preencha:
 
 **URL:** `https://portfolio-pessoal-[seu-hash].vercel.app`
 
+> **Você já concluiu todo o PASSO 1 (Vercel)**. Seu frontend está online nessa URL, apenas aguardando o backend em produção.
+
 ---
 
-## 🚂 PASSO 2: Hospedar Backend (Railway) - GRÁTIS ($5/mês)
+## PASSO 2: Hospedar Backend (Azure App Service Free)
 
-### Por que Railway?
-- ✅ **$5 de crédito grátis por mês** (suficiente para projetos pequenos)
-- ✅ Suporte nativo a .NET
-- ✅ Deploy automático do GitHub
-- ✅ PostgreSQL grátis (se precisar)
+### Por que Azure App Service?
+- **Runtime .NET nativo** (sem precisar configurar Docker)
+- **Plano F1 (Free)** suficiente para portfolio pessoal
+- **Deploy integrado com GitHub**
+- **HTTPS grátis**
 
 ### Passos:
 
 #### 2.1. Criar Conta
-1. Acesse: https://railway.app
-2. Clique em **"Login"**
-3. Escolha **"Login with GitHub"**
-4. Autorize o Railway
+1. Acesse: https://portal.azure.com
+2. Faça login com sua conta Microsoft (Outlook/Hotmail/etc.) ou crie uma conta nova
 
-#### 2.2. Criar Novo Projeto
-1. Clique em **"New Project"**
-2. Escolha **"Deploy from GitHub repo"**
-3. Selecione **"Portfolio-Pessoal"**
-4. Clique em **"Deploy Now"**
+> Em alguns casos, a Azure pode pedir um cartão apenas para verificação, mas você usará o **plano gratuito F1**.
 
-#### 2.3. Configurar Variáveis de Ambiente
-1. No dashboard do projeto, clique na aba **"Variables"**
-2. Adicione as seguintes variáveis:
+#### 2.2. Criar um App Service para a API
+1. No portal Azure, clique em **"Create a resource"**
+2. Procure por **"Web App"**
+3. Clique em **"Create"** (Create Web App)
+4. Preencha:
+   - **Subscription:** sua assinatura padrão
+   - **Resource Group:** crie um novo, por exemplo `rg-portfolio`
+   - **Name:** `portfolio-api-seu-nome` (esse nome vira `https://portfolio-api-seu-nome.azurewebsites.net`)
+   - **Publish:** `Code`
+   - **Runtime stack:** `.NET`
+   - **Operating System:** `Linux`
+   - **Region:** escolha uma região próxima (por exemplo, `Brazil South` ou `East US`)
+   - **Pricing Plan:** clique em **"Change plan"** e selecione **F1 (Free)**
+5. Clique em **"Review + create"** e depois em **"Create"**
 
-```
-ASPNETCORE_ENVIRONMENT=Production
-ASPNETCORE_URLS=http://0.0.0.0:$PORT
-UseInMemoryDatabase=true
-```
+#### 2.3. Publicar a API usando GitHub Actions (recomendado)
+1. Depois que o Web App for criado, abra o recurso **Web App** que você acabou de criar
+2. No menu lateral, vá em **"Deployment Center"**
+3. Em **Source**, escolha **GitHub**
+4. Conecte sua conta GitHub (se ainda não estiver conectada)
+5. Selecione:
+   - **Organization:** sua conta
+   - **Repository:** `Portfolio-Pessoal`
+   - **Branch:** `main`
+6. Em **Build provider**, escolha **GitHub Actions**
+7. Em **Runtime stack / .NET**, mantenha o padrão detectado pela Azure
+8. Clique em **"Save"** / **"Finish"**; a Azure vai criar um workflow do GitHub Actions para buildar e publicar a API sempre que você der push na `main`.
 
-**Importante:** Railway fornece a variável `$PORT` automaticamente.
+#### 2.4. Configurar variáveis de ambiente na Azure
+1. No Web App, no menu lateral, vá em **"Configuration"**
+2. Aba **"Application settings"**
+3. Clique em **"New application setting"** e adicione:
 
-#### 2.4. Configurar Build
-1. Clique em **"Settings"**
-2. Em **"Build"**, configure:
-   - **Build Command:** (deixe vazio, Railway detecta automaticamente)
-   - **Start Command:** `dotnet run --project GustavoPortfolio.API/GustavoPortfolio.API.csproj`
+   - **Name:** `ASPNETCORE_ENVIRONMENT`  
+     **Value:** `Production`
 
-#### 2.5. Gerar Domínio Público
-1. Clique em **"Settings"**
-2. Em **"Networking"**, clique em **"Generate Domain"**
-3. Railway criará uma URL pública: `https://seu-projeto.up.railway.app`
+   - **Name:** `UseInMemoryDatabase`  
+     **Value:** `true`
 
-#### 2.6. Aguardar Deploy
-- O primeiro deploy pode levar 5-10 minutos
-- Acompanhe os logs em **"Deployments"**
-- ✅ Quando aparecer "Application started", está pronto!
+4. Clique em **"Save"** e confirme o restart do Web App
 
-**URL:** `https://seu-projeto.up.railway.app`
+#### 2.5. Verificar a URL da API
+1. Na página do Web App, veja o campo **"Default domain"**
+2. Será algo como:
+
+   `https://portfolio-api-seu-nome.azurewebsites.net`
+
+3. Acesse essa URL + `/swagger` para testar:
+
+   `https://portfolio-api-seu-nome.azurewebsites.net/swagger`
+
+Se o Swagger abrir, sua API está rodando em produção.
 
 ---
 
-## 🔗 PASSO 3: Conectar Frontend com Backend
+## PASSO 3: Conectar Frontend com Backend
 
 Agora que o backend está no ar, vamos atualizar o frontend:
 
@@ -123,7 +171,7 @@ Agora que o backend está no ar, vamos atualizar o frontend:
 2. Selecione seu projeto
 3. Vá em **"Settings"** → **"Environment Variables"**
 4. Edite `VITE_API_BASE_URL`:
-   - **Novo valor:** `https://seu-projeto.up.railway.app` (URL do Railway)
+   - **Novo valor:** `https://portfolio-api-seu-nome.azurewebsites.net` (URL do Azure App Service que você copiou no PASSO 2)
 5. Clique em **"Save"**
 
 ### 3.2. Fazer Redeploy
@@ -132,81 +180,35 @@ Agora que o backend está no ar, vamos atualizar o frontend:
 3. Clique em **"Redeploy"**
 4. Aguarde 2 minutos
 
-✅ **Pronto! Seu portfolio está 100% funcional e online!**
+**Pronto! Seu portfolio está 100% funcional e online!**
 
 ---
 
-## 🔧 PASSO 4: Atualizar CORS no Backend
-
-Para o frontend acessar o backend, precisamos atualizar o CORS:
-
-### 4.1. Editar Program.cs
-No arquivo `GustavoPortfolio.API/Program.cs`, encontre:
-
-```csharp
-builder.Services.AddCors(options =>
-{
-    options.AddPolicy("AllowFrontend",
-        policy => policy
-            .WithOrigins("http://localhost:5173")
-            .AllowAnyMethod()
-            .AllowAnyHeader());
-});
-```
-
-### 4.2. Adicionar URL da Vercel
-Atualize para:
-
-```csharp
-builder.Services.AddCors(options =>
-{
-    options.AddPolicy("AllowFrontend",
-        policy => policy
-            .WithOrigins(
-                "http://localhost:5173",
-                "https://seu-portfolio.vercel.app"  // ← Adicione sua URL da Vercel aqui
-            )
-            .AllowAnyMethod()
-            .AllowAnyHeader());
-});
-```
-
-### 4.3. Fazer Commit e Push
-```bash
-git add .
-git commit -m "feat: Adicionar URL da Vercel no CORS"
-git push
-```
-
-O Railway fará deploy automático em 2-3 minutos!
-
----
-
-## ✅ CHECKLIST FINAL
+## CHECKLIST FINAL
 
 ### Verificar se está tudo funcionando:
 
-- [ ] **Frontend no ar:** Acesse `https://seu-portfolio.vercel.app`
-- [ ] **Backend no ar:** Acesse `https://seu-projeto.up.railway.app/swagger`
-- [ ] **Integração funcionando:** Teste se os dados aparecem no frontend
-- [ ] **Certificados abrindo:** Clique em "Ver Certificado" e veja se o PDF abre
-- [ ] **Links do GitHub funcionando:** Teste os botões de repositório
-- [ ] **Smooth scroll funcionando:** Clique nos links do menu
+- **Frontend no ar:** Acesse `https://seu-portfolio.vercel.app`
+- **Backend no ar:** Acesse `https://portfolio-api-seu-nome.azurewebsites.net/swagger`
+- **Integração funcionando:** Teste se os dados aparecem no frontend
+- **Certificados abrindo:** Clique em "Ver Certificado" e veja se o PDF abre
+- **Links do GitHub funcionando:** Teste os botões de repositório
+- **Smooth scroll funcionando:** Clique nos links do menu
 
 ---
 
-## 🎯 URLs Finais para Compartilhar
+## URLs Finais para Compartilhar
 
 Após o deploy, você terá:
 
-**🌐 Portfolio:** `https://seu-portfolio.vercel.app`  
-**📡 API:** `https://seu-projeto.up.railway.app`  
-**📚 Swagger:** `https://seu-projeto.up.railway.app/swagger`  
-**💻 GitHub:** `https://github.com/GustavoFragas/Portfolio-Pessoal`
+**Portfolio:** `https://seu-portfolio.vercel.app`  
+**API:** `https://portfolio-api-seu-nome.azurewebsites.net`  
+**Swagger:** `https://portfolio-api-seu-nome.azurewebsites.net/swagger`  
+**GitHub:** `https://github.com/GustavoFragas/Portfolio-Pessoal`
 
 ---
 
-## 📱 PASSO 5: Adicionar no LinkedIn
+## PASSO 5: Adicionar no LinkedIn
 
 ### 5.1. Seção "Projetos"
 1. Vá no seu perfil do LinkedIn
@@ -226,24 +228,23 @@ Após o deploy, você terá:
 
 ---
 
-## 💰 Custos
+## Custos
 
 ### Vercel (Frontend)
 - **Plano:** Hobby (Grátis)
 - **Limite:** 100 GB bandwidth/mês
-- **Custo:** **$0/mês** ✅
+- **Custo:** **$0/mês** 
 
-### Railway (Backend)
-- **Plano:** Trial
-- **Crédito:** $5/mês grátis
-- **Uso estimado:** ~$2-3/mês (com InMemory DB)
-- **Custo:** **$0/mês** ✅ (dentro do crédito grátis)
+### Azure App Service (Backend)
+- **Plano:** F1 Free (Web App for Linux)
+- **Uso estimado:** suficiente para portfolio e testes
+- **Custo:** **$0/mês** (dentro dos limites gratuitos)
 
-**Total: $0/mês** 🎉
+**Total: $0/mês** 
 
 ---
 
-## 🔄 Atualizações Futuras
+## Atualizações Futuras
 
 Quando você atualizar o código:
 
@@ -254,14 +255,14 @@ git commit -m "feat: Nova funcionalidade"
 git push
 ```
 
-2. **Vercel:** Deploy automático em 2 minutos ✅
-3. **Railway:** Deploy automático em 3-5 minutos ✅
+2. **Vercel:** Deploy automático em 2 minutos 
+3. **Azure App Service:** Deploy automático via GitHub Actions 
 
 Não precisa fazer nada manual!
 
 ---
 
-## 🆘 Troubleshooting
+## Troubleshooting
 
 ### Erro: "Failed to fetch"
 **Causa:** Frontend não consegue acessar o backend  
@@ -269,7 +270,7 @@ Não precisa fazer nada manual!
 
 ### Erro: "Application failed to start"
 **Causa:** Erro no build do .NET  
-**Solução:** Verifique os logs no Railway e teste `dotnet build` localmente
+**Solução:** Verifique os logs no Azure (Log stream / Deployments) e teste `dotnet build` localmente
 
 ### Erro: "Certificate not found"
 **Causa:** PDFs não foram copiados  
@@ -277,26 +278,26 @@ Não precisa fazer nada manual!
 
 ### Frontend carrega mas não mostra dados
 **Causa:** Backend não está respondendo  
-**Solução:** Acesse `https://seu-projeto.up.railway.app/swagger` e veja se a API está no ar
+**Solução:** Acesse `https://portfolio-api-seu-nome.azurewebsites.net/swagger` e veja se a API está no ar
 
 ---
 
-## 🎉 Parabéns!
+## Parabéns!
 
 Seu portfolio está no ar e pronto para impressionar recrutadores!
 
 **Próximos passos:**
-1. ✅ Compartilhe no LinkedIn
-2. ✅ Adicione no README do GitHub
-3. ✅ Envie para recrutadores
-4. ✅ Adicione no currículo
+1. Compartilhe no LinkedIn
+2. Adicione no README do GitHub
+3. Envie para recrutadores
+4. Adicione no currículo
 
 ---
 
-## 📚 Links Úteis
+## Links Úteis
 
 - **Vercel Docs:** https://vercel.com/docs
-- **Railway Docs:** https://docs.railway.app
+- **Azure App Service Docs:** https://learn.microsoft.com/azure/app-service/
 - **Seu GitHub:** https://github.com/GustavoFragas/Portfolio-Pessoal
 
 ---
