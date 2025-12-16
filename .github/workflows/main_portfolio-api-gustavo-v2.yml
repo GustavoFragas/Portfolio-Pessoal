@@ -24,10 +24,12 @@ jobs:
           dotnet-version: '9.x'
 
       - name: Build with dotnet
-        run: dotnet build --configuration Release
+        # AQUI FOI A MUDANÇA: Adicionei a pasta GustavoPortfolio.API
+        run: dotnet build GustavoPortfolio.API --configuration Release
 
       - name: dotnet publish
-        run: dotnet publish -c Release -o ${{env.DOTNET_ROOT}}/myapp
+        # AQUI TAMBÉM: Adicionei a pasta GustavoPortfolio.API
+        run: dotnet publish GustavoPortfolio.API -c Release -o ${{env.DOTNET_ROOT}}/myapp
 
       - name: Upload artifact for deployment job
         uses: actions/upload-artifact@v4
@@ -62,4 +64,3 @@ jobs:
           app-name: 'portfolio-api-gustavo-v2'
           slot-name: 'Production'
           package: .
-          
