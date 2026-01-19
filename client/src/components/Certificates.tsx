@@ -1,50 +1,25 @@
-import { useEffect, useState } from 'react';
+import { memo, useState, useCallback } from 'react';
 import { FaExternalLinkAlt, FaChevronLeft, FaChevronRight } from 'react-icons/fa';
-import { certificatesApi } from '../services/api';
+import { certificatesData } from '../data/portfolioData';
 import type { Certificate } from '../types';
 
-export default function Certificates() {
-  const [certificates, setCertificates] = useState<Certificate[]>([]);
-  const [loading, setLoading] = useState(true);
+const formatDate = (dateString: string) => {
+  const date = new Date(dateString);
+  return date.toLocaleDateString('pt-BR', { month: 'long', year: 'numeric' });
+};
+
+function Certificates() {
+  // Dados estáticos - sem necessidade de fetch
+  const certificates = certificatesData;
   const [currentIndex, setCurrentIndex] = useState(0);
 
-  useEffect(() => {
-    const fetchCertificates = async () => {
-      try {
-        const response = await certificatesApi.getAll();
-        setCertificates(response.data);
-      } catch (error) {
-        console.error('Error fetching certificates:', error);
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    fetchCertificates();
-  }, []);
-
-  const formatDate = (dateString: string) => {
-    const date = new Date(dateString);
-    return date.toLocaleDateString('pt-BR', { month: 'long', year: 'numeric' });
-  };
-
-  const nextSlide = () => {
+  const nextSlide = useCallback(() => {
     setCurrentIndex((prev) => (prev + 1) % certificates.length);
-  };
+  }, [certificates.length]);
 
-  const prevSlide = () => {
+  const prevSlide = useCallback(() => {
     setCurrentIndex((prev) => (prev - 1 + certificates.length) % certificates.length);
-  };
-
-  if (loading) {
-    return (
-      <section className="py-20 px-4">
-        <div className="max-w-6xl mx-auto text-center">
-          <p className="text-gray-400">Carregando certificados...</p>
-        </div>
-      </section>
-    );
-  }
+  }, [certificates.length]);
 
   return (
     <section id="certificates" className="py-16 md:py-20 px-4">
@@ -142,3 +117,5 @@ export default function Certificates() {
     </section>
   );
 }
+
+export default memo(Certificates);

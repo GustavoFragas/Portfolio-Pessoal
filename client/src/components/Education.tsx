@@ -1,54 +1,29 @@
-import { useEffect, useState } from 'react';
+import { memo, useMemo } from 'react';
 import { FaExternalLinkAlt } from 'react-icons/fa';
 import type { Education } from '../types';
-import { educationApi } from '../services/api';
+import { educationData } from '../data/portfolioData';
 
-export default function EducationSection() {
-  const [educations, setEducations] = useState<Education[]>([]);
-  const [loading, setLoading] = useState(true);
+const formatDate = (dateString: string) => {
+  const date = new Date(dateString);
+  return date.toLocaleDateString('pt-BR', { month: 'short', year: 'numeric' });
+};
 
-  useEffect(() => {
-    const fetchEducations = async () => {
-      try {
-        const response = await educationApi.getAll();
-        // Ordenar: BYU primeiro, depois os em andamento, depois os concluídos por data
-        const sorted = response.data.sort((a, b) => {
-          // BYU sempre primeiro
-          if (a.institution.includes('BYU')) return -1;
-          if (b.institution.includes('BYU')) return 1;
-          
-          // Depois por status (em andamento primeiro)
-          if (a.isCurrent && !b.isCurrent) return -1;
-          if (!a.isCurrent && b.isCurrent) return 1;
-          
-          // Depois por data de início (mais recente primeiro)
-          return new Date(b.startDate).getTime() - new Date(a.startDate).getTime();
-        });
-        setEducations(sorted);
-      } catch (error) {
-        console.error('Error fetching educations:', error);
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    fetchEducations();
+function EducationSection() {
+  // Dados estáticos ordenados com useMemo
+  const educations = useMemo(() => {
+    return [...educationData].sort((a, b) => {
+      // BYU sempre primeiro
+      if (a.institution.includes('BYU')) return -1;
+      if (b.institution.includes('BYU')) return 1;
+      
+      // Depois por status (em andamento primeiro)
+      if (a.isCurrent && !b.isCurrent) return -1;
+      if (!a.isCurrent && b.isCurrent) return 1;
+      
+      // Depois por data de início (mais recente primeiro)
+      return new Date(b.startDate).getTime() - new Date(a.startDate).getTime();
+    });
   }, []);
-
-  const formatDate = (dateString: string) => {
-    const date = new Date(dateString);
-    return date.toLocaleDateString('pt-BR', { month: 'short', year: 'numeric' });
-  };
-
-  if (loading) {
-    return (
-      <section className="py-20 px-4">
-        <div className="max-w-6xl mx-auto text-center">
-          <p className="text-gray-400">Carregando educação...</p>
-        </div>
-      </section>
-    );
-  }
 
   return (
     <section id="education" className="py-16 md:py-20 px-4">
@@ -107,3 +82,5 @@ export default function EducationSection() {
     </section>
   );
 }
+
+export default memo(EducationSection);

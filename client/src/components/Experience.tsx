@@ -1,40 +1,15 @@
-import { useEffect, useState } from 'react';
-import { experiencesApi } from '../services/api';
+import { memo, useMemo } from 'react';
+import { experiencesData } from '../data/portfolioData';
 import type { Experience } from '../types';
 
-export default function ExperienceSection() {
-  const [experiences, setExperiences] = useState<Experience[]>([]);
-  const [loading, setLoading] = useState(true);
+const formatDate = (dateString: string) => {
+  const date = new Date(dateString);
+  return date.toLocaleDateString('pt-BR', { month: 'short', year: 'numeric' });
+};
 
-  useEffect(() => {
-    const fetchExperiences = async () => {
-      try {
-        const response = await experiencesApi.getAll();
-        setExperiences(response.data);
-      } catch (error) {
-        console.error('Error fetching experiences:', error);
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    fetchExperiences();
-  }, []);
-
-  const formatDate = (dateString: string) => {
-    const date = new Date(dateString);
-    return date.toLocaleDateString('pt-BR', { month: 'short', year: 'numeric' });
-  };
-
-  if (loading) {
-    return (
-      <section className="py-20 px-4">
-        <div className="max-w-6xl mx-auto text-center">
-          <p className="text-gray-400">Carregando experiências...</p>
-        </div>
-      </section>
-    );
-  }
+function ExperienceSection() {
+  // Dados estáticos - sem necessidade de fetch
+  const experiences = experiencesData;
 
   return (
     <section id="experience" className="py-16 md:py-20 px-4 bg-gray-800/50">
@@ -81,3 +56,5 @@ export default function ExperienceSection() {
     </section>
   );
 }
+
+export default memo(ExperienceSection);
