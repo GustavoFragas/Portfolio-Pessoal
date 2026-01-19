@@ -23,26 +23,26 @@ export default function About({ profile }: AboutProps) {
   ];
 
   return (
-    <section id="about" className="py-20 px-4">
+    <section id="about" className="py-16 md:py-20 px-4">
       <div className="max-w-6xl mx-auto">
-        <h2 className="text-4xl font-bold mb-12 text-center">
+        <h2 className="text-3xl md:text-4xl font-bold mb-8 md:mb-12 text-center">
           Sobre <span className="text-gradient">Mim</span>
         </h2>
 
-        <div className="grid md:grid-cols-2 gap-12">
+        <div className="grid md:grid-cols-2 gap-8 md:gap-12">
           <div>
-            <h3 className="text-2xl font-semibold mb-4">Sobre Mim</h3>
-            <p className="text-gray-400 leading-relaxed mb-4">
+            <h3 className="text-xl md:text-2xl font-semibold mb-3 md:mb-4">Sobre Mim</h3>
+            <p className="text-sm md:text-base text-gray-400 leading-relaxed mb-3 md:mb-4">
               {profile.bio}
             </p>
-            <p className="text-gray-400 leading-relaxed mb-4">
+            <p className="text-sm md:text-base text-gray-400 leading-relaxed mb-3 md:mb-4">
               Minha experiência internacional na Argentina e atuação 
               como líder voluntário me ensinou gestão de equipes e análise de métricas.
             </p>
             <div className="relative inline-block">
               <button
                 onClick={copyEmail}
-                className="font-mono text-blue-400 hover:text-blue-300 transition-colors cursor-pointer"
+                className="font-mono text-sm md:text-base text-blue-400 hover:text-blue-300 transition-colors cursor-pointer break-all"
               >
                 {profile.email}
               </button>
@@ -55,18 +55,18 @@ export default function About({ profile }: AboutProps) {
           </div>
 
           <div>
-            <h3 className="text-2xl font-semibold mb-4">Idiomas</h3>
-            <div className="space-y-4">
+            <h3 className="text-xl md:text-2xl font-semibold mb-3 md:mb-4 mt-6 md:mt-0">Idiomas</h3>
+            <div className="space-y-3 md:space-y-4">
               {languages.map((lang) => (
                 <div
                   key={lang.name}
-                  className="flex items-center gap-4 p-4 bg-gray-800 rounded-lg hover:scale-105 hover:bg-gray-750 hover:shadow-xl hover:shadow-blue-500/10 transition-all duration-300 cursor-pointer group"
+                  className="flex items-center gap-3 md:gap-4 p-3 md:p-4 bg-gray-800 rounded-lg hover:bg-gray-750 transition-all duration-300 cursor-pointer group border border-gray-700"
                 >
-                  <span className="text-4xl group-hover:scale-110 transition-transform">{lang.flag}</span>
-                  <div className="flex-1">
-                    <h4 className="font-semibold group-hover:text-blue-400 transition-colors">{lang.name}</h4>
-                    <p className="text-sm text-gray-400">{lang.level}</p>
-                    <p className="text-xs text-gray-500 mt-1 group-hover:text-gray-400 transition-colors">{lang.detail}</p>
+                  <span className="text-3xl md:text-4xl">{lang.flag}</span>
+                  <div className="flex-1 min-w-0">
+                    <h4 className="font-semibold text-sm md:text-base group-hover:text-blue-400 transition-colors">{lang.name}</h4>
+                    <p className="text-xs md:text-sm text-gray-400">{lang.level}</p>
+                    <p className="text-xs text-gray-500 mt-0.5 md:mt-1 group-hover:text-gray-400 transition-colors truncate">{lang.detail}</p>
                   </div>
                 </div>
               ))}

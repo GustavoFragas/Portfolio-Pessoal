@@ -47,13 +47,45 @@ export default function Certificates() {
   }
 
   return (
-    <section id="certificates" className="py-20 px-4">
+    <section id="certificates" className="py-16 md:py-20 px-4">
       <div className="max-w-6xl mx-auto">
-        <h2 className="text-4xl font-bold mb-12 text-center">
+        <h2 className="text-3xl md:text-4xl font-bold mb-8 md:mb-12 text-center">
           Certificações & <span className="text-gradient">Licenças</span>
         </h2>
 
-        <div className="relative">
+        {/* Mobile: Grid vertical */}
+        <div className="md:hidden grid grid-cols-1 gap-4">
+          {certificates.map((cert) => (
+            <div
+              key={cert.id}
+              className="bg-gray-800 rounded-lg p-4 border border-gray-700"
+            >
+              <div className="flex items-center gap-3 mb-2">
+                <div className="text-2xl">🏆</div>
+                <div className="flex-1">
+                  <h3 className="text-sm font-bold leading-tight">{cert.name}</h3>
+                  <p className="text-blue-400 text-xs">{cert.issuer}</p>
+                </div>
+              </div>
+              <div className="flex items-center justify-between">
+                <p className="text-xs text-gray-400">
+                  {formatDate(cert.issueDate)}
+                </p>
+                <a
+                  href={cert.credentialUrl}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="flex items-center gap-1 text-purple-400 hover:text-purple-300 transition-colors text-xs"
+                >
+                  <FaExternalLinkAlt /> Ver
+                </a>
+              </div>
+            </div>
+          ))}
+        </div>
+
+        {/* Desktop: Carousel horizontal */}
+        <div className="hidden md:block relative">
           {/* Navigation Buttons */}
           {certificates.length > 3 && (
             <>

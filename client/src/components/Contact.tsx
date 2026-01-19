@@ -18,58 +18,58 @@ export default function Contact({ profile }: ContactProps) {
   };
 
   return (
-    <section id="contact" className="py-20 px-4 bg-gray-800/50">
+    <section id="contact" className="py-16 md:py-20 px-4 bg-gray-800/50">
       <div className="max-w-4xl mx-auto text-center">
-        <h2 className="text-4xl font-bold mb-8">
+        <h2 className="text-3xl md:text-4xl font-bold mb-4 md:mb-8">
           Vamos <span className="text-gradient">Conversar?</span>
         </h2>
-        <p className="text-xl text-gray-400 mb-12">
+        <p className="text-base md:text-xl text-gray-400 mb-8 md:mb-12 px-4">
           Estou sempre aberto a novas oportunidades e colaborações
         </p>
 
-        <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6 mb-12">
+        <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 md:gap-6 mb-8 md:mb-12">
           <a
             href={profile.gitHub}
             target="_blank"
             rel="noopener noreferrer"
-            className="flex flex-col items-center gap-3 p-6 bg-gray-800 rounded-lg hover:bg-gray-700 hover:scale-105 transition-all duration-300"
+            className="flex flex-col items-center gap-2 md:gap-3 p-4 md:p-6 bg-gray-800 rounded-lg hover:bg-gray-700 transition-all duration-300 border border-gray-700"
           >
-            <FaGithub className="text-4xl" />
-            <span className="font-semibold">GitHub</span>
+            <FaGithub className="text-2xl md:text-4xl" />
+            <span className="font-semibold text-sm md:text-base">GitHub</span>
           </a>
           <a
             href={profile.linkedIn}
             target="_blank"
             rel="noopener noreferrer"
-            className="flex flex-col items-center gap-3 p-6 bg-gray-800 rounded-lg hover:bg-gray-700 hover:scale-105 transition-all duration-300"
+            className="flex flex-col items-center gap-2 md:gap-3 p-4 md:p-6 bg-gray-800 rounded-lg hover:bg-gray-700 transition-all duration-300 border border-gray-700"
           >
-            <FaLinkedin className="text-4xl text-blue-500" />
-            <span className="font-semibold">LinkedIn</span>
+            <FaLinkedin className="text-2xl md:text-4xl text-blue-500" />
+            <span className="font-semibold text-sm md:text-base">LinkedIn</span>
           </a>
           <a
             href="https://www.instagram.com/fragas_gustavo/"
             target="_blank"
             rel="noopener noreferrer"
-            className="flex flex-col items-center gap-3 p-6 bg-gray-800 rounded-lg hover:bg-gray-700 hover:scale-105 transition-all duration-300"
+            className="flex flex-col items-center gap-2 md:gap-3 p-4 md:p-6 bg-gray-800 rounded-lg hover:bg-gray-700 transition-all duration-300 border border-gray-700"
           >
-            <FaInstagram className="text-4xl text-pink-500" />
-            <span className="font-semibold">Instagram</span>
+            <FaInstagram className="text-2xl md:text-4xl text-pink-500" />
+            <span className="font-semibold text-sm md:text-base">Instagram</span>
           </a>
           <a
             href="https://wa.me/5511980192710"
             target="_blank"
             rel="noopener noreferrer"
-            className="flex flex-col items-center gap-3 p-6 bg-gray-800 rounded-lg hover:bg-gray-700 hover:scale-105 transition-all duration-300"
+            className="flex flex-col items-center gap-2 md:gap-3 p-4 md:p-6 bg-gray-800 rounded-lg hover:bg-gray-700 transition-all duration-300 border border-gray-700"
           >
-            <FaWhatsapp className="text-4xl text-green-500" />
-            <span className="font-semibold">WhatsApp</span>
+            <FaWhatsapp className="text-2xl md:text-4xl text-green-500" />
+            <span className="font-semibold text-sm md:text-base">WhatsApp</span>
           </a>
         </div>
 
-        <div className="mt-8 relative inline-block">
+        <div className="mt-6 md:mt-8 relative inline-block">
           <button
             onClick={copyEmail}
-            className="font-mono text-blue-400 hover:text-blue-300 transition-colors cursor-pointer text-lg"
+            className="font-mono text-blue-400 hover:text-blue-300 transition-colors cursor-pointer text-sm md:text-lg break-all px-4"
           >
             {profile.email}
           </button>
@@ -80,7 +80,7 @@ export default function Contact({ profile }: ContactProps) {
           )}
         </div>
 
-        <div className="text-gray-400 mt-6">
+        <div className="text-gray-400 mt-4 md:mt-6 text-sm md:text-base">
           <p>{profile.location}</p>
         </div>
       </div>

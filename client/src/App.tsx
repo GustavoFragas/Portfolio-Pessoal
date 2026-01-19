@@ -63,9 +63,9 @@ function App() {
           <Contact profile={profile} />
         </Suspense>
         
-        <footer className="py-8 text-center text-gray-400 border-t border-gray-800">
-          <p>© 2025 Gustavo Fragas Cunha. Todos os direitos reservados.</p>
-          <p className="text-sm mt-2">Desenvolvido com React + TypeScript + TailwindCSS</p>
+        <footer className="py-6 md:py-8 text-center text-gray-400 border-t border-gray-800 px-4">
+          <p className="text-sm md:text-base">© 2025 Gustavo Fragas Cunha. Todos os direitos reservados.</p>
+          <p className="text-xs md:text-sm mt-2">Desenvolvido com React + TypeScript + TailwindCSS</p>
         </footer>
       </main>
     </div>
