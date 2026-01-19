@@ -1,39 +1,56 @@
-import axios from 'axios';
-import type { Profile, Project, Experience, Skill, Certificate } from '../types';
+import type { Profile, Project, Experience, Skill, Certificate, Education } from '../types';
+import {
+  profileData,
+  projectsData,
+  experiencesData,
+  skillsData,
+  certificatesData,
+  educationData
+} from '../data/portfolioData';
 
-const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:5167';
-
-const api = axios.create({
-  baseURL: `${API_BASE_URL.replace(/\/$/, '')}/api`,
-  headers: {
-    'Content-Type': 'application/json',
-  },
-});
+// Simulação de resposta de API usando dados estáticos
+// Isso permite que o site funcione sem necessidade de backend
+const createResponse = <T>(data: T) => Promise.resolve({ data });
 
 export const profileApi = {
-  getAll: () => api.get<Profile[]>('/profile'),
-  getById: (id: string) => api.get<Profile>(`/profile/${id}`),
+  getAll: () => createResponse<Profile[]>([profileData]),
+  getById: (id: string) => createResponse<Profile>(profileData),
 };
 
 export const projectsApi = {
-  getAll: () => api.get<Project[]>('/projects'),
-  getById: (id: string) => api.get<Project>(`/projects/${id}`),
+  getAll: () => createResponse<Project[]>(projectsData),
+  getById: (id: string) => createResponse<Project | undefined>(
+    projectsData.find(p => p.id === id)
+  ),
 };
 
 export const experiencesApi = {
-  getAll: () => api.get<Experience[]>('/experiences'),
-  getById: (id: string) => api.get<Experience>(`/experiences/${id}`),
+  getAll: () => createResponse<Experience[]>(experiencesData),
+  getById: (id: string) => createResponse<Experience | undefined>(
+    experiencesData.find(e => e.id === id)
+  ),
 };
 
 export const skillsApi = {
-  getAll: () => api.get<Skill[]>('/skills'),
-  getByCategory: (category: string) => api.get<Skill[]>(`/skills/by-category/${category}`),
-  getById: (id: string) => api.get<Skill>(`/skills/${id}`),
+  getAll: () => createResponse<Skill[]>(skillsData),
+  getByCategory: (category: string) => createResponse<Skill[]>(
+    skillsData.filter(s => s.category === category)
+  ),
+  getById: (id: string) => createResponse<Skill | undefined>(
+    skillsData.find(s => s.id === id)
+  ),
 };
 
 export const certificatesApi = {
-  getAll: () => api.get<Certificate[]>('/certificates'),
-  getById: (id: string) => api.get<Certificate>(`/certificates/${id}`),
+  getAll: () => createResponse<Certificate[]>(certificatesData),
+  getById: (id: string) => createResponse<Certificate | undefined>(
+    certificatesData.find(c => c.id === id)
+  ),
 };
 
-export default api;
+export const educationApi = {
+  getAll: () => createResponse<Education[]>(educationData),
+  getById: (id: string) => createResponse<Education | undefined>(
+    educationData.find(e => e.id === id)
+  ),
+};

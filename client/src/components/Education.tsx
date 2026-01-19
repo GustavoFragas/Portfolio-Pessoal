@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import { FaExternalLinkAlt } from 'react-icons/fa';
 import type { Education } from '../types';
-import axios from 'axios';
+import { educationApi } from '../services/api';
 
 export default function EducationSection() {
   const [educations, setEducations] = useState<Education[]>([]);
@@ -10,7 +10,7 @@ export default function EducationSection() {
   useEffect(() => {
     const fetchEducations = async () => {
       try {
-        const response = await axios.get<Education[]>('http://localhost:5167/api/education');
+        const response = await educationApi.getAll();
         // Ordenar: BYU primeiro, depois os em andamento, depois os concluídos por data
         const sorted = response.data.sort((a, b) => {
           // BYU sempre primeiro
