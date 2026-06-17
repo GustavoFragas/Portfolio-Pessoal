@@ -1,6 +1,5 @@
 import { memo, useMemo } from 'react';
 import { FaExternalLinkAlt } from 'react-icons/fa';
-import type { Education } from '../types';
 import { educationData } from '../data/portfolioData';
 
 const formatDate = (dateString: string) => {

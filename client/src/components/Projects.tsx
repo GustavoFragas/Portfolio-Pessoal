@@ -25,14 +25,16 @@ const ProjectCard = memo(({ project }: { project: Project }) => (
       </div>
 
       <div className="flex gap-3 md:gap-4 text-sm md:text-base">
-        <a
-          href={project.repoUrl}
-          target="_blank"
-          rel="noopener noreferrer"
-          className="flex items-center gap-1 md:gap-2 text-blue-400 hover:text-blue-300 transition-colors"
-        >
-          <FaGithub /> Repositório
-        </a>
+        {project.repoUrl && (
+          <a
+            href={project.repoUrl}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="flex items-center gap-1 md:gap-2 text-blue-400 hover:text-blue-300 transition-colors"
+          >
+            <FaGithub /> Repositório
+          </a>
+        )}
         {project.demoUrl && (
           <a
             href={project.demoUrl}

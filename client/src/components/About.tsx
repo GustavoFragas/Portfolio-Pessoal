@@ -36,8 +36,8 @@ export default function About({ profile }: AboutProps) {
               {profile.bio}
             </p>
             <p className="text-sm md:text-base text-gray-400 leading-relaxed mb-3 md:mb-4">
-              Minha experiência internacional na Argentina e atuação 
-              como líder voluntário me ensinou gestão de equipes e análise de métricas.
+              Além da parte técnica, trago experiência com comunicação trilíngue,
+              documentação, análise de métricas e colaboração com áreas não técnicas.
             </p>
             <div className="relative inline-block">
               <button

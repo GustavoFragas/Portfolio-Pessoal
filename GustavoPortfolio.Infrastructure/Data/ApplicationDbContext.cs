@@ -26,8 +26,8 @@ public class ApplicationDbContext : DbContext
         {
             Id = profileId,
             Name = "Gustavo Fragas Cunha",
-            Role = "Desenvolvedor de Software (.NET + React)",
-            Bio = "Desenvolvedor fullstack com experiência em .NET, C#, React e SQL. Transição de carreira de suporte técnico trilíngue para desenvolvimento de software, com forte experiência em liderança e resolução de problemas. Fluente em Português, Espanhol e Inglês (B2).",
+            Role = "Software Engineer C#/.NET | Backend, APIs & AI Automation",
+            Bio = "Oi, tudo bem? Sou desenvolvedor de software com foco em C#/.NET, backend, APIs, integrações e automações com IA. Trabalho transformando processos manuais e dados espalhados em sistemas mais limpos, observáveis e fáceis de manter, usando também TypeScript, React, AWS, Notion, Monday e ferramentas modernas de AI-assisted development.",
             Email = "gustavofragascunha@gmail.com",
             Phone = "+55 11 98019-2710",
             LinkedIn = "https://linkedin.com/in/gustavofragascunha",
@@ -42,11 +42,11 @@ public class ApplicationDbContext : DbContext
             {
                 Id = Guid.NewGuid(),
                 Company = "Alest Consultoria",
-                Role = "Estagiário em Desenvolvimento de Sistemas",
+                Role = "Software Engineer | Desenvolvimento de Sistemas",
                 StartDate = new DateTime(2025, 10, 27),
                 EndDate = null,
                 IsCurrent = true,
-                Description = "• Desenvolvimento Backend com TypeScript e Python\n• Criação de integrações e produtos para plataformas parceiras\n• Trabalho com Google Cloud Platform (GCP), bancos de dados SQL e NoSQL\n• Aplicação de metodologias ágeis e foco em soluções escaláveis"
+                Description = "• Desenvolvimento de APIs, integrações e automações para plataformas internas e ferramentas SaaS\n• Construção de rotinas de observabilidade, saneamento de dados e rastreio de execuções para apoiar decisões técnicas\n• Uso de C#/.NET, TypeScript, Node.js, React, AWS, SQL/NoSQL e integrações com Notion, Monday e Google APIs\n• Aplicação prática de AI-assisted development com Codex, Kiro e Windsurf para acelerar entregas com revisão técnica"
             },
             new Experience
             {
@@ -132,9 +132,9 @@ public class ApplicationDbContext : DbContext
             new Project
             {
                 Id = Guid.NewGuid(),
-                Title = "Portfólio Pessoal Fullstack",
-                Description = "Portfólio profissional desenvolvido com arquitetura Clean Architecture, demonstrando habilidades em .NET e React. API RESTful com Swagger e frontend responsivo com design moderno.",
-                TechStack = ".NET 9, React, TypeScript, TailwindCSS, Entity Framework",
+                Title = "Portfólio Técnico",
+                Description = "Portfolio profissional com frontend responsivo em React/Vite, dados centralizados em TypeScript e backend .NET mantido como referência arquitetural para API, entidades, repositórios e testes.",
+                TechStack = "React, TypeScript, TailwindCSS, .NET 10, Clean Architecture",
                 RepoUrl = "https://github.com/GustavoFragas/Portfolio-Pessoal",
                 DemoUrl = null,
                 ImageUrl = "/images/projects/portfolio.jpg",

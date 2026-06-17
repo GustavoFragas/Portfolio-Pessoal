@@ -1,6 +1,5 @@
-import { memo, useMemo } from 'react';
+import { memo } from 'react';
 import { experiencesData } from '../data/portfolioData';
-import type { Experience } from '../types';
 
 const formatDate = (dateString: string) => {
   const date = new Date(dateString);

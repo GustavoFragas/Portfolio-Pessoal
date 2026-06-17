@@ -4,8 +4,8 @@ import type { Profile, Project, Experience, Skill, Certificate, Education } from
 export const profileData: Profile = {
   id: "1",
   name: "Gustavo Fragas Cunha",
-  role: "Desenvolvedor de Software (.NET + React)",
-  bio: "Desenvolvedor fullstack com experiência em .NET, C#, React e SQL. Transição de carreira de suporte técnico trilíngue para desenvolvimento de software, com forte experiência em liderança e resolução de problemas. Fluente em Português, Espanhol e Inglês (B2).",
+  role: "Software Engineer C#/.NET | Backend, APIs & AI Automation",
+  bio: "Oi, tudo bem? Sou desenvolvedor de software com foco em C#/.NET, backend, APIs, integrações e automações com IA. Trabalho transformando processos manuais e dados espalhados em sistemas mais limpos, observáveis e fáceis de manter, usando também TypeScript, React, AWS, Notion, Monday e ferramentas modernas de AI-assisted development.",
   email: "gustavofragascunha@gmail.com",
   phone: "+55 11 98019-2710",
   linkedIn: "https://linkedin.com/in/gustavofragascunha",
@@ -19,11 +19,11 @@ export const experiencesData: Experience[] = [
   {
     id: "1",
     company: "Alest Consultoria",
-    role: "Estagiário em Desenvolvimento de Sistemas",
+    role: "Software Engineer | Desenvolvimento de Sistemas",
     startDate: "2025-10-27",
     endDate: undefined,
     isCurrent: true,
-    description: "• Desenvolvimento Backend com TypeScript e Python\n• Criação de integrações e produtos para plataformas parceiras\n• Trabalho com Google Cloud Platform (GCP), bancos de dados SQL e NoSQL\n• Aplicação de metodologias ágeis e foco em soluções escaláveis"
+    description: "• Desenvolvimento de APIs, integrações e automações para plataformas internas e ferramentas SaaS\n• Construção de rotinas de observabilidade, saneamento de dados e rastreio de execuções para apoiar decisões técnicas\n• Uso de C#/.NET, TypeScript, Node.js, React, AWS, SQL/NoSQL e integrações com Notion, Monday e Google APIs\n• Aplicação prática de AI-assisted development com Codex, Kiro e Windsurf para acelerar entregas com revisão técnica"
   },
   {
     id: "2",
@@ -32,7 +32,7 @@ export const experiencesData: Experience[] = [
     startDate: "2025-08-01",
     endDate: "2025-10-31",
     isCurrent: false,
-    description: "• Suporte técnico especializado para plataformas Meta (Facebook, Instagram, WhatsApp)\n• Atendimento trilíngue (Português, Espanhol, Inglês) com resolução de 95% dos casos no primeiro contato\n• Redução de 30% no tempo médio de atendimento através de otimização de processos"
+    description: "• Suporte técnico especializado para plataformas Meta, com análise de incidentes, comunicação clara e priorização de problemas\n• Atendimento trilíngue em Português, Espanhol e Inglês, atuando em cenários de alta pressão e alto volume\n• Criação de documentação e melhoria de processos para reduzir retrabalho e acelerar resolução de chamados"
   },
   {
     id: "3",
@@ -41,7 +41,7 @@ export const experiencesData: Experience[] = [
     startDate: "2023-03-01",
     endDate: "2025-04-30",
     isCurrent: false,
-    description: "• Liderança e gestão de equipe de 70+ pessoas, resultando em crescimento de 210% nas métricas principais (38 para 118 batizados)\n• Implementação de sistema de treinamento que capacitou 70+ pessoas, aumentando a produtividade em 40%\n• Gestão de dados e análise de métricas usando Excel, otimizando processos e tomada de decisões estratégicas"
+    description: "• Liderança e treinamento de equipes multiculturais, com foco em comunicação, rotina e acompanhamento de indicadores\n• Organização de dados operacionais, análise de métricas e padronização de processos para apoiar decisões locais\n• Experiência internacional na Argentina, fortalecendo fluência em Espanhol e colaboração em contextos diversos"
   },
   {
     id: "4",
@@ -50,74 +50,99 @@ export const experiencesData: Experience[] = [
     startDate: "2021-05-01",
     endDate: "2022-11-30",
     isCurrent: false,
-    description: "• Suporte técnico em ambiente hospitalar com sistema Tasy (gestão hospitalar)\n• Atendimento a 50+ usuários diários, mantendo 98% de satisfação\n• Redução de 25% no tempo de resolução de incidentes através de documentação de processos e criação de base de conhecimento"
+    description: "• Suporte técnico em ambiente hospitalar com sistema Tasy e atendimento a usuários internos\n• Diagnóstico de incidentes, documentação de processos e criação de base de conhecimento\n• Experiência inicial com operação crítica, suporte a sistemas e comunicação com áreas não técnicas"
   }
 ];
 
 // Dados das Skills
 export const skillsData: Skill[] = [
   // Backend
-  { id: "1", name: "C#", category: "Backend", level: 55 },
-  { id: "2", name: ".NET", category: "Backend", level: 50 },
-  { id: "3", name: "Python", category: "Backend", level: 60 },
-  { id: "4", name: "TypeScript", category: "Backend", level: 45 },
-  { id: "5", name: "PHP", category: "Backend", level: 40 },
-  { id: "6", name: "Laravel", category: "Backend", level: 30 },
+  { id: "1", name: "C#", category: "Backend", level: 78 },
+  { id: "2", name: ".NET / ASP.NET Core", category: "Backend", level: 76 },
+  { id: "3", name: "API REST", category: "Backend", level: 78 },
+  { id: "4", name: "TypeScript", category: "Backend", level: 72 },
+  { id: "5", name: "Node.js", category: "Backend", level: 70 },
+  { id: "6", name: "Python", category: "Backend", level: 62 },
   
   // Frontend
-  { id: "7", name: "React.js", category: "Frontend", level: 30 },
-  { id: "8", name: "HTML5", category: "Frontend", level: 70 },
-  { id: "9", name: "CSS3", category: "Frontend", level: 70 },
-  { id: "10", name: "TailwindCSS", category: "Frontend", level: 30 },
+  { id: "7", name: "React.js", category: "Frontend", level: 68 },
+  { id: "8", name: "TypeScript UI", category: "Frontend", level: 66 },
+  { id: "9", name: "TailwindCSS", category: "Frontend", level: 64 },
+  { id: "10", name: "HTML5 / CSS3", category: "Frontend", level: 72 },
   
   // Database
-  { id: "11", name: "SQL Server", category: "Database", level: 50 },
-  { id: "12", name: "MySQL", category: "Database", level: 55 },
-  { id: "13", name: "PostgreSQL", category: "Database", level: 30 },
-  { id: "14", name: "NoSQL", category: "Database", level: 30 },
-  { id: "15", name: "phpMyAdmin", category: "Database", level: 50 },
+  { id: "11", name: "SQL Server", category: "Database", level: 68 },
+  { id: "12", name: "PostgreSQL", category: "Database", level: 62 },
+  { id: "13", name: "MySQL", category: "Database", level: 64 },
+  { id: "14", name: "NoSQL", category: "Database", level: 58 },
+  { id: "15", name: "Data Cleanup", category: "Database", level: 74 },
   
-  // Tools
-  { id: "16", name: "Git", category: "Tools", level: 60 },
-  { id: "17", name: "GitHub", category: "Tools", level: 60 },
-  { id: "18", name: "Visual Studio", category: "Tools", level: 55 },
-  { id: "19", name: "VS Code", category: "Tools", level: 65 },
-  { id: "20", name: "Windsurf IDE", category: "Tools", level: 60 },
-  { id: "21", name: "Notion", category: "Tools", level: 80 },
-  { id: "22", name: "XAMPP", category: "Tools", level: 30 },
-  { id: "23", name: "USBWebServer", category: "Tools", level: 50 },
-  { id: "24", name: "Google Cloud Platform", category: "Tools", level: 30 },
+  // Cloud & DevOps
+  { id: "16", name: "AWS", category: "Cloud & DevOps", level: 66 },
+  { id: "17", name: "Docker", category: "Cloud & DevOps", level: 58 },
+  { id: "18", name: "Git / GitHub", category: "Cloud & DevOps", level: 76 },
+  { id: "19", name: "GitHub Actions", category: "Cloud & DevOps", level: 56 },
+  { id: "20", name: "Observability", category: "Cloud & DevOps", level: 70 },
+  { id: "21", name: "Linux / macOS", category: "Cloud & DevOps", level: 64 },
+
+  // AI & Automation
+  { id: "22", name: "Codex / AI Coding", category: "AI & Automation", level: 82 },
+  { id: "23", name: "Kiro / Windsurf", category: "AI & Automation", level: 76 },
+  { id: "24", name: "Notion API", category: "AI & Automation", level: 84 },
+  { id: "25", name: "Monday API", category: "AI & Automation", level: 72 },
+  { id: "26", name: "Google APIs", category: "AI & Automation", level: 66 },
+  { id: "27", name: "Webhooks", category: "AI & Automation", level: 72 },
   
   // Soft Skills
-  { id: "25", name: "Liderança", category: "Soft Skills", level: 85 },
-  { id: "26", name: "Comunicação", category: "Soft Skills", level: 90 },
-  { id: "27", name: "Resolução de Problemas", category: "Soft Skills", level: 85 },
-  { id: "28", name: "Trabalho em Equipe", category: "Soft Skills", level: 85 },
-  { id: "29", name: "Proatividade", category: "Soft Skills", level: 90 },
+  { id: "28", name: "Liderança", category: "Soft Skills", level: 85 },
+  { id: "29", name: "Comunicação", category: "Soft Skills", level: 90 },
+  { id: "30", name: "Resolução de Problemas", category: "Soft Skills", level: 86 },
+  { id: "31", name: "Trabalho em Equipe", category: "Soft Skills", level: 86 },
+  { id: "32", name: "Proatividade", category: "Soft Skills", level: 90 },
   
   // Languages
-  { id: "30", name: "Português (Nativo)", category: "Languages", level: 100 },
-  { id: "31", name: "Espanhol (Fluente)", category: "Languages", level: 95 },
-  { id: "32", name: "Inglês (B2)", category: "Languages", level: 85 }
+  { id: "33", name: "Português (Nativo)", category: "Languages", level: 100 },
+  { id: "34", name: "Espanhol (Fluente)", category: "Languages", level: 95 },
+  { id: "35", name: "Inglês (B2)", category: "Languages", level: 85 }
 ];
 
 // Dados dos Projetos
 export const projectsData: Project[] = [
   {
     id: "1",
-    title: "Portfólio Pessoal Fullstack",
-    description: "Portfólio profissional desenvolvido com arquitetura Clean Architecture, demonstrando habilidades em .NET e React. API RESTful com Swagger e frontend responsivo com design moderno.",
-    techStack: ".NET 9, React, TypeScript, TailwindCSS, Entity Framework",
+    title: "ATS Optimizer | C#/.NET, React e IA aplicada",
+    description: "Aplicação que analisa currículo, LinkedIn e descrição de vaga para gerar melhorias ATS-friendly sem inventar experiências. Inclui backend em C#/.NET, parsing de PDF, prompts anti-alucinação, geração de PDF e frontend React.",
+    techStack: "C#, .NET, React, TypeScript, LLM, PDF Parsing",
+    repoUrl: "https://github.com/GustavoFragas/ats-optimizer",
+    demoUrl: undefined,
+    imageUrl: "/images/projects/ats-optimizer.jpg",
+    createdAt: "2026-06-01"
+  },
+  {
+    id: "2",
+    title: "Plataforma Interna de Observabilidade e Adoção Digital",
+    description: "Case profissional descrito de forma pública e segura: construção de rotinas para acompanhar uso, custo, execuções, dados e integrações de plataformas internas, apoiando análise operacional e melhoria contínua.",
+    techStack: "React, TypeScript, Node.js, AWS, APIs, Notion, Monday",
+    repoUrl: undefined,
+    demoUrl: undefined,
+    imageUrl: "/images/projects/observability.jpg",
+    createdAt: "2026-05-01"
+  },
+  {
+    id: "3",
+    title: "Portfólio Técnico",
+    description: "Portfolio profissional com frontend responsivo em React/Vite, dados centralizados em TypeScript e backend .NET mantido como referência arquitetural para API, entidades, repositórios e testes.",
+    techStack: "React, TypeScript, TailwindCSS, .NET 10, Clean Architecture",
     repoUrl: "https://github.com/GustavoFragas/Portfolio-Pessoal",
     demoUrl: "https://portfolio-pessoal-vert.vercel.app/",
     imageUrl: "/images/projects/portfolio.jpg",
     createdAt: "2025-11-01"
   },
   {
-    id: "2",
+    id: "4",
     title: "Sistema para Estacionamento",
-    description: "Sistema completo para gestão de estacionamentos com controle de entrada/saída de veículos, cálculo automático de tarifas e geração de relatórios. Desenvolvido em C# com Windows Forms.",
-    techStack: "C#, Windows Forms, SQL Server",
+    description: "Projeto em C# para praticar regras de domínio, controle de entrada e saída de veículos, cálculo de tarifas e organização de fluxo em aplicação de console.",
+    techStack: "C#, .NET, OOP",
     repoUrl: "https://github.com/GustavoFragas/Sistema-para-Estacionamento",
     demoUrl: undefined,
     imageUrl: "/images/projects/parking.jpg",
@@ -235,7 +260,7 @@ export const educationData: Education[] = [
     startDate: "2025-05-01",
     endDate: undefined,
     isCurrent: true,
-    description: "Programa internacional de desenvolvimento de software com foco em programação, banco de dados e desenvolvimento web. Instituição americana credenciada. Atualmente no 4º bloco do programa.",
+    description: "Programa internacional com foco em fundamentos de engenharia de software, programação, banco de dados, desenvolvimento web e comunicação profissional em inglês.",
     url: "https://www.byupathway.edu/"
   },
   {
@@ -246,7 +271,7 @@ export const educationData: Education[] = [
     startDate: "2025-10-01",
     endDate: undefined,
     isCurrent: true,
-    description: "Curso superior de tecnologia focado em desenvolvimento de sistemas, banco de dados e engenharia de software. 1º semestre em andamento.",
+    description: "Formação superior voltada a análise, desenvolvimento de sistemas, banco de dados, engenharia de software e construção de aplicações corporativas.",
     url: "https://www.ufbra.edu.br/"
   },
   {
@@ -257,7 +282,7 @@ export const educationData: Education[] = [
     startDate: "2020-02-01",
     endDate: "2022-12-31",
     isCurrent: false,
-    description: "Curso técnico completo em desenvolvimento de sistemas com foco em programação, banco de dados e desenvolvimento web.",
+    description: "Base técnica em programação, lógica, banco de dados, web e documentação de sistemas.",
     url: "https://www.cps.sp.gov.br/"
   },
   {
@@ -268,7 +293,7 @@ export const educationData: Education[] = [
     startDate: "2025-06-01",
     endDate: undefined,
     isCurrent: true,
-    description: "Plataforma de aprendizado com foco em .NET, C#, MySQL e desenvolvimento backend.",
+    description: "Trilhas práticas de C#, .NET, orientação a objetos, APIs, Git/GitHub e banco de dados.",
     url: "https://www.dio.me/"
   },
   {
@@ -279,29 +304,29 @@ export const educationData: Education[] = [
     startDate: "2025-11-01",
     endDate: undefined,
     isCurrent: true,
-    description: "Estudando para certificação AWS Cloud Practitioner com foco em serviços de nuvem e arquitetura AWS.",
+    description: "Estudos em serviços AWS, arquitetura cloud, serverless, fundamentos de segurança, custo e observabilidade.",
     url: "https://aws.amazon.com/certification/certified-cloud-practitioner/"
   },
   {
     id: "6",
     institution: "Autodidata",
     degree: "Estudos",
-    field: "Monday.com Platform",
+    field: "Automação e Integrações SaaS",
     startDate: "2025-10-01",
     endDate: undefined,
     isCurrent: true,
-    description: "Aprendendo gerenciamento de projetos e automação de processos com Monday.com.",
+    description: "Estudo e prática de integrações entre Notion, Monday, Google APIs, webhooks e rotinas de sincronização.",
     url: "https://monday.com/"
   },
   {
     id: "7",
     institution: "Notion",
-    degree: "Ferramenta",
-    field: "Organização e Produtividade",
+    degree: "Certificação e prática",
+    field: "Notion Admin, documentação e dados",
     startDate: "2025-10-01",
     endDate: undefined,
     isCurrent: true,
-    description: "Uso avançado do Notion para organização pessoal, gestão de projetos e documentação.",
+    description: "Uso avançado do Notion para documentação técnica, bases relacionais, workflows, automações e observabilidade.",
     url: "https://www.notion.so/"
   }
 ];

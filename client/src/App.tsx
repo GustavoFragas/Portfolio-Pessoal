@@ -23,6 +23,7 @@ LoadingFallback.displayName = 'LoadingFallback';
 function App() {
   // Dados estáticos - sem necessidade de fetch
   const profile = profileData;
+  const currentYear = new Date().getFullYear();
 
   useEffect(() => {
     // Garantir smooth scroll no documento
@@ -30,7 +31,7 @@ function App() {
   }, []);
 
   return (
-    <div className="min-h-screen flex">
+    <div className="min-h-screen">
       <Sidebar />
       <main className="flex-1 lg:ml-64">
         <Hero profile={profile} />
@@ -45,7 +46,7 @@ function App() {
         </Suspense>
         
         <footer className="py-6 md:py-8 text-center text-gray-400 border-t border-gray-800 px-4">
-          <p className="text-sm md:text-base">© 2025 Gustavo Fragas Cunha. Todos os direitos reservados.</p>
+          <p className="text-sm md:text-base">© {currentYear} Gustavo Fragas Cunha. Todos os direitos reservados.</p>
           <p className="text-xs md:text-sm mt-2">Desenvolvido com React + TypeScript + TailwindCSS</p>
         </footer>
       </main>

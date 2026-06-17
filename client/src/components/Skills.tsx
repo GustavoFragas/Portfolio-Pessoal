@@ -46,7 +46,8 @@ const MobileSkillCard = memo(({ category, skills }: { category: string; skills: 
 ));
 MobileSkillCard.displayName = 'MobileSkillCard';
 
-const CATEGORIES = ['Backend', 'Frontend', 'Database', 'Tools', 'Soft Skills', 'Languages'] as const;
+const CATEGORIES = ['Backend', 'Frontend', 'Database', 'Cloud & DevOps', 'AI & Automation', 'Soft Skills', 'Languages'] as const;
+const VISIBLE_DESKTOP_CARDS = 3;
 
 function Skills() {
   // Dados estáticos - sem necessidade de fetch
@@ -61,12 +62,14 @@ function Skills() {
     }, {} as Record<string, Skill[]>);
   }, [skills]);
 
+  const maxDesktopIndex = Math.max(0, CATEGORIES.length - VISIBLE_DESKTOP_CARDS);
+
   const nextSlide = () => {
-    setCurrentIndex((prev) => (prev + 1) % CATEGORIES.length);
+    setCurrentIndex((prev) => (prev >= maxDesktopIndex ? 0 : prev + 1));
   };
 
   const prevSlide = () => {
-    setCurrentIndex((prev) => (prev - 1 + CATEGORIES.length) % CATEGORIES.length);
+    setCurrentIndex((prev) => (prev <= 0 ? maxDesktopIndex : prev - 1));
   };
 
   return (
@@ -107,7 +110,7 @@ function Skills() {
           <div className="overflow-hidden">
             <div
               className="flex gap-8 transition-transform duration-500 ease-in-out"
-              style={{ transform: `translateX(-${currentIndex * 33.33}%)` }}
+              style={{ transform: `translateX(-${currentIndex * (100 / VISIBLE_DESKTOP_CARDS)}%)` }}
             >
               {CATEGORIES.map((category) => {
                 const categorySkills = skillsByCategory[category];

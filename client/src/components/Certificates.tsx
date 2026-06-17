@@ -1,7 +1,6 @@
 import { memo, useState, useCallback } from 'react';
 import { FaExternalLinkAlt, FaChevronLeft, FaChevronRight } from 'react-icons/fa';
 import { certificatesData } from '../data/portfolioData';
-import type { Certificate } from '../types';
 
 const formatDate = (dateString: string) => {
   const date = new Date(dateString);

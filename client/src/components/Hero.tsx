@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { FaGithub, FaLinkedin, FaWhatsapp, FaInstagram } from 'react-icons/fa';
+import { FaEnvelope, FaGithub, FaLinkedin } from 'react-icons/fa';
 import { smoothScrollTo } from '../utils/smoothScroll';
 import type { Profile } from '../types';
 
@@ -9,7 +9,7 @@ interface HeroProps {
 
 export default function Hero({ profile }: HeroProps) {
   const [displayedText, setDisplayedText] = useState('');
-  const fullText = profile?.role || 'Desenvolvedor de Software';
+  const fullText = profile?.role || 'Software Engineer C#/.NET';
 
   useEffect(() => {
     let index = 0;
@@ -41,7 +41,7 @@ export default function Hero({ profile }: HeroProps) {
           <h1 className="text-3xl md:text-5xl lg:text-6xl font-bold mb-3 md:mb-4 px-2">
             {profile.name}
           </h1>
-          <h2 className="text-lg md:text-2xl lg:text-3xl text-gradient font-semibold mb-4 md:mb-6 h-8 md:h-10 px-2">
+          <h2 className="text-lg md:text-2xl lg:text-3xl text-gradient font-semibold mb-4 md:mb-6 min-h-[4rem] md:min-h-[4.5rem] lg:min-h-[3rem] px-2 leading-tight">
             {displayedText}
             <span className="animate-pulse">|</span>
           </h2>
@@ -93,22 +93,11 @@ export default function Hero({ profile }: HeroProps) {
             <FaLinkedin />
           </a>
           <a
-            href="https://wa.me/5511980192710"
-            target="_blank"
-            rel="noopener noreferrer"
-            className="hover:text-green-500 hover:scale-110 transition-all duration-300 p-2"
-            aria-label="WhatsApp"
+            href={`mailto:${profile.email}`}
+            className="hover:text-blue-500 hover:scale-110 transition-all duration-300 p-2"
+            aria-label="Email"
           >
-            <FaWhatsapp />
-          </a>
-          <a
-            href="https://www.instagram.com/fragas_gustavo/"
-            target="_blank"
-            rel="noopener noreferrer"
-            className="hover:text-pink-500 hover:scale-110 transition-all duration-300 p-2"
-            aria-label="Instagram"
-          >
-            <FaInstagram />
+            <FaEnvelope />
           </a>
         </div>
 

@@ -4,6 +4,7 @@ import { smoothScrollTo } from '../utils/smoothScroll';
 
 export default function Sidebar() {
   const [isOpen, setIsOpen] = useState(false);
+  const currentYear = new Date().getFullYear();
 
   const menuItems = [
     { icon: <FaHome />, label: 'Início', href: '#home' },
@@ -43,7 +44,7 @@ export default function Sidebar() {
           {/* Logo/Header */}
           <div className="p-6 border-b border-gray-700">
             <h2 className="text-xl font-bold text-gradient">Gustavo Fragas</h2>
-            <p className="text-sm text-gray-400 mt-1">Desenvolvedor</p>
+            <p className="text-sm text-gray-400 mt-1">C#/.NET & AI Automation</p>
           </div>
 
           {/* Navigation */}
@@ -68,7 +69,7 @@ export default function Sidebar() {
 
           {/* Footer */}
           <div className="p-4 border-t border-gray-700 text-center text-xs text-gray-500">
-            © 2025 Gustavo Fragas
+            © {currentYear} Gustavo Fragas
           </div>
         </div>
       </aside>

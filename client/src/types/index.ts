@@ -16,7 +16,7 @@ export interface Project {
   title: string;
   description: string;
   techStack: string;
-  repoUrl: string;
+  repoUrl?: string;
   demoUrl?: string;
   imageUrl: string;
   createdAt: string;

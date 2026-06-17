@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { FaGithub, FaLinkedin, FaWhatsapp, FaInstagram } from 'react-icons/fa';
+import { FaEnvelope, FaGithub, FaLinkedin, FaWhatsapp } from 'react-icons/fa';
 import type { Profile } from '../types';
 
 interface ContactProps {
@@ -24,7 +24,7 @@ export default function Contact({ profile }: ContactProps) {
           Vamos <span className="text-gradient">Conversar?</span>
         </h2>
         <p className="text-base md:text-xl text-gray-400 mb-8 md:mb-12 px-4">
-          Estou sempre aberto a novas oportunidades e colaborações
+          Gosto de trocar ideias sobre backend, integrações, automação e uso prático de IA no desenvolvimento
         </p>
 
         <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 md:gap-6 mb-8 md:mb-12">
@@ -47,13 +47,11 @@ export default function Contact({ profile }: ContactProps) {
             <span className="font-semibold text-sm md:text-base">LinkedIn</span>
           </a>
           <a
-            href="https://www.instagram.com/fragas_gustavo/"
-            target="_blank"
-            rel="noopener noreferrer"
+            href={`mailto:${profile.email}`}
             className="flex flex-col items-center gap-2 md:gap-3 p-4 md:p-6 bg-gray-800 rounded-lg hover:bg-gray-700 transition-all duration-300 border border-gray-700"
           >
-            <FaInstagram className="text-2xl md:text-4xl text-pink-500" />
-            <span className="font-semibold text-sm md:text-base">Instagram</span>
+            <FaEnvelope className="text-2xl md:text-4xl text-blue-400" />
+            <span className="font-semibold text-sm md:text-base">Email</span>
           </a>
           <a
             href="https://wa.me/5511980192710"

@@ -14,7 +14,7 @@ const createResponse = <T>(data: T) => Promise.resolve({ data });
 
 export const profileApi = {
   getAll: () => createResponse<Profile[]>([profileData]),
-  getById: (id: string) => createResponse<Profile>(profileData),
+  getById: () => createResponse<Profile>(profileData),
 };
 
 export const projectsApi = {
