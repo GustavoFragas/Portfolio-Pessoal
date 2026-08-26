@@ -1,6 +1,6 @@
 # Portfolio Pessoal - Gustavo Fragas Cunha
 
-Portfolio técnico para apresentar minha atuação como **Software Engineer com foco em C#/.NET, backend, APIs, integrações, observabilidade e AI Automation**.
+Portfólio técnico para apresentar minha atuação como **Desenvolvedor III com foco em C#/.NET, backend, APIs, integrações, AWS e engenharia assistida por IA**.
 
 O site público é um frontend estático em React/Vite, com dados centralizados em TypeScript para facilitar manutenção. O repositório também mantém um backend .NET como referência arquitetural, com entidades, controllers, repositórios, InMemory DB e testes de API.
 
@@ -18,11 +18,13 @@ O site público é um frontend estático em React/Vite, com dados centralizados 
 
 **Frontend**
 
-- React 18
+- React 19
 - TypeScript
-- Vite
-- TailwindCSS
-- React Icons
+- Vite 8
+- Tailwind CSS 4
+- Motion
+- Three.js
+- Lucide + Simple Icons
 
 **Backend de referência**
 
@@ -47,9 +49,9 @@ O site público é um frontend estático em React/Vite, com dados centralizados 
 Portfolio-Pessoal/
 ├── client/                         # Frontend React usado em produção
 │   ├── src/components/             # Hero, About, Projects, Skills, Experience...
-│   ├── src/data/portfolioData.ts   # Fonte principal dos dados públicos
-│   ├── src/services/api.ts         # Adapter local que entrega os dados estáticos
-│   └── public/                     # Imagem de perfil e certificados
+│   ├── src/data/portfolioContent.ts # Conteúdo público base em português
+│   ├── src/data/portfolioLocales.ts # Versões PT, EN e ES
+│   └── public/                      # Favicon e card social 1200x630
 ├── GustavoPortfolio.API/           # API .NET de referência
 ├── GustavoPortfolio.Application/   # DTOs e contratos
 ├── GustavoPortfolio.Domain/        # Entidades
@@ -109,11 +111,13 @@ dotnet test GustavoPortfolio.Tests/GustavoPortfolio.Tests.csproj
 
 | Decisão | Motivo |
 |---|---|
-| Dados públicos em `portfolioData.ts` | Deploy simples na Vercel, sem depender de backend para conteúdo estático |
+| Conteúdo público tipado e localizado | Deploy estático com versões em português, inglês e espanhol |
 | Backend mantido no repo | Demonstra modelagem, controllers, repositórios e testes em .NET |
 | Cases confidenciais sem link de repo | Permite mostrar impacto técnico sem expor informação interna |
 | Textos sem "buscando vaga" | Mantém presença profissional discreta e compatível com emprego atual |
 | Projetos com foco em impacto | Aproxima o portfolio do padrão de leitura de Tech Leads e recrutadores técnicos |
+| Motion com redução de movimento | Preserva presença visual sem ignorar preferências de acessibilidade |
+| Open Graph 1200x630 | Gera uma apresentação consistente ao compartilhar o portfólio |
 
 ## Checks Úteis
 

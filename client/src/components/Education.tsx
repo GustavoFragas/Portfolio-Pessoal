@@ -1,85 +1,45 @@
-import { memo, useMemo } from 'react';
-import { FaExternalLinkAlt } from 'react-icons/fa';
-import { educationData } from '../data/portfolioData';
+import { usePortfolioContent } from '../LocaleContext';
+import ScrollReveal from './ScrollReveal';
 
-const formatDate = (dateString: string) => {
-  const date = new Date(dateString);
-  return date.toLocaleDateString('pt-BR', { month: 'short', year: 'numeric' });
-};
-
-function EducationSection() {
-  // Dados estáticos ordenados com useMemo
-  const educations = useMemo(() => {
-    return [...educationData].sort((a, b) => {
-      // BYU sempre primeiro
-      if (a.institution.includes('BYU')) return -1;
-      if (b.institution.includes('BYU')) return 1;
-      
-      // Depois por status (em andamento primeiro)
-      if (a.isCurrent && !b.isCurrent) return -1;
-      if (!a.isCurrent && b.isCurrent) return 1;
-      
-      // Depois por data de início (mais recente primeiro)
-      return new Date(b.startDate).getTime() - new Date(a.startDate).getTime();
-    });
-  }, []);
+export default function EducationSection() {
+  const { content } = usePortfolioContent();
+  const { education, languages, ui } = content;
 
   return (
-    <section id="education" className="py-16 md:py-20 px-4">
-      <div className="max-w-4xl mx-auto">
-        <h2 className="text-3xl md:text-4xl font-bold mb-8 md:mb-12 text-center">
-          Educação & <span className="text-gradient">Estudos</span>
-        </h2>
-
-        <div className="relative">
-          <div className="absolute left-4 md:left-8 top-0 bottom-0 w-0.5 bg-gradient-to-b from-green-500 to-blue-600" />
-
-          <div className="space-y-6 md:space-y-12">
-            {educations.map((edu) => (
-              <div key={edu.id} className="relative pl-10 md:pl-20 group">
-                <div className={`absolute left-1.5 md:left-5 top-2 w-5 h-5 md:w-6 md:h-6 rounded-full ${
-                  edu.isCurrent 
-                    ? 'bg-gradient-to-r from-green-500 to-blue-600 animate-pulse' 
-                    : 'bg-gray-600'
-                }`} />
-                
-                <div className="bg-gray-800 rounded-lg p-4 md:p-6 border border-gray-700 transition-all duration-300">
-                  <div className="flex flex-col md:flex-row md:justify-between md:items-start mb-2 gap-1">
-                    <div>
-                      <h3 className="text-base md:text-xl font-bold group-hover:text-green-400 transition-colors">
-                        {edu.field}
-                      </h3>
-                      <h4 className="text-sm md:text-lg text-blue-400">{edu.institution}</h4>
-                      <p className="text-xs md:text-sm text-gray-500">{edu.degree}</p>
-                    </div>
-                    <span className="text-xs md:text-sm text-gray-400 mt-1 md:mt-0">
-                      {formatDate(edu.startDate)} - {edu.isCurrent ? 'Presente' : formatDate(edu.endDate!)}
-                    </span>
-                  </div>
-                  <p className="text-xs md:text-base text-gray-400 leading-relaxed mb-3">{edu.description}</p>
-                  <div className="flex flex-wrap items-center gap-2">
-                    {edu.isCurrent && (
-                      <span className="inline-block px-2 md:px-3 py-0.5 md:py-1 bg-green-500/20 text-green-400 rounded-full text-xs md:text-sm">
-                        Em Andamento
-                      </span>
-                    )}
-                    <a
-                      href={edu.url}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="inline-flex items-center gap-1 md:gap-2 text-purple-400 hover:text-purple-300 transition-colors text-xs md:text-sm"
-                    >
-                      <FaExternalLinkAlt /> Visitar Site
-                    </a>
-                  </div>
+    <section id="formacao" className="section section--paper section--tight">
+      <ScrollReveal className="section-shell split-ledger" direction="up">
+        <div>
+          <div className="section-heading">
+            <p className="section-kicker">{ui.education.educationKicker}</p>
+            <h2>{ui.education.educationTitle}</h2>
+          </div>
+          <div className="compact-ledger">
+            {education.map(([period, institution, program]) => (
+              <article key={institution}>
+                <time>{period}</time>
+                <div>
+                  <h3>{institution}</h3>
+                  <p>{program}</p>
                 </div>
+              </article>
+            ))}
+          </div>
+        </div>
+        <div>
+          <div className="section-heading">
+            <p className="section-kicker">{ui.education.languagesKicker}</p>
+            <h2>{ui.education.languagesTitle}</h2>
+          </div>
+          <div className="language-grid">
+            {languages.map(([language, level]) => (
+              <div key={language}>
+                <span>{language}</span>
+                <strong>{level}</strong>
               </div>
             ))}
           </div>
         </div>
-      </div>
+      </ScrollReveal>
     </section>
   );
 }
-
-export default memo(EducationSection);

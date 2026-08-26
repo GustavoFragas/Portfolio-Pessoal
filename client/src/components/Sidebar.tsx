@@ -1,86 +1,91 @@
-import { useState } from 'react';
-import { FaHome, FaUser, FaBriefcase, FaCode, FaGraduationCap, FaCertificate, FaEnvelope, FaBars, FaTimes } from 'react-icons/fa';
-import { smoothScrollTo } from '../utils/smoothScroll';
+import { useEffect, useState } from 'react';
+import { Menu, X } from 'lucide-react';
+import { usePortfolioContent } from '../LocaleContext';
+import { supportedLocales, type PortfolioLocale } from '../data/portfolioLocales';
+
+type LanguageSwitcherProps = {
+  className: string;
+  label: string;
+  locale: PortfolioLocale;
+  onSelect: (locale: PortfolioLocale) => void;
+};
+
+function LanguageSwitcher({ className, label, locale, onSelect }: LanguageSwitcherProps) {
+  return (
+    <div className={`language-switcher ${className}`} role="group" aria-label={label}>
+      {supportedLocales.map((option) => (
+        <button
+          type="button"
+          key={option}
+          aria-pressed={locale === option}
+          onClick={() => onSelect(option)}
+        >
+          {option.toUpperCase()}
+        </button>
+      ))}
+    </div>
+  );
+}
 
 export default function Sidebar() {
   const [isOpen, setIsOpen] = useState(false);
-  const currentYear = new Date().getFullYear();
+  const { content, locale, selectLocale } = usePortfolioContent();
+  const { navItems, profile, ui } = content;
 
-  const menuItems = [
-    { icon: <FaHome />, label: 'Início', href: '#home' },
-    { icon: <FaUser />, label: 'Sobre Mim', href: '#about' },
-    { icon: <FaCode />, label: 'Habilidades', href: '#skills' },
-    { icon: <FaBriefcase />, label: 'Projetos', href: '#projects' },
-    { icon: <FaBriefcase />, label: 'Experiência', href: '#experience' },
-    { icon: <FaGraduationCap />, label: 'Educação', href: '#education' },
-    { icon: <FaCertificate />, label: 'Certificados', href: '#certificates' },
-    { icon: <FaEnvelope />, label: 'Contato', href: '#contact' },
-  ];
+  useEffect(() => {
+    if (!isOpen) return;
+    const onKeyDown = (event: KeyboardEvent) => {
+      if (event.key === 'Escape') setIsOpen(false);
+    };
+    window.addEventListener('keydown', onKeyDown);
+    return () => window.removeEventListener('keydown', onKeyDown);
+  }, [isOpen]);
 
-  const handleClick = (e: React.MouseEvent<HTMLAnchorElement>, href: string) => {
-    e.preventDefault();
-    smoothScrollTo(href);
-    setIsOpen(false);
-  };
+  const closeMenu = () => setIsOpen(false);
 
   return (
-    <>
-      {/* Mobile Toggle Button */}
-      <button
-        onClick={() => setIsOpen(!isOpen)}
-        className="fixed top-4 left-4 z-50 lg:hidden p-3 bg-gray-800 rounded-lg hover:bg-gray-700 transition-colors"
-        aria-label="Toggle Menu"
-      >
-        {isOpen ? <FaTimes size={24} /> : <FaBars size={24} />}
-      </button>
-
-      {/* Sidebar */}
-      <aside
-        className={`fixed left-0 top-0 h-full w-64 bg-gray-800 border-r border-gray-700 z-40 transform transition-transform duration-300 ease-in-out ${
-          isOpen ? 'translate-x-0' : '-translate-x-full'
-        } lg:translate-x-0`}
-      >
-        <div className="flex flex-col h-full">
-          {/* Logo/Header */}
-          <div className="p-6 border-b border-gray-700">
-            <h2 className="text-xl font-bold text-gradient">Gustavo Fragas</h2>
-            <p className="text-sm text-gray-400 mt-1">C#/.NET & AI Automation</p>
-          </div>
-
-          {/* Navigation */}
-          <nav className="flex-1 overflow-y-auto py-6">
-            <ul className="space-y-2 px-4">
-              {menuItems.map((item) => (
-                <li key={item.href}>
-                  <a
-                    href={item.href}
-                    onClick={(e) => handleClick(e, item.href)}
-                    className="flex items-center gap-3 px-4 py-3 rounded-lg text-gray-300 hover:bg-gray-700 hover:text-white transition-all duration-200 group"
-                  >
-                    <span className="text-lg group-hover:scale-110 transition-transform">
-                      {item.icon}
-                    </span>
-                    <span className="font-medium">{item.label}</span>
-                  </a>
-                </li>
-              ))}
-            </ul>
-          </nav>
-
-          {/* Footer */}
-          <div className="p-4 border-t border-gray-700 text-center text-xs text-gray-500">
-            © {currentYear} Gustavo Fragas
-          </div>
-        </div>
-      </aside>
-
-      {/* Overlay for mobile */}
-      {isOpen && (
-        <div
-          className="fixed inset-0 bg-black bg-opacity-50 z-30 lg:hidden"
-          onClick={() => setIsOpen(false)}
+    <header className="topbar">
+      <div className="topbar__inner">
+        <a className="brand-lockup" href="#home" onClick={closeMenu}>
+          <span>{profile.name}</span>
+          <small>{profile.displayTitle}</small>
+        </a>
+        <nav className="topbar__nav" aria-label={ui.navigation.mainLabel}>
+          {navItems.map((item) => <a key={item.href} href={item.href}>{item.label}</a>)}
+        </nav>
+        <LanguageSwitcher
+          className="topbar__languages"
+          label={ui.navigation.languageLabel}
+          locale={locale}
+          onSelect={selectLocale}
         />
-      )}
-    </>
+        <a className="button button--small button--primary topbar__contact" href="#contato">{ui.navigation.contact}</a>
+        <button
+          className="icon-button topbar__menu"
+          type="button"
+          aria-label={isOpen ? ui.navigation.closeMenu : ui.navigation.openMenu}
+          aria-expanded={isOpen}
+          aria-controls="mobile-navigation"
+          onClick={() => setIsOpen((open) => !open)}
+        >
+          {isOpen ? <X aria-hidden="true" /> : <Menu aria-hidden="true" />}
+        </button>
+      </div>
+      <div className={`mobile-nav ${isOpen ? 'mobile-nav--open' : ''}`} id="mobile-navigation">
+        <nav aria-label={ui.navigation.mobileLabel}>
+          {navItems.map((item) => <a key={item.href} href={item.href} onClick={closeMenu}>{item.label}</a>)}
+          <LanguageSwitcher
+            className="mobile-nav__languages"
+            label={ui.navigation.languageLabel}
+            locale={locale}
+            onSelect={(nextLocale) => {
+              selectLocale(nextLocale);
+              closeMenu();
+            }}
+          />
+          <a className="button button--primary" href="#contato" onClick={closeMenu}>{ui.navigation.directContact}</a>
+        </nav>
+      </div>
+    </header>
   );
 }

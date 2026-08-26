@@ -19,38 +19,47 @@ export const experiencesData: Experience[] = [
   {
     id: "1",
     company: "Alest Consultoria",
-    role: "Software Engineer | Desenvolvimento de Sistemas",
-    startDate: "2025-10-27",
+    role: "Desenvolvedor III",
+    startDate: "2026-03-30",
     endDate: undefined,
     isCurrent: true,
-    description: "• Desenvolvimento de APIs, integrações e automações para plataformas internas e ferramentas SaaS\n• Construção de rotinas de observabilidade, saneamento de dados e rastreio de execuções para apoiar decisões técnicas\n• Uso de C#/.NET, TypeScript, Node.js, React, AWS, SQL/NoSQL e integrações com Notion, Monday e Google APIs\n• Aplicação prática de AI-assisted development com Codex, Kiro e Windsurf para acelerar entregas com revisão técnica"
+    description: "• Efetivado em 30/03/2026; Dev II em 14/05/2026; Dev III em 01/06/2026\n• Plataformas internas de dados e telemetria, integrações SaaS e serviços backend enterprise\n• Documentação, configuração, testes locais e validação sob orientação de liderança técnica"
   },
   {
     id: "2",
-    company: "Atento",
-    role: "Suporte Técnico Trilíngue (META)",
-    startDate: "2025-08-01",
-    endDate: "2025-10-31",
+    company: "Alest Consultoria",
+    role: "Estagiário de Desenvolvimento de Software",
+    startDate: "2025-10-27",
+    endDate: "2026-03-29",
     isCurrent: false,
-    description: "• Suporte técnico especializado para plataformas Meta, com análise de incidentes, comunicação clara e priorização de problemas\n• Atendimento trilíngue em Português, Espanhol e Inglês, atuando em cenários de alta pressão e alto volume\n• Criação de documentação e melhoria de processos para reduzir retrabalho e acelerar resolução de chamados"
+    description: "• Apoio em integrações e automações internas com C#/.NET, TypeScript/Node.js e APIs SaaS\n• Participação nas etapas iniciais de plataforma interna de telemetria e dados\n• Flows no DocuSign CLM com foco em validação e rastreabilidade"
   },
   {
     id: "3",
-    company: "IJCSUD",
-    role: "Representante Institucional",
-    startDate: "2023-03-01",
-    endDate: "2025-04-30",
+    company: "Atento",
+    role: "Suporte bilíngue em espanhol",
+    startDate: "2025-08-01",
+    endDate: "2025-10-31",
     isCurrent: false,
-    description: "• Liderança e treinamento de equipes multiculturais, com foco em comunicação, rotina e acompanhamento de indicadores\n• Organização de dados operacionais, análise de métricas e padronização de processos para apoiar decisões locais\n• Experiência internacional na Argentina, fortalecendo fluência em Espanhol e colaboração em contextos diversos"
+    description: "• Atendimento e suporte a clientes em espanhol\n• Comunicação, triagem e acompanhamento de solicitações"
   },
   {
     id: "4",
+    company: "Argentina",
+    role: "Serviço voluntário de tempo integral",
+    startDate: "2023-03-01",
+    endDate: "2025-04-30",
+    isCurrent: false,
+    description: "• Atuação comunitária em contexto multicultural com comunicação diária em espanhol\n• Visitas, organização de agenda e acompanhamento de pessoas\n• Experiência internacional que consolidou fluência em espanhol e adaptação cultural"
+  },
+  {
+    id: "5",
     company: "Beneficência Portuguesa de São Paulo",
-    role: "Jovem Aprendiz - Suporte Técnico",
-    startDate: "2021-05-01",
+    role: "Jovem Aprendiz",
+    startDate: "2021-03-01",
     endDate: "2022-11-30",
     isCurrent: false,
-    description: "• Suporte técnico em ambiente hospitalar com sistema Tasy e atendimento a usuários internos\n• Diagnóstico de incidentes, documentação de processos e criação de base de conhecimento\n• Experiência inicial com operação crítica, suporte a sistemas e comunicação com áreas não técnicas"
+    description: "• Experiência inicial de ambiente corporativo, rotina operacional e comunicação com áreas internas"
   }
 ];
 

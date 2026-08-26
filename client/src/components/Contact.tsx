@@ -1,87 +1,26 @@
-import { useState } from 'react';
-import { FaEnvelope, FaGithub, FaLinkedin, FaWhatsapp } from 'react-icons/fa';
-import type { Profile } from '../types';
+import { usePortfolioContent } from '../LocaleContext';
+import ChannelIcon from './ChannelIcon';
+import ScrollReveal from './ScrollReveal';
 
-interface ContactProps {
-  profile: Profile | null;
-}
-
-export default function Contact({ profile }: ContactProps) {
-  const [showTooltip, setShowTooltip] = useState(false);
-
-  if (!profile) return null;
-
-  const copyEmail = () => {
-    navigator.clipboard.writeText(profile.email);
-    setShowTooltip(true);
-    setTimeout(() => setShowTooltip(false), 2000);
-  };
+export default function Contact() {
+  const { content } = usePortfolioContent();
+  const { profile, ui } = content;
 
   return (
-    <section id="contact" className="py-16 md:py-20 px-4 bg-gray-800/50">
-      <div className="max-w-4xl mx-auto text-center">
-        <h2 className="text-3xl md:text-4xl font-bold mb-4 md:mb-8">
-          Vamos <span className="text-gradient">Conversar?</span>
-        </h2>
-        <p className="text-base md:text-xl text-gray-400 mb-8 md:mb-12 px-4">
-          Gosto de trocar ideias sobre backend, integrações, automação e uso prático de IA no desenvolvimento
-        </p>
-
-        <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 md:gap-6 mb-8 md:mb-12">
-          <a
-            href={profile.gitHub}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="flex flex-col items-center gap-2 md:gap-3 p-4 md:p-6 bg-gray-800 rounded-lg hover:bg-gray-700 transition-all duration-300 border border-gray-700"
-          >
-            <FaGithub className="text-2xl md:text-4xl" />
-            <span className="font-semibold text-sm md:text-base">GitHub</span>
-          </a>
-          <a
-            href={profile.linkedIn}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="flex flex-col items-center gap-2 md:gap-3 p-4 md:p-6 bg-gray-800 rounded-lg hover:bg-gray-700 transition-all duration-300 border border-gray-700"
-          >
-            <FaLinkedin className="text-2xl md:text-4xl text-blue-500" />
-            <span className="font-semibold text-sm md:text-base">LinkedIn</span>
-          </a>
-          <a
-            href={`mailto:${profile.email}`}
-            className="flex flex-col items-center gap-2 md:gap-3 p-4 md:p-6 bg-gray-800 rounded-lg hover:bg-gray-700 transition-all duration-300 border border-gray-700"
-          >
-            <FaEnvelope className="text-2xl md:text-4xl text-blue-400" />
-            <span className="font-semibold text-sm md:text-base">Email</span>
-          </a>
-          <a
-            href="https://wa.me/5511980192710"
-            target="_blank"
-            rel="noopener noreferrer"
-            className="flex flex-col items-center gap-2 md:gap-3 p-4 md:p-6 bg-gray-800 rounded-lg hover:bg-gray-700 transition-all duration-300 border border-gray-700"
-          >
-            <FaWhatsapp className="text-2xl md:text-4xl text-green-500" />
-            <span className="font-semibold text-sm md:text-base">WhatsApp</span>
-          </a>
+    <section id="contato" className="section contact-section">
+      <ScrollReveal className="section-shell contact-grid" direction="up">
+        <div>
+          <p className="section-kicker">{ui.contact.kicker}</p>
+          <h2>{ui.contact.title}</h2>
+          <p>{profile.location}. {ui.contact.description}</p>
         </div>
-
-        <div className="mt-6 md:mt-8 relative inline-block">
-          <button
-            onClick={copyEmail}
-            className="font-mono text-blue-400 hover:text-blue-300 transition-colors cursor-pointer text-sm md:text-lg break-all px-4"
-          >
-            {profile.email}
-          </button>
-          {showTooltip && (
-            <div className="absolute -top-10 left-1/2 -translate-x-1/2 bg-gray-700 text-white px-3 py-1 rounded text-sm whitespace-nowrap">
-              Copiado
-            </div>
-          )}
+        <div className="contact-actions">
+          <a href={profile.gitHub} target="_blank" rel="noopener noreferrer"><ChannelIcon channel="github" /> GitHub</a>
+          <a href={profile.linkedIn} target="_blank" rel="noopener noreferrer"><ChannelIcon channel="linkedin" /> LinkedIn</a>
+          <a href={`mailto:${profile.email}`}><ChannelIcon channel="email" /> Email</a>
+          <a href={profile.phoneLink} target="_blank" rel="noopener noreferrer"><ChannelIcon channel="whatsapp" /> WhatsApp</a>
         </div>
-
-        <div className="text-gray-400 mt-4 md:mt-6 text-sm md:text-base">
-          <p>{profile.location}</p>
-        </div>
-      </div>
+      </ScrollReveal>
     </section>
   );
 }

@@ -1,15 +1,13 @@
 import { defineConfig } from 'vite'
 import react from '@vitejs/plugin-react'
+import tailwindcss from '@tailwindcss/vite'
 
 // https://vite.dev/config/
 export default defineConfig({
-  plugins: [react()],
+  plugins: [react(), tailwindcss()],
   build: {
-    // Otimizações de build
-    target: 'esnext',
     sourcemap: false,
-    chunkSizeWarningLimit: 1000,
-    // Code splitting otimizado
+    chunkSizeWarningLimit: 900,
     rollupOptions: {
       output: {
         manualChunks(id) {
@@ -17,7 +15,10 @@ export default defineConfig({
             if (id.includes('react') || id.includes('react-dom')) {
               return 'react-vendor';
             }
-            if (id.includes('lucide-react') || id.includes('react-icons')) {
+            if (id.includes('three')) {
+              return 'hero-telemetry';
+            }
+            if (id.includes('lucide-react')) {
               return 'icons';
             }
             return 'vendor';
@@ -26,7 +27,6 @@ export default defineConfig({
       },
     },
   },
-  // Otimizar servidor de desenvolvimento
   server: {
     port: 5173,
     strictPort: true,

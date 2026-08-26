@@ -1,56 +1,41 @@
-import { useEffect, lazy, Suspense, memo } from 'react';
-import { profileData } from './data/portfolioData';
+import { LazyMotion, domAnimation } from 'motion/react';
+import { usePortfolioContent } from './LocaleContext';
 import Sidebar from './components/Sidebar';
 import Hero from './components/Hero';
 import About from './components/About';
-
-// Lazy loading para componentes abaixo da dobra com preload
-const Skills = lazy(() => import('./components/Skills'));
-const Projects = lazy(() => import('./components/Projects'));
-const ExperienceSection = lazy(() => import('./components/Experience'));
-const EducationSection = lazy(() => import('./components/Education'));
-const Certificates = lazy(() => import('./components/Certificates'));
-const Contact = lazy(() => import('./components/Contact'));
-
-// Loading component memoizado
-const LoadingFallback = memo(() => (
-  <div className="py-20 text-center text-gray-400">
-    <div className="animate-pulse">Carregando...</div>
-  </div>
-));
-LoadingFallback.displayName = 'LoadingFallback';
+import Skills from './components/Skills';
+import Projects from './components/Projects';
+import ExperienceSection from './components/Experience';
+import EducationSection from './components/Education';
+import Certificates from './components/Certificates';
+import Contact from './components/Contact';
 
 function App() {
-  // Dados estáticos - sem necessidade de fetch
-  const profile = profileData;
   const currentYear = new Date().getFullYear();
-
-  useEffect(() => {
-    // Garantir smooth scroll no documento
-    document.documentElement.style.scrollBehavior = 'smooth';
-  }, []);
+  const { content } = usePortfolioContent();
+  const { profile, ui } = content;
 
   return (
-    <div className="min-h-screen">
-      <Sidebar />
-      <main className="flex-1 lg:ml-64">
-        <Hero profile={profile} />
-        <About profile={profile} />
-        <Suspense fallback={<LoadingFallback />}>
-          <Skills />
+    <LazyMotion features={domAnimation}>
+      <div className="site-shell">
+        <a className="skip-link" href="#main-content">{ui.skipLink}</a>
+        <Sidebar />
+        <main id="main-content">
+          <Hero />
+          <About />
           <Projects />
+          <Skills />
           <ExperienceSection />
           <EducationSection />
           <Certificates />
-          <Contact profile={profile} />
-        </Suspense>
-        
-        <footer className="py-6 md:py-8 text-center text-gray-400 border-t border-gray-800 px-4">
-          <p className="text-sm md:text-base">© {currentYear} Gustavo Fragas Cunha. Todos os direitos reservados.</p>
-          <p className="text-xs md:text-sm mt-2">Desenvolvido com React + TypeScript + TailwindCSS</p>
-        </footer>
-      </main>
-    </div>
+          <Contact />
+          <footer className="site-footer">
+            <p>© {currentYear} {profile.name}. {ui.footer.disclaimer}</p>
+            <p>{ui.footer.builtWith}</p>
+          </footer>
+        </main>
+      </div>
+    </LazyMotion>
   );
 }
 
