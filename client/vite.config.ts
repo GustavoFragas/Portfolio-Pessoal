@@ -15,9 +15,6 @@ export default defineConfig({
             if (id.includes('react') || id.includes('react-dom')) {
               return 'react-vendor';
             }
-            if (id.includes('three')) {
-              return 'hero-telemetry';
-            }
             if (id.includes('lucide-react')) {
               return 'icons';
             }
