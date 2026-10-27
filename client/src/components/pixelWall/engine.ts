@@ -11,6 +11,7 @@ import {
   PINK_SOFT,
   buildEntranceDelays,
   buildPortraitMask,
+  buildRestLevels,
   buildThresholds,
   buildWall,
   keepFringe,
@@ -59,14 +60,14 @@ type Breather = { index: number; to: number; start: number };
 const CROP = { x: 120, y: 440, w: 700, h: 900 } as const;
 const PORTRAIT_RATIO = CROP.w / CROP.h;
 const LEVELS = [1, 2, 3, 4, 6] as const;
-const LEVEL_STEPS = [0.14, 0.26, 0.36, 0.46, 0.56] as const;
+// Story resolution: rest composite, then T/4, T/6 and finally the photo itself.
+const LEVEL_STEPS = [0.14, 0.3, 0.44] as const;
 const FLIP_WINDOW = 0.045;
 const MOVE_START = 0.16;
 const MOVE_SPAN = 0.52;
 const LENS_LIMIT = 0.06;
-// Where the lens rests when no pointer is over the portrait: Gustavo's face,
-// relative to the crop. Keeps the portrait recognizable above the fold.
-const FACE = { x: 0.489, y: 0.165, radius: 0.82 } as const;
+// Head and shoulders, relative to the crop: they rest at finer tiles than the body.
+const HEAD = { x: 0.489, y: 0.21, rx: 0.3, ry: 0.2 } as const;
 const ENTRY_SPREAD = 0.6;
 const ENTRY_JITTER = 0.1;
 const ENTRY_TILE = 0.3;
@@ -85,11 +86,6 @@ const shadeTable: string[][] = PALETTE.map(([r, g, b]) =>
 
 function shade(index: number, s: number): string {
   return shadeTable[index][Math.round(Math.min(1, Math.max(0, s)) * SHADES)];
-}
-
-function rgbShade(r: number, g: number, b: number, s: number): string {
-  const f = 0.62 + 0.38 * Math.min(1, Math.max(0, s));
-  return `rgb(${Math.round(r * f)},${Math.round(g * f)},${Math.round(b * f)})`;
 }
 
 function clamp01(value: number): number {
@@ -183,9 +179,10 @@ export function createPixelWall(canvas: HTMLCanvasElement, options: Options): Pi
   let delays: Float32Array = new Float32Array(0);
   let levels: HTMLCanvasElement[] = [];
   let full: HTMLCanvasElement | null = null;
-  let photoRgb: Uint8ClampedArray | null = null;
-  let entryCanvas: HTMLCanvasElement | null = null;
-  let entryData: ImageData | null = null;
+  let photoRgb: Uint8ClampedArray | null = null; // one pixel per T/2 cell, unmasked
+  let restLevels: Uint8Array = new Uint8Array(0);
+  let restCanvas: HTMLCanvasElement | null = null;
+  let portraitKey = '';
   const scratch = makeCanvas(1, 1);
   const scratchCtx = context2d(scratch);
 
@@ -194,8 +191,7 @@ export function createPixelWall(canvas: HTMLCanvasElement, options: Options): Pi
   let entry: 'idle' | 'pending' | 'running' | 'done' = mode === 'story' && motion ? 'idle' : 'done';
   let entryStart = 0;
   const pointer = { x: 0, y: 0, active: false };
-  const lens = { x: 0, y: 0, r: 0, ready: false };
-  const rest = { x: 0, y: 0 };
+  const lens = { x: 0, y: 0, r: 0 };
   let lensRadius = 150;
   let active = true;
   let breathers: Breather[] = [];
@@ -238,13 +234,56 @@ export function createPixelWall(canvas: HTMLCanvasElement, options: Options): Pi
     };
 
     levels = LEVELS.map((f) => downscale(cropCanvas as HTMLCanvasElement, pcols * f, prows * f));
-    photoRgb = context2d(levels[0]).getImageData(0, 0, pcols, prows).data;
+    photoRgb = context2d(levels[1]).getImageData(0, 0, pcols * 2, prows * 2).data;
     levels.forEach(applyMask);
     full = makeCanvas(CROP.w, CROP.h);
     context2d(full).drawImage(cropCanvas, 0, 0);
     applyMask(full);
-    entryCanvas = makeCanvas(pcols, prows);
-    entryData = context2d(entryCanvas).createImageData(pcols, prows);
+    buildRest();
+  }
+
+  /**
+   * The portrait at rest, in device pixels: T/2 tiles for the body and finer
+   * tiles over the head and shoulders, never the full-resolution photo.
+   */
+  function buildRest() {
+    if (!levels.length) return;
+    restLevels = buildRestLevels(pcols, prows, HEAD);
+    const w = pcols * td;
+    const h = prows * td;
+    restCanvas = makeCanvas(w, h);
+    const rctx = context2d(restCanvas);
+    rctx.imageSmoothingEnabled = false;
+    // Grout fades with the tile size: full at T, thin at T/2, faint at T/3, none at T/4.
+    const grouts = [
+      { sub: td, line: gd, alpha: 1 },
+      { sub: td / 2, line: Math.max(1, Math.round(gd / 2)), alpha: 0.85 },
+      { sub: td / 3, line: 1, alpha: 0.4 },
+      null,
+    ];
+    for (const step of [0, 1, 2, 3]) {
+      rctx.save();
+      rctx.beginPath();
+      let any = false;
+      for (let k = 0; k < restLevels.length; k += 1) {
+        if (restLevels[k] !== step || !mask[k]) continue;
+        rctx.rect((k % pcols) * td, Math.floor(k / pcols) * td, td, td);
+        any = true;
+      }
+      const grout = grouts[step];
+      if (any) {
+        rctx.clip();
+        rctx.drawImage(levels[step], 0, 0, w, h);
+        if (grout) {
+          rctx.fillStyle = INK_CSS;
+          rctx.globalAlpha = grout.alpha;
+          for (let x = grout.sub; x <= w + 0.5; x += grout.sub) rctx.fillRect(Math.round(x) - grout.line, 0, grout.line, h);
+          for (let y = grout.sub; y <= h + 0.5; y += grout.sub) rctx.fillRect(0, Math.round(y) - grout.line, w, grout.line);
+          rctx.globalAlpha = 1;
+        }
+      }
+      rctx.restore();
+    }
   }
 
   function setLayout(layout: WallLayout) {
@@ -266,7 +305,7 @@ export function createPixelWall(canvas: HTMLCanvasElement, options: Options): Pi
     calm = wall.calm;
     thresholds = buildThresholds(cols, rows, early);
 
-    const previous = `${pcols}x${prows}`;
+    const previous = portraitKey;
     hero = null;
     about = null;
     if (layout.hero && mode !== 'wall') {
@@ -275,13 +314,6 @@ export function createPixelWall(canvas: HTMLCanvasElement, options: Options): Pi
       pr0 = Math.round((layout.hero.y * dpr) / td);
       pc0 = Math.round(((layout.hero.x + layout.hero.w / 2) * dpr) / td - pcols / 2);
       hero = { x: pc0 * td, y: pr0 * td, w: pcols * td, h: prows * td };
-      rest.x = hero.x + hero.w * FACE.x;
-      rest.y = hero.y + hero.h * FACE.y;
-      if (!lens.ready) {
-        lens.x = rest.x;
-        lens.y = rest.y;
-        lens.ready = true;
-      }
       if (layout.about && mode === 'story') {
         const h = Math.round(layout.about.h * dpr);
         const w = Math.round((h * pcols) / prows);
@@ -299,7 +331,8 @@ export function createPixelWall(canvas: HTMLCanvasElement, options: Options): Pi
           early,
         );
       }
-      if (`${pcols}x${prows}` !== previous || !maskCanvas || (photo && !levels.length)) rebuildPortrait();
+      portraitKey = `${pcols}x${prows}@${td}/${gd}`;
+      if (portraitKey !== previous || !maskCanvas || (photo && !levels.length)) rebuildPortrait();
     }
 
     wallCanvas = makeCanvas(cols, rows);
@@ -497,56 +530,51 @@ export function createPixelWall(canvas: HTMLCanvasElement, options: Options): Pi
     ctx.drawImage(scratch, 0, 0, w, h, Math.round(rect.x), Math.round(rect.y), w, h);
   }
 
+  /** Coarse wall tiles flip over one by one and land showing the finer portrait. */
   function drawEntry(now: number) {
-    if (!hero || !entryCanvas || !entryData || !photoRgb) return;
+    if (!hero || !restCanvas) return;
     const elapsed = (now - entryStart) / 1000;
-    const data = entryData.data;
     const size = td - gd;
-    const pending: Flip[] = [];
-    for (let j = 0; j < prows; j += 1) {
-      for (let i = 0; i < pcols; i += 1) {
-        const k = j * pcols + i;
-        const o = k * 4;
-        if (!mask[k]) {
-          data[o + 3] = 0;
-          continue;
-        }
+    const turning: Array<{ i: number; j: number; t: number }> = [];
+    ctx.save();
+    ctx.beginPath();
+    let landed = false;
+    for (let k = 0; k < mask.length; k += 1) {
+      if (!mask[k]) continue;
+      const t = (elapsed - delays[k]) / ENTRY_TILE;
+      if (t <= 0) continue; // still wall: the wall underneath shows through
+      const i = k % pcols;
+      const j = Math.floor(k / pcols);
+      if (t >= 1) {
+        ctx.rect(hero.x + i * td, hero.y + j * td, td, td);
+        landed = true;
+      } else turning.push({ i, j, t });
+    }
+    if (landed) {
+      ctx.clip();
+      ctx.drawImage(restCanvas, hero.x, hero.y);
+    }
+    ctx.restore();
+    for (const { i, j, t } of turning) {
+      const x = hero.x + i * td;
+      const y = hero.y + j * td;
+      const s = Math.abs(Math.cos(Math.PI * t));
+      const h = size * s;
+      ctx.fillStyle = INK_CSS;
+      ctx.fillRect(x, y, size, size);
+      if (h < 0.5) continue;
+      if (t < 0.5) {
         const c = pc0 + i;
         const r = pr0 + j;
         const wallIndex = c >= 0 && r >= 0 && c < cols && r < rows ? colors[r * cols + c] : INK;
-        const t = (elapsed - delays[k]) / ENTRY_TILE;
-        data[o + 3] = 255;
-        if (t <= 0) {
-          const w = PALETTE[wallIndex];
-          data[o] = w[0];
-          data[o + 1] = w[1];
-          data[o + 2] = w[2];
-        } else if (t >= 1) {
-          data[o] = photoRgb[o];
-          data[o + 1] = photoRgb[o + 1];
-          data[o + 2] = photoRgb[o + 2];
-        } else {
-          const ink = PALETTE[INK];
-          data[o] = ink[0];
-          data[o + 1] = ink[1];
-          data[o + 2] = ink[2];
-          const s = Math.abs(Math.cos(Math.PI * t));
-          pending.push({
-            x: hero.x + i * td,
-            y: hero.y + j * td,
-            size,
-            from: shade(wallIndex, s),
-            to: rgbShade(photoRgb[o], photoRgb[o + 1], photoRgb[o + 2], s),
-            t,
-            back: INK_CSS,
-          });
-        }
+        ctx.fillStyle = shade(wallIndex, s);
+        ctx.fillRect(x, y + (size - h) / 2, size, h);
+      } else {
+        ctx.drawImage(restCanvas, i * td, j * td, size, size, x, y + (size - h) / 2, size, h);
+        ctx.fillStyle = `rgba(22,15,41,${((1 - s) * 0.38).toFixed(3)})`;
+        ctx.fillRect(x, y + (size - h) / 2, size, h);
       }
     }
-    context2d(entryCanvas).putImageData(entryData, 0, 0);
-    drawPortraitImage(entryCanvas, hero, pcols, prows, false);
-    flips.push(...pending);
-    drawFlips();
     if (elapsed >= ENTRY_TOTAL) finishEntry();
   }
 
@@ -572,13 +600,14 @@ export function createPixelWall(canvas: HTMLCanvasElement, options: Options): Pi
     return any;
   }
 
+  /** Pointer or finger only: the resolution climbs toward the centre, up to the photo itself. */
   function drawLens() {
-    if (!hero || !full || levels.length < 4 || !photoRgb) return;
+    if (!hero || !full || levels.length < 5 || !photoRgb) return;
     const R = lens.r;
-    const steps: Array<{ cell: number; coarse: number; radius: number; image: HTMLCanvasElement; smooth: boolean; lines: number }> = [
-      { cell: td, coarse: 1, radius: R, image: levels[1], smooth: false, lines: 2 },
-      { cell: td / 2, coarse: 2, radius: R * 0.6, image: levels[3], smooth: false, lines: 0 },
-      { cell: td / 4, coarse: 4, radius: R * 0.3, image: full, smooth: true, lines: 0 },
+    const steps: Array<{ cell: number; coarse: number; radius: number; image: HTMLCanvasElement; smooth: boolean }> = [
+      { cell: td / 2, coarse: 2, radius: R, image: levels[3], smooth: false },
+      { cell: td / 4, coarse: 4, radius: R * 0.6, image: levels[4], smooth: false },
+      { cell: td / 4, coarse: 4, radius: R * 0.3, image: full, smooth: true },
     ];
     for (const step of steps) {
       ctx.save();
@@ -586,43 +615,34 @@ export function createPixelWall(canvas: HTMLCanvasElement, options: Options): Pi
         ctx.clip();
         ctx.imageSmoothingEnabled = step.smooth;
         ctx.drawImage(step.image, hero.x, hero.y, hero.w, hero.h);
-        if (step.lines) {
-          const sub = td / step.lines;
-          const line = Math.max(1, Math.round(gd / (step.lines / 1.5)));
-          ctx.fillStyle = INK_CSS;
-          const x0 = Math.max(hero.x, lens.x - step.radius - td);
-          const x1 = Math.min(hero.x + hero.w, lens.x + step.radius + td);
-          const y0 = Math.max(hero.y, lens.y - step.radius - td);
-          const y1 = Math.min(hero.y + hero.h, lens.y + step.radius + td);
-          for (let x = hero.x + Math.ceil((x0 - hero.x) / sub) * sub; x <= x1; x += sub) ctx.fillRect(Math.round(x) - line, y0, line, y1 - y0);
-          for (let y = hero.y + Math.ceil((y0 - hero.y) / sub) * sub; y <= y1; y += sub) ctx.fillRect(x0, Math.round(y) - line, x1 - x0, line);
-        }
         ctx.imageSmoothingEnabled = false;
       }
       ctx.restore();
     }
 
-    // Tiles on the outer ring lift off the wall: scale 1.12 and a flat offset shadow.
-    const ringOuter = R + td * 1.3;
-    const i0 = Math.max(0, Math.floor((lens.x - ringOuter - hero.x) / td));
-    const i1 = Math.min(pcols - 1, Math.floor((lens.x + ringOuter - hero.x) / td));
-    const j0 = Math.max(0, Math.floor((lens.y - ringOuter - hero.y) / td));
-    const j1 = Math.min(prows - 1, Math.floor((lens.y + ringOuter - hero.y) / td));
-    const size = (td - gd) * 1.12;
-    const offset = Math.max(1, Math.round(2 * dpr));
+    // T/2 tiles on the outer ring lift off: scale 1.12 and a flat offset shadow.
+    const cell = td / 2;
+    const ringOuter = R + td;
+    const i0 = Math.max(0, Math.floor((lens.x - ringOuter - hero.x) / cell));
+    const i1 = Math.min(pcols * 2 - 1, Math.floor((lens.x + ringOuter - hero.x) / cell));
+    const j0 = Math.max(0, Math.floor((lens.y - ringOuter - hero.y) / cell));
+    const j1 = Math.min(prows * 2 - 1, Math.floor((lens.y + ringOuter - hero.y) / cell));
+    const inner = cell - Math.max(1, Math.round(gd / 2));
+    const size = inner * 1.12;
+    const offset = Math.max(1, Math.round(1.5 * dpr));
+    const width = pcols * 2;
     for (let j = j0; j <= j1; j += 1) {
       for (let i = i0; i <= i1; i += 1) {
-        const k = j * pcols + i;
-        if (!mask[k]) continue;
-        const cx = hero.x + (i + 0.5) * td;
-        const cy = hero.y + (j + 0.5) * td;
+        if (!mask[Math.floor(j / 2) * pcols + Math.floor(i / 2)]) continue;
+        const cx = hero.x + (i + 0.5) * cell;
+        const cy = hero.y + (j + 0.5) * cell;
         const d = Math.hypot(cx - lens.x, cy - lens.y);
         if (d <= R || d > ringOuter) continue;
-        const x = cx - (td - gd) / 2 - size * 0.06;
-        const y = cy - (td - gd) / 2 - size * 0.06;
+        const x = cx - size / 2;
+        const y = cy - size / 2;
         ctx.fillStyle = INK_CSS;
         ctx.fillRect(x + offset, y + offset, size, size);
-        const o = k * 4;
+        const o = (j * width + i) * 4;
         ctx.fillStyle = `rgb(${photoRgb[o]},${photoRgb[o + 1]},${photoRgb[o + 2]})`;
         ctx.fillRect(x, y, size, size);
       }
@@ -650,9 +670,12 @@ export function createPixelWall(canvas: HTMLCanvasElement, options: Options): Pi
     };
     let step = 0;
     while (step < LEVEL_STEPS.length && p >= LEVEL_STEPS[step]) step += 1;
-    if (step >= LEVELS.length) drawPortraitImage(full, rect, 0, 0, true);
-    else drawPortraitImage(levels[step], rect, pcols * LEVELS[step], prows * LEVELS[step], false);
-    if (step === 0 && lens.r > 2) drawLens();
+    if (step === 0 && restCanvas) {
+      ctx.drawImage(restCanvas, Math.round(rect.x), Math.round(rect.y));
+      if (lens.r > 2) drawLens();
+    } else if (step === 1) drawPortraitImage(levels[3], rect, pcols * 4, prows * 4, false);
+    else if (step === 2) drawPortraitImage(levels[4], rect, pcols * 6, prows * 6, false);
+    else drawPortraitImage(full, rect, 0, 0, true);
   }
 
   function render(now: number) {
@@ -686,23 +709,22 @@ export function createPixelWall(canvas: HTMLCanvasElement, options: Options): Pi
 
   function updateLens(dt: number): boolean {
     if (mode !== 'story' || !motion || !hero) return false;
-    const following = pointerOnPortrait();
-    const tx = following ? pointer.x : rest.x;
-    const ty = following ? pointer.y : rest.y;
-    const visible = progress < LENS_LIMIT && entry === 'done';
-    const wanted = visible ? lensRadius * (following ? 1 : FACE.radius) : 0;
-    const follow = 1 - Math.exp(-dt * (following ? 16 : 6));
-    const grow = 1 - Math.exp(-dt * 7);
-    lens.x += (tx - lens.x) * follow;
-    lens.y += (ty - lens.y) * follow;
+    const following = pointerOnPortrait() && progress < LENS_LIMIT && entry === 'done';
+    const wanted = following ? lensRadius : 0;
+    if (following && lens.r < 1) {
+      lens.x = pointer.x;
+      lens.y = pointer.y;
+    }
+    const follow = 1 - Math.exp(-dt * 16);
+    const grow = 1 - Math.exp(-dt * 9);
+    if (following) {
+      lens.x += (pointer.x - lens.x) * follow;
+      lens.y += (pointer.y - lens.y) * follow;
+    }
     lens.r += (wanted - lens.r) * grow;
     if (Math.abs(wanted - lens.r) < 0.5) lens.r = wanted;
-    const moving = Math.abs(tx - lens.x) > 0.5 || Math.abs(ty - lens.y) > 0.5;
-    if (!moving) {
-      lens.x = tx;
-      lens.y = ty;
-    }
-    return lens.r !== wanted || (lens.r > 0 && moving);
+    const moving = following && (Math.abs(pointer.x - lens.x) > 0.5 || Math.abs(pointer.y - lens.y) > 0.5);
+    return lens.r !== wanted || moving;
   }
 
   function frame(now: number) {

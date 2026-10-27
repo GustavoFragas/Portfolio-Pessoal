@@ -186,6 +186,42 @@ export function buildPortraitMask(cols: number, rows: number, seed = 7): Uint8Ar
   return mask;
 }
 
+export type HeadArea = { x: number; y: number; rx: number; ry: number };
+
+// Rough silhouette of Gustavo inside the crop (0..1): curly hair and face, then
+// shoulders and sweater down to the hands. Only used to pick tile sizes.
+const HEAD_SHAPE = { x: 0.49, y: 0.15, rx: 0.15, ry: 0.13 } as const;
+const BODY_SHAPE = { u0: 0.17, u1: 0.81, v0: 0.27 } as const;
+
+/**
+ * Tile size per portrait cell while nothing points at it, as an index into the
+ * engine levels: 0 = wall tile T for the panel behind him, 1 = T/2 for the body,
+ * 2 = T/3 and 3 = T/4 over the head and shoulders. Every boundary is dithered per
+ * tile, so the resolution grows toward the face without a hard ring or box.
+ */
+export function buildRestLevels(cols: number, rows: number, head: HeadArea, seed = 7): Uint8Array {
+  const levels = new Uint8Array(cols * rows);
+  for (let j = 0; j < rows; j += 1) {
+    for (let i = 0; i < cols; i += 1) {
+      const u = (i + 0.5) / cols;
+      const v = (j + 0.5) / rows;
+      const bodyDx = Math.max(BODY_SHAPE.u0 - u, 0, u - BODY_SHAPE.u1);
+      const bodyDy = Math.max(BODY_SHAPE.v0 - v, 0);
+      const body = Math.hypot(bodyDx, bodyDy);
+      const headDistance = Math.max(0, Math.hypot((u - HEAD_SHAPE.x) / HEAD_SHAPE.rx, (v - HEAD_SHAPE.y) / HEAD_SHAPE.ry) - 1) * 0.14;
+      const outside = Math.min(body, headDistance) + (hash2(i, j, seed + 51) - 0.5) * 0.05;
+      const k = j * cols + i;
+      if (outside > 0.035) {
+        levels[k] = 0;
+        continue;
+      }
+      const s = Math.hypot((u - head.x) / head.rx, (v - head.y) / head.ry) + (hash2(i, j, seed + 50) - 0.5) * 0.32;
+      levels[k] = s < 0.62 ? 3 : s < 1.02 ? 2 : 1;
+    }
+  }
+  return levels;
+}
+
 /** Entrance delay (seconds) per portrait tile: a diagonal wave plus a little jitter. */
 export function buildEntranceDelays(cols: number, rows: number, spread: number, jitter: number, seed = 7): Float32Array {
   const delays = new Float32Array(cols * rows);
