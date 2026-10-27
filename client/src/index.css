@@ -571,6 +571,16 @@ h2 {
   font-weight: 750;
 }
 
+.about-facts-flow {
+  display: none;
+  padding: 1.75rem var(--gutter) 0;
+}
+
+.about-facts-flow .about__facts {
+  max-width: 44rem;
+  margin-top: 0;
+}
+
 .story__anchor {
   position: absolute;
   left: 0;
@@ -1461,6 +1471,45 @@ h2 {
     margin-top: 1rem;
     padding-top: 0.75rem;
     font-size: 0.875rem;
+  }
+
+  /* The sticky stage is one screen tall: on phones the facts leave the overlay. */
+  .about__facts--overlay {
+    display: none;
+  }
+
+  .about-facts-flow {
+    display: block;
+  }
+
+  @media (max-height: 760px) {
+    .about {
+      gap: 0.75rem;
+      padding-top: calc(var(--topbar-h) + 0.5rem);
+      padding-bottom: 0.75rem;
+    }
+
+    .about__slot {
+      height: min(26svh, 11rem);
+    }
+
+    .about__text .kicker {
+      margin-bottom: 0.5rem;
+    }
+
+    .about__text h2 {
+      margin-bottom: 0.55rem;
+      font-size: clamp(1.4rem, 6.4vw, 1.9rem);
+    }
+
+    .about__paragraph {
+      font-size: 0.9rem;
+      line-height: 1.45;
+    }
+
+    .about__paragraph + .about__paragraph {
+      margin-top: 0.45rem;
+    }
   }
 
   .story[data-wall="static"] .story__hero,

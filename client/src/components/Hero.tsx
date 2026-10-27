@@ -1,7 +1,7 @@
 import { useLayoutEffect, useRef, useState } from 'react';
 import { ArrowDownRight } from 'lucide-react';
 import { usePortfolioContent } from '../LocaleContext';
-import About from './About';
+import About, { AboutFacts } from './About';
 import { createPixelWall, type CalmRect, type PixelWall, type Rect, type WallLayout } from './pixelWall/engine';
 import { useReducedMotion } from './pixelWall/useReducedMotion';
 
@@ -247,48 +247,53 @@ export default function Hero() {
   const interactive = wallState !== 'static' && wallState !== 'off';
 
   return (
-    <div className="story" data-wall={wallState} ref={storyRef}>
-      <div className="story__stage" ref={stageRef}>
-        <div className="story__hero on-wall" ref={heroBoxRef}>
-          <div className="story__frame-box" ref={frameBoxRef}>
-            <div className="story__frame" ref={frameRef}>
-              <div className="story__crop">
-                <img
-                  src={image}
-                  alt={ui.hero.portraitAlt}
-                  width={1200}
-                  height={1600}
-                  decoding="async"
-                  fetchPriority="high"
-                />
+    <>
+      <div className="story" data-wall={wallState} ref={storyRef}>
+        <div className="story__stage" ref={stageRef}>
+          <div className="story__hero on-wall" ref={heroBoxRef}>
+            <div className="story__frame-box" ref={frameBoxRef}>
+              <div className="story__frame" ref={frameRef}>
+                <div className="story__crop">
+                  <img
+                    src={image}
+                    alt={ui.hero.portraitAlt}
+                    width={1200}
+                    height={1600}
+                    decoding="async"
+                    fetchPriority="high"
+                  />
+                </div>
+                {interactive && (
+                  <p className="hero__hint" aria-hidden="true">
+                    <span className="hero__hint-pointer">{ui.hero.hintPointer}</span>
+                    <span className="hero__hint-touch">{ui.hero.hintTouch}</span>
+                  </p>
+                )}
               </div>
-              {interactive && (
-                <p className="hero__hint" aria-hidden="true">
-                  <span className="hero__hint-pointer">{ui.hero.hintPointer}</span>
-                  <span className="hero__hint-touch">{ui.hero.hintTouch}</span>
-                </p>
-              )}
             </div>
+            <canvas className="story__canvas" ref={canvasRef} aria-hidden="true" />
+            <section id="home" className="hero" aria-labelledby="hero-title">
+              <p className="hero__hello" data-calm="2">{ui.hero.hello}</p>
+              <h1 id="hero-title" className="hero__name" data-calm="1">
+                <span>{profile.firstName}</span> <span>{profile.lastName}</span>
+                {hiddenSurname && <span className="sr-only"> {hiddenSurname}</span>}
+              </h1>
+              <p className="hero__lead" data-calm="2">{ui.hero.lead}</p>
+              <div className="hero__actions" data-calm="2" ref={actionsRef} role="group" aria-label={ui.hero.actionsLabel}>
+                <a className="btn btn--pink" href="#projetos">
+                  {ui.hero.primaryCta} <ArrowDownRight aria-hidden="true" />
+                </a>
+                <a className="btn btn--line" href="#contato">{ui.hero.secondaryCta}</a>
+              </div>
+            </section>
           </div>
-          <canvas className="story__canvas" ref={canvasRef} aria-hidden="true" />
-          <section id="home" className="hero" aria-labelledby="hero-title">
-            <p className="hero__hello" data-calm="2">{ui.hero.hello}</p>
-            <h1 id="hero-title" className="hero__name" data-calm="1">
-              <span>{profile.firstName}</span> <span>{profile.lastName}</span>
-              {hiddenSurname && <span className="sr-only"> {hiddenSurname}</span>}
-            </h1>
-            <p className="hero__lead" data-calm="2">{ui.hero.lead}</p>
-            <div className="hero__actions" data-calm="2" ref={actionsRef} role="group" aria-label={ui.hero.actionsLabel}>
-              <a className="btn btn--pink" href="#projetos">
-                {ui.hero.primaryCta} <ArrowDownRight aria-hidden="true" />
-              </a>
-              <a className="btn btn--line" href="#contato">{ui.hero.secondaryCta}</a>
-            </div>
-          </section>
+          <About slotRef={aboutSlotRef} />
         </div>
-        <About slotRef={aboutSlotRef} />
+        <span id="sobre" className="story__anchor" aria-hidden="true" />
       </div>
-      <span id="sobre" className="story__anchor" aria-hidden="true" />
-    </div>
+      <div className="about-facts-flow">
+        <AboutFacts className="about__facts--flow" />
+      </div>
+    </>
   );
 }

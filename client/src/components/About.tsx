@@ -1,6 +1,21 @@
 import type { RefObject } from 'react';
 import { usePortfolioContent } from '../LocaleContext';
 
+/** Quick facts. Shown inside the sticky About on wide screens and after the story on phones. */
+export function AboutFacts({ className }: { className: string }) {
+  const { content } = usePortfolioContent();
+  return (
+    <dl className={`about__facts ${className}`}>
+      {content.ui.about.facts.map(([term, value]) => (
+        <div key={term}>
+          <dt>{term}</dt>
+          <dd>{value}</dd>
+        </div>
+      ))}
+    </dl>
+  );
+}
+
 type AboutProps = {
   /** Where the resolved portrait lands at the end of the scroll story. */
   slotRef: RefObject<HTMLDivElement | null>;
@@ -21,14 +36,7 @@ export default function About({ slotRef }: AboutProps) {
         {about.paragraphs.map((paragraph) => (
           <p className="about__paragraph" key={paragraph}>{paragraph}</p>
         ))}
-        <dl className="about__facts">
-          {about.facts.map(([term, value]) => (
-            <div key={term}>
-              <dt>{term}</dt>
-              <dd>{value}</dd>
-            </div>
-          ))}
-        </dl>
+        <AboutFacts className="about__facts--overlay" />
       </div>
     </section>
   );
