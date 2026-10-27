@@ -1,6 +1,6 @@
 import { Component, StrictMode, type ReactNode } from 'react'
 import { createRoot } from 'react-dom/client'
-import '@fontsource-variable/mona-sans'
+import '@fontsource-variable/mona-sans/wdth.css'
 import '@fontsource-variable/jetbrains-mono'
 import './index.css'
 import App from './App.tsx'
@@ -21,10 +21,10 @@ class AppErrorBoundary extends Component<{ children: ReactNode }, { failed: bool
 
       return (
         <main className="fatal-fallback">
-          <p className="section-kicker">{fatal.kicker}</p>
+          <p className="kicker">{fatal.kicker}</p>
           <h1>{fatal.title}</h1>
           <p>{fatal.description}</p>
-          <a className="button button--primary" href={window.location.href}>{fatal.action}</a>
+          <a className="btn btn--pink" href={window.location.href}>{fatal.action}</a>
         </main>
       )
     }

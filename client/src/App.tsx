@@ -1,14 +1,13 @@
-import { LazyMotion, domAnimation } from 'motion/react';
 import { usePortfolioContent } from './LocaleContext';
-import Sidebar from './components/Sidebar';
+import Topbar from './components/Topbar';
 import Hero from './components/Hero';
-import About from './components/About';
-import Skills from './components/Skills';
 import Projects from './components/Projects';
 import ExperienceSection from './components/Experience';
+import Skills from './components/Skills';
 import EducationSection from './components/Education';
 import Certificates from './components/Certificates';
 import Contact from './components/Contact';
+import TileRule from './components/TileRule';
 
 function App() {
   const currentYear = new Date().getFullYear();
@@ -16,26 +15,28 @@ function App() {
   const { profile, ui } = content;
 
   return (
-    <LazyMotion features={domAnimation}>
-      <div className="site-shell">
-        <a className="skip-link" href="#main-content">{ui.skipLink}</a>
-        <Sidebar />
-        <main id="main-content">
-          <Hero />
-          <About />
-          <Projects />
-          <Skills />
-          <ExperienceSection />
-          <EducationSection />
-          <Certificates />
-          <Contact />
-          <footer className="site-footer">
-            <p>© {currentYear} {profile.name}. {ui.footer.disclaimer}</p>
-            <p>{ui.footer.builtWith}</p>
-          </footer>
-        </main>
-      </div>
-    </LazyMotion>
+    <div className="site">
+      <a className="skip-link" href="#main-content">{ui.skipLink}</a>
+      <Topbar />
+      <main id="main-content">
+        <Hero />
+        <TileRule seed={3} />
+        <Projects />
+        <TileRule seed={5} />
+        <ExperienceSection />
+        <TileRule seed={8} />
+        <Skills />
+        <TileRule seed={13} />
+        <EducationSection />
+        <TileRule seed={21} />
+        <Certificates />
+        <Contact />
+      </main>
+      <footer className="site-footer on-wall">
+        <p>© {currentYear} {profile.name}. {ui.footer.disclaimer} {ui.footer.builtWith}</p>
+        <a className="text-link" href="#home">{ui.footer.backToTop}</a>
+      </footer>
+    </div>
   );
 }
 

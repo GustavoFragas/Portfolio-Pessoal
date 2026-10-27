@@ -1,45 +1,42 @@
 import { usePortfolioContent } from '../LocaleContext';
-import ScrollReveal from './ScrollReveal';
 
 export default function EducationSection() {
   const { content } = usePortfolioContent();
   const { education, languages, ui } = content;
 
   return (
-    <section id="formacao" className="section section--paper section--tight">
-      <ScrollReveal className="section-shell split-ledger" direction="up">
+    <section id="formacao" className="section study" aria-labelledby="study-title">
+      <div className="section__inner study__grid">
         <div>
-          <div className="section-heading">
-            <p className="section-kicker">{ui.education.educationKicker}</p>
-            <h2>{ui.education.educationTitle}</h2>
-          </div>
-          <div className="compact-ledger">
+          <header className="section__head section__head--single">
+            <p className="kicker">{ui.education.kicker}</p>
+            <h2 id="study-title">{ui.education.title}</h2>
+          </header>
+          <ol className="study__list">
             {education.map(([period, institution, program]) => (
-              <article key={institution}>
-                <time>{period}</time>
-                <div>
-                  <h3>{institution}</h3>
-                  <p>{program}</p>
-                </div>
-              </article>
+              <li key={institution}>
+                <p className="study__period">{period}</p>
+                <h3>{institution}</h3>
+                <p>{program}</p>
+              </li>
             ))}
-          </div>
+          </ol>
         </div>
         <div>
-          <div className="section-heading">
-            <p className="section-kicker">{ui.education.languagesKicker}</p>
+          <header className="section__head section__head--single">
+            <p className="kicker">{ui.education.languagesKicker}</p>
             <h2>{ui.education.languagesTitle}</h2>
-          </div>
-          <div className="language-grid">
-            {languages.map(([language, level]) => (
-              <div key={language}>
-                <span>{language}</span>
-                <strong>{level}</strong>
-              </div>
+          </header>
+          <ul className="study__languages">
+            {languages.map(([name, code, level]) => (
+              <li key={code}>
+                <span className="study__language" lang={code}>{name}</span>
+                <span className="study__level">{level}</span>
+              </li>
             ))}
-          </div>
+          </ul>
         </div>
-      </ScrollReveal>
+      </div>
     </section>
   );
 }

@@ -12,14 +12,9 @@ type LanguageSwitcherProps = {
 
 function LanguageSwitcher({ className, label, locale, onSelect }: LanguageSwitcherProps) {
   return (
-    <div className={`language-switcher ${className}`} role="group" aria-label={label}>
+    <div className={`language-switcher ${className}`} role="group" aria-label={label} data-calm="2">
       {supportedLocales.map((option) => (
-        <button
-          type="button"
-          key={option}
-          aria-pressed={locale === option}
-          onClick={() => onSelect(option)}
-        >
+        <button type="button" key={option} aria-pressed={locale === option} onClick={() => onSelect(option)}>
           {option.toUpperCase()}
         </button>
       ))}
@@ -27,7 +22,7 @@ function LanguageSwitcher({ className, label, locale, onSelect }: LanguageSwitch
   );
 }
 
-export default function Sidebar() {
+export default function Topbar() {
   const [isOpen, setIsOpen] = useState(false);
   const { content, locale, selectLocale } = usePortfolioContent();
   const { navItems, profile, ui } = content;
@@ -44,13 +39,13 @@ export default function Sidebar() {
   const closeMenu = () => setIsOpen(false);
 
   return (
-    <header className="topbar">
+    <header className={`topbar ${isOpen ? 'topbar--open' : ''}`}>
       <div className="topbar__inner">
-        <a className="brand-lockup" href="#home" onClick={closeMenu}>
-          <span>{profile.name}</span>
-          <small>{profile.displayTitle}</small>
+        <a className="brand" href="#home" onClick={closeMenu} data-calm="2" aria-label={`${profile.name} — ${ui.navigation.home}`}>
+          <span className="brand__mark" aria-hidden="true"><i /><i /><i /><i /></span>
+          <span className="brand__name">{profile.firstName} {profile.lastName}</span>
         </a>
-        <nav className="topbar__nav" aria-label={ui.navigation.mainLabel}>
+        <nav className="topbar__nav" aria-label={ui.navigation.mainLabel} data-calm="2">
           {navItems.map((item) => <a key={item.href} href={item.href}>{item.label}</a>)}
         </nav>
         <LanguageSwitcher
@@ -59,10 +54,10 @@ export default function Sidebar() {
           locale={locale}
           onSelect={selectLocale}
         />
-        <a className="button button--small button--primary topbar__contact" href="#contato">{ui.navigation.contact}</a>
         <button
-          className="icon-button topbar__menu"
+          className="topbar__menu"
           type="button"
+          data-calm="2"
           aria-label={isOpen ? ui.navigation.closeMenu : ui.navigation.openMenu}
           aria-expanded={isOpen}
           aria-controls="mobile-navigation"
@@ -83,7 +78,6 @@ export default function Sidebar() {
               closeMenu();
             }}
           />
-          <a className="button button--primary" href="#contato" onClick={closeMenu}>{ui.navigation.directContact}</a>
         </nav>
       </div>
     </header>

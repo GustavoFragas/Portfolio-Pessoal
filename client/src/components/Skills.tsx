@@ -1,35 +1,29 @@
 import { usePortfolioContent } from '../LocaleContext';
-import ScrollReveal from './ScrollReveal';
 
 export default function Skills() {
   const { content } = usePortfolioContent();
   const { capabilities, ui } = content;
 
   return (
-    <section id="capacidades" className="section section--paper">
-      <ScrollReveal className="section-shell" direction="left">
-        <div className="section-heading">
-          <p className="section-kicker">{ui.skills.kicker}</p>
-          <h2>{ui.skills.title}</h2>
-          <p>{ui.skills.description}</p>
-        </div>
-        <div className="capability-table" role="table" aria-label={ui.skills.tableLabel}>
-          <div className="capability-row capability-row--head" role="row">
-            <span role="columnheader">{ui.skills.area}</span>
-            <span role="columnheader">{ui.skills.evidence}</span>
-            <span role="columnheader">{ui.skills.tools}</span>
-            <span role="columnheader">{ui.skills.validation}</span>
+    <section id="ferramentas" className="section tools" aria-labelledby="tools-title">
+      <div className="section__inner">
+        <header className="section__head">
+          <div>
+            <p className="kicker">{ui.skills.kicker}</p>
+            <h2 id="tools-title">{ui.skills.title}</h2>
           </div>
-          {capabilities.map(([area, evidence, tools, validation]) => (
-            <div className="capability-row" role="row" key={area}>
-              <strong role="cell">{area}</strong>
-              <p role="cell">{evidence}</p>
-              <p role="cell" className="mono-list">{tools}</p>
-              <p role="cell">{validation}</p>
-            </div>
+          <p className="section__intro">{ui.skills.intro}</p>
+        </header>
+        <ul className="tools__list">
+          {capabilities.map(([area, sentence, tools]) => (
+            <li className="tools__row" key={area}>
+              <h3>{area}</h3>
+              <p>{sentence}</p>
+              <p className="tools__stack">{tools}</p>
+            </li>
           ))}
-        </div>
-      </ScrollReveal>
+        </ul>
+      </div>
     </section>
   );
 }

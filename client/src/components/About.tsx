@@ -1,33 +1,34 @@
+import type { RefObject } from 'react';
 import { usePortfolioContent } from '../LocaleContext';
-import ScrollReveal from './ScrollReveal';
 
-export default function About() {
+type AboutProps = {
+  /** Where the resolved portrait lands at the end of the scroll story. */
+  slotRef: RefObject<HTMLDivElement | null>;
+};
+
+export default function About({ slotRef }: AboutProps) {
   const { content } = usePortfolioContent();
-  const { evidenceRows, ui } = content;
+  const { about } = content.ui;
 
   return (
-    <section id="evidencias" className="section section--paper">
-      <div className="section-shell">
-        <ScrollReveal direction="left">
-          <div className="section-heading section-heading--split">
-            <div>
-              <p className="section-kicker">{ui.about.kicker}</p>
-              <h2>{ui.about.title}</h2>
+    <section className="about" aria-labelledby="about-title">
+      <div className="about__slot-col">
+        <div className="about__slot" ref={slotRef} aria-hidden="true" />
+      </div>
+      <div className="about__text" data-early="true">
+        <p className="kicker">{about.kicker}</p>
+        <h2 id="about-title">{about.title}</h2>
+        {about.paragraphs.map((paragraph) => (
+          <p className="about__paragraph" key={paragraph}>{paragraph}</p>
+        ))}
+        <dl className="about__facts">
+          {about.facts.map(([term, value]) => (
+            <div key={term}>
+              <dt>{term}</dt>
+              <dd>{value}</dd>
             </div>
-            <p>{ui.about.description}</p>
-          </div>
-        </ScrollReveal>
-        <ScrollReveal direction="left">
-          <div className="evidence-ledger" role="list">
-            {evidenceRows.map(([domain, evidence, validation]) => (
-              <article className="evidence-row" key={domain} role="listitem">
-                <span>{domain}</span>
-                <p>{evidence}</p>
-                <small>{validation}</small>
-              </article>
-            ))}
-          </div>
-        </ScrollReveal>
+          ))}
+        </dl>
       </div>
     </section>
   );
