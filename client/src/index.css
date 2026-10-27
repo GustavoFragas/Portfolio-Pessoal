@@ -463,7 +463,8 @@ h2 {
   justify-content: center;
   padding: 1rem 2rem 3rem var(--gutter);
   color: var(--paper);
-  opacity: clamp(0, calc(1 - (var(--p) - 0.06) * 5), 1);
+  /* Gone by p 0.18; the CTAs become inert at the same point (Hero.tsx). */
+  opacity: clamp(0, calc(1 - (var(--p) - 0.04) / 0.14), 1);
 }
 
 .hero > * {

@@ -49,7 +49,7 @@ export function valueNoise(x: number, y: number, cell: number, seed: number): nu
 /** Inclusive tile bounds of a calm zone. level 2 = no pink at all, 1 = little pink. */
 export type TileZone = { c0: number; r0: number; c1: number; r1: number; level: 1 | 2 };
 
-const CALM_FALLOFF = 3;
+const CALM_FALLOFF = 5;
 
 export type WallTiles = {
   /** Palette index per tile. */
@@ -58,9 +58,17 @@ export type WallTiles = {
   calm: Uint8Array;
 };
 
+function smooth(edge0: number, edge1: number, x: number): number {
+  const t = Math.min(1, Math.max(0, (x - edge0) / (edge1 - edge0)));
+  return t * t * (3 - 2 * t);
+}
+
 /**
- * Procedural wall: ~58 % ink/navy, ~32 % pink, ~10 % light pink, grouped in short
- * rectangular runs like the physical panel. Calm zones keep text legible.
+ * Procedural wall modelled on the AWS Summit panel: large pink areas peppered
+ * with navy squares next to large navy areas with a few pink ones, decided in
+ * 2×2 blocks (offset every other block row) with single-tile breaks that form
+ * the L shapes of the real panel. Roughly 60 % dark, 30 % pink, 10 % light pink.
+ * Calm zones keep text on ink and navy only.
  */
 export function buildWall(cols: number, rows: number, zones: readonly TileZone[], seed = 7): WallTiles {
   const colors = new Uint8Array(cols * rows);
@@ -80,40 +88,53 @@ export function buildWall(cols: number, rows: number, zones: readonly TileZone[]
           if (zone.level === 2) zero = true;
           else low = true;
         }
-        const weight = Math.max(0, 1 - distance / CALM_FALLOFF) * (zone.level === 2 ? 1 : 0.7);
+        const weight = (1 - smooth(0, CALM_FALLOFF, distance)) * (zone.level === 2 ? 1 : 0.7);
         if (weight > factor) factor = weight;
       }
 
-      const regional = 0.75 + 0.5 * valueNoise(c, r, 9, seed);
-      let pink = 0.32 * regional * (1 - factor);
-      let soft = 0.1 * regional * (1 - Math.min(1, factor * 1.6));
-      if (zero) {
-        pink = 0;
-        soft = 0;
-      } else if (low) {
-        pink = Math.min(pink, 0.1);
-        soft = 0;
-      }
+      // Large regions, then 2×2 blocks inside them.
+      const field = 0.65 * valueNoise(c, r, 16, seed) + 0.35 * valueNoise(c, r, 7, seed + 5);
+      let share = (0.04 + 0.9 * smooth(0.3, 0.76, field)) * (1 - factor);
+      if (zero) share = 0;
+      else if (low) share = Math.min(share, 0.06);
 
-      const superCol = Math.floor(c / 4);
-      const superRow = Math.floor(r / 3);
-      const shape = hash2(superCol, superRow, seed + 1);
-      const runWidth = shape < 0.45 ? 1 : shape < 0.8 ? 2 : 3;
-      const runHeight = hash2(superCol, superRow, seed + 2) < 0.65 ? 1 : 2;
-      const runCol = Math.floor(c / runWidth);
-      const runRow = Math.floor(r / runHeight);
-      const value = hash2(runCol, runRow, seed + 3);
+      const blockRow = Math.floor(r / 2);
+      const blockCol = Math.floor((c + (blockRow % 2)) / 2);
+      let pink = hash2(blockCol, blockRow, seed + 3) < share;
+      // A quarter of the tiles re-roll on their own: corners and single squares.
+      if (hash2(c, r, seed + 6) < 0.25) pink = hash2(c, r, seed + 8) < share;
 
       const index = r * cols + c;
-      if (value < pink) colors[index] = PINK;
-      else if (value < pink + soft) colors[index] = PINK_SOFT;
-      else colors[index] = hash2(runCol, runRow, seed + 4) < 0.55 ? NAVY : INK;
+      if (pink) colors[index] = hash2(blockCol, blockRow, seed + 9) < 0.24 && !low ? PINK_SOFT : PINK;
+      else {
+        const darkRow = Math.floor(r / 2);
+        const darkCol = Math.floor((c + 1) / 3);
+        colors[index] = hash2(darkCol, darkRow, seed + 4) < 0.5 ? NAVY : INK;
+      }
 
       calm[index] = zero ? 2 : low || factor > 0.35 ? 1 : 0;
     }
   }
 
   return { colors, calm };
+}
+
+/**
+ * Erosion for the moving portrait: the panel behind Gustavo falls away tile by
+ * tile from the outside in (p 0.14 → ~0.48), leaving a ragged halo of panel
+ * around him, so the crop never travels as a rectangle. Gustavo never erodes.
+ */
+export function buildErosion(cols: number, rows: number, seed = 7): Float32Array {
+  const out = new Float32Array(cols * rows);
+  for (let j = 0; j < rows; j += 1) {
+    for (let i = 0; i < cols; i += 1) {
+      // Dithered so the halo edge never follows the silhouette's straight sides.
+      const d = silhouetteDistance((i + 0.5) / cols, (j + 0.5) / rows) + (hash2(i, j, seed + 61) - 0.5) * 0.06;
+      const near = 1 - Math.min(1, Math.max(0, (d - HALO) / 0.3));
+      out[j * cols + i] = d <= HALO ? NEVER : 0.14 + 0.26 * near + 0.08 * hash2(i, j, seed + 60);
+    }
+  }
+  return out;
 }
 
 /**
@@ -141,31 +162,6 @@ export function buildThresholds(
 export const NEVER = 9;
 
 /**
- * Keeps a ragged fringe of wall tiles around a rectangle (in tiles) so the
- * resolved portrait still carries pieces of the wall once the rest is paper.
- */
-export function keepFringe(
-  thresholds: Float32Array,
-  cols: number,
-  rows: number,
-  zone: Omit<TileZone, 'level'>,
-  blocked: readonly TileZone[],
-  seed = 7,
-): void {
-  for (let r = Math.max(0, zone.r0 - 2); r <= Math.min(rows - 1, zone.r1 + 2); r += 1) {
-    for (let c = Math.max(0, zone.c0 - 2); c <= Math.min(cols - 1, zone.c1 + 2); c += 1) {
-      const dx = c < zone.c0 ? zone.c0 - c : c > zone.c1 ? c - zone.c1 : 0;
-      const dy = r < zone.r0 ? zone.r0 - r : r > zone.r1 ? r - zone.r1 : 0;
-      const distance = Math.max(dx, dy);
-      if (distance === 0) continue;
-      if (blocked.some((b) => c >= b.c0 && c <= b.c1 && r >= b.r0 && r <= b.r1)) continue;
-      const chance = distance === 1 ? 0.5 : 0.22;
-      if (hash2(c, r, seed + 40) < chance) thresholds[r * cols + c] = NEVER;
-    }
-  }
-}
-
-/**
  * Which portrait tiles show the photo. Tiles near the region edge randomly fall
  * back to the wall so Gustavo comes out of the wall instead of sitting in a box.
  */
@@ -189,9 +185,18 @@ export function buildPortraitMask(cols: number, rows: number, seed = 7): Uint8Ar
 export type HeadArea = { x: number; y: number; rx: number; ry: number };
 
 // Rough silhouette of Gustavo inside the crop (0..1): curly hair and face, then
-// shoulders and sweater down to the hands. Only used to pick tile sizes.
+// shoulders and sweater down to the hands. Only used to pick tile sizes and erosion.
 const HEAD_SHAPE = { x: 0.49, y: 0.15, rx: 0.15, ry: 0.13 } as const;
 const BODY_SHAPE = { u0: 0.17, u1: 0.81, v0: 0.27 } as const;
+/** Width of panel that stays around him once the rest has eroded. */
+export const HALO = 0.05;
+
+/** Approximate distance (in crop widths) from a crop point to Gustavo's silhouette; 0 inside. */
+export function silhouetteDistance(u: number, v: number): number {
+  const body = Math.hypot(Math.max(BODY_SHAPE.u0 - u, 0, u - BODY_SHAPE.u1), Math.max(BODY_SHAPE.v0 - v, 0));
+  const head = Math.max(0, Math.hypot((u - HEAD_SHAPE.x) / HEAD_SHAPE.rx, (v - HEAD_SHAPE.y) / HEAD_SHAPE.ry) - 1) * 0.14;
+  return Math.min(body, head);
+}
 
 /**
  * Tile size per portrait cell while nothing points at it, as an index into the
@@ -205,11 +210,7 @@ export function buildRestLevels(cols: number, rows: number, head: HeadArea, seed
     for (let i = 0; i < cols; i += 1) {
       const u = (i + 0.5) / cols;
       const v = (j + 0.5) / rows;
-      const bodyDx = Math.max(BODY_SHAPE.u0 - u, 0, u - BODY_SHAPE.u1);
-      const bodyDy = Math.max(BODY_SHAPE.v0 - v, 0);
-      const body = Math.hypot(bodyDx, bodyDy);
-      const headDistance = Math.max(0, Math.hypot((u - HEAD_SHAPE.x) / HEAD_SHAPE.rx, (v - HEAD_SHAPE.y) / HEAD_SHAPE.ry) - 1) * 0.14;
-      const outside = Math.min(body, headDistance) + (hash2(i, j, seed + 51) - 0.5) * 0.05;
+      const outside = silhouetteDistance(u, v) + (hash2(i, j, seed + 51) - 0.5) * 0.05;
       const k = j * cols + i;
       if (outside > 0.035) {
         levels[k] = 0;

@@ -9,12 +9,15 @@ import {
   PAPER,
   PINK,
   PINK_SOFT,
+  HALO,
   buildEntranceDelays,
+  buildErosion,
   buildPortraitMask,
   buildRestLevels,
   buildThresholds,
   buildWall,
-  keepFringe,
+  hash2,
+  silhouetteDistance,
   type TileZone,
 } from './tiles';
 
@@ -28,6 +31,8 @@ export type WallLayout = {
   tile: number;
   calm: readonly CalmRect[];
   early: readonly Rect[];
+  /** Tiles that stay wall until p 0.3 (behind the transparent topbar). */
+  late?: readonly Rect[];
   hero?: Rect | null;
   about?: Rect | null;
 };
@@ -64,6 +69,8 @@ const LEVELS = [1, 2, 3, 4, 6] as const;
 const LEVEL_STEPS = [0.14, 0.3, 0.44] as const;
 const FLIP_WINDOW = 0.045;
 const MOVE_START = 0.16;
+const TEXT_GONE = 0.18; // hero copy is fully transparent from here (index.css)
+const TOPBAR_PAPER = 0.3; // the topbar turns to paper from here (Hero.tsx)
 const MOVE_SPAN = 0.52;
 const LENS_LIMIT = 0.06;
 // Head and shoulders, relative to the crop: they rest at finer tiles than the body.
@@ -176,6 +183,13 @@ export function createPixelWall(canvas: HTMLCanvasElement, options: Options): Pi
   let prows = 0;
   let mask: Uint8Array = new Uint8Array(0);
   let maskCanvas: HTMLCanvasElement | null = null;
+  let erosion: Float32Array = new Float32Array(0);
+  let liveMask: HTMLCanvasElement | null = null;
+  let liveMaskData: ImageData | null = null;
+  let liveMaskAt = -1;
+  let personMask: HTMLCanvasElement | null = null; // Gustavo's cells; the rest is panel
+  const layer = makeCanvas(1, 1);
+  const layerCtx = context2d(layer);
   let delays: Float32Array = new Float32Array(0);
   let levels: HTMLCanvasElement[] = [];
   let full: HTMLCanvasElement | null = null;
@@ -215,6 +229,10 @@ export function createPixelWall(canvas: HTMLCanvasElement, options: Options): Pi
     const maskImage = maskCtx.createImageData(pcols, prows);
     for (let i = 0; i < mask.length; i += 1) maskImage.data[i * 4 + 3] = mask[i] ? 255 : 0;
     maskCtx.putImageData(maskImage, 0, 0);
+    erosion = buildErosion(pcols, prows);
+    liveMask = makeCanvas(pcols, prows);
+    liveMaskData = context2d(liveMask).createImageData(pcols, prows);
+    liveMaskAt = -1;
 
     if (!photo) return;
     if (!cropCanvas) {
@@ -249,6 +267,11 @@ export function createPixelWall(canvas: HTMLCanvasElement, options: Options): Pi
   function buildRest() {
     if (!levels.length) return;
     restLevels = buildRestLevels(pcols, prows, HEAD);
+    personMask = makeCanvas(pcols, prows);
+    const personCtx = context2d(personMask);
+    const personData = personCtx.createImageData(pcols, prows);
+    for (let k = 0; k < restLevels.length; k += 1) personData.data[k * 4 + 3] = restLevels[k] > 0 ? 255 : 0;
+    personCtx.putImageData(personData, 0, 0);
     const w = pcols * td;
     const h = prows * td;
     restCanvas = makeCanvas(w, h);
@@ -298,12 +321,25 @@ export function createPixelWall(canvas: HTMLCanvasElement, options: Options): Pi
     rows = Math.ceil(heightD / td);
     lensRadius = Math.min(150, Math.max(90, Math.min(layout.width, layout.height) * 0.17)) * dpr;
 
-    const zones: TileZone[] = layout.calm.map((rect) => ({ ...toZone(rect, dpr, td, cols, rows, 0), level: rect.level }));
+    const zones: TileZone[] = layout.calm.map((rect) => ({ ...toZone(rect, dpr, td, cols, rows, 1), level: rect.level }));
     const early: TileZone[] = layout.early.map((rect) => ({ ...toZone(rect, dpr, td, cols, rows, 2), level: 2 }));
     const wall = buildWall(cols, rows, zones);
     colors = wall.colors;
     calm = wall.calm;
     thresholds = buildThresholds(cols, rows, early);
+    // Tiles behind text stay until the text has faded; behind the topbar, until it turns to paper.
+    for (let i = 0; i < calm.length; i += 1) {
+      if (calm[i] === 2) thresholds[i] = Math.max(thresholds[i], TEXT_GONE + 0.1 * hash2(i % cols, Math.floor(i / cols), 71));
+    }
+    for (const rect of layout.late ?? []) {
+      const z = toZone(rect, dpr, td, cols, rows, 1);
+      for (let r = z.r0; r <= z.r1; r += 1) {
+        for (let c = z.c0; c <= z.c1; c += 1) {
+          const i = r * cols + c;
+          thresholds[i] = Math.max(thresholds[i], TOPBAR_PAPER + 0.1 * hash2(c, r, 72));
+        }
+      }
+    }
 
     const previous = portraitKey;
     hero = null;
@@ -323,13 +359,22 @@ export function createPixelWall(canvas: HTMLCanvasElement, options: Options): Pi
           w,
           h,
         };
-        keepFringe(
-          thresholds,
-          cols,
-          rows,
-          toZone({ x: about.x / dpr, y: about.y / dpr, w: about.w / dpr, h: about.h / dpr }, dpr, td, cols, rows, 0),
-          early,
-        );
+        // A few wall tiles survive around the eroded halo: the last pieces of the wall.
+        const blocked = early;
+        const c0 = Math.max(0, Math.floor(about.x / td) - 1);
+        const c1 = Math.min(cols - 1, Math.floor((about.x + about.w) / td) + 1);
+        const r0 = Math.max(0, Math.floor(about.y / td) - 1);
+        const r1 = Math.min(rows - 1, Math.floor((about.y + about.h) / td) + 1);
+        for (let r = r0; r <= r1; r += 1) {
+          for (let c = c0; c <= c1; c += 1) {
+            if (blocked.some((b) => c >= b.c0 && c <= b.c1 && r >= b.r0 && r <= b.r1)) continue;
+            const u = ((c + 0.5) * td - about.x) / about.w;
+            const v = ((r + 0.5) * td - about.y) / about.h;
+            const d = silhouetteDistance(u, v);
+            const chance = d < HALO ? 0 : d < HALO + 0.07 ? 0.45 : d < HALO + 0.15 ? 0.16 : 0;
+            if (hash2(c, r, 40) < chance) thresholds[r * cols + c] = NEVER;
+          }
+        }
       }
       portraitKey = `${pcols}x${prows}@${td}/${gd}`;
       if (portraitKey !== previous || !maskCanvas || (photo && !levels.length)) rebuildPortrait();
@@ -498,12 +543,26 @@ export function createPixelWall(canvas: HTMLCanvasElement, options: Options): Pi
   }
 
   /** Draws a portrait image into rect with optional grout lines, masked to the ragged edge. */
-  function drawPortraitImage(image: HTMLCanvasElement, rect: Rect, gridCols: number, gridRows: number, smooth: boolean) {
+  /** Mask with the eroded edge tiles removed for the current progress. */
+  function currentMask(p: number): HTMLCanvasElement | null {
+    if (!maskCanvas || !liveMask || !liveMaskData || p < 0.14) return maskCanvas;
+    if (p !== liveMaskAt) {
+      const data = liveMaskData.data;
+      for (let k = 0; k < mask.length; k += 1) data[k * 4 + 3] = mask[k] && p < erosion[k] ? 255 : 0;
+      context2d(liveMask).putImageData(liveMaskData, 0, 0);
+      liveMaskAt = p;
+    }
+    return liveMask;
+  }
+
+  /** Draws a portrait image into rect with optional grout lines, masked to the ragged (and eroding) edge. */
+  function drawPortraitImage(image: HTMLCanvasElement, rect: Rect, gridCols: number, gridRows: number, smooth: boolean, p = 0) {
     const w = Math.max(1, Math.round(rect.w));
     const h = Math.max(1, Math.round(rect.h));
     const tile = gridRows > 0 ? h / gridRows : 0;
     const lineAlpha = tile >= 5 ? clamp01((tile - 5) / 4) : 0;
-    if (lineAlpha <= 0 || !maskCanvas) {
+    const edgeMask = currentMask(p);
+    if (!edgeMask || (lineAlpha <= 0 && edgeMask === maskCanvas)) {
       ctx.imageSmoothingEnabled = smooth;
       ctx.drawImage(image, Math.round(rect.x), Math.round(rect.y), w, h);
       ctx.imageSmoothingEnabled = false;
@@ -517,15 +576,58 @@ export function createPixelWall(canvas: HTMLCanvasElement, options: Options): Pi
     scratchCtx.clearRect(0, 0, w, h);
     scratchCtx.imageSmoothingEnabled = smooth;
     scratchCtx.drawImage(image, 0, 0, w, h);
-    const line = Math.max(1, Math.round((gd * tile) / td));
-    scratchCtx.globalAlpha = lineAlpha;
-    scratchCtx.fillStyle = INK_CSS;
-    for (let k = 1; k <= gridCols; k += 1) scratchCtx.fillRect(Math.round((k * w) / gridCols) - line, 0, line, h);
-    for (let k = 1; k <= gridRows; k += 1) scratchCtx.fillRect(0, Math.round((k * h) / gridRows) - line, w, line);
-    scratchCtx.globalAlpha = 1;
+    if (lineAlpha > 0) {
+      const line = Math.max(1, Math.round((gd * tile) / td));
+      scratchCtx.globalAlpha = lineAlpha;
+      scratchCtx.fillStyle = INK_CSS;
+      for (let k = 1; k <= gridCols; k += 1) scratchCtx.fillRect(Math.round((k * w) / gridCols) - line, 0, line, h);
+      for (let k = 1; k <= gridRows; k += 1) scratchCtx.fillRect(0, Math.round((k * h) / gridRows) - line, w, line);
+      scratchCtx.globalAlpha = 1;
+    }
     scratchCtx.globalCompositeOperation = 'destination-in';
     scratchCtx.imageSmoothingEnabled = false;
-    scratchCtx.drawImage(maskCanvas, 0, 0, w, h);
+    scratchCtx.drawImage(edgeMask, 0, 0, w, h);
+    scratchCtx.globalCompositeOperation = 'source-over';
+    ctx.drawImage(scratch, 0, 0, w, h, Math.round(rect.x), Math.round(rect.y), w, h);
+  }
+
+  /**
+   * The portrait while it travels to About: Gustavo sharpens step by step while
+   * the panel behind him keeps the wall tile and erodes with the wall.
+   */
+  function drawTravelling(image: HTMLCanvasElement, rect: Rect, smooth: boolean, p: number) {
+    const edgeMask = currentMask(p);
+    if (!edgeMask || !personMask || !levels.length) return;
+    const w = Math.max(1, Math.round(rect.w));
+    const h = Math.max(1, Math.round(rect.h));
+    for (const target of [scratch, layer]) {
+      if (target.width < w || target.height < h) {
+        target.width = Math.max(target.width, w);
+        target.height = Math.max(target.height, h);
+      }
+    }
+    // Panel: wall-sized tiles with grout.
+    scratchCtx.globalCompositeOperation = 'source-over';
+    scratchCtx.clearRect(0, 0, w, h);
+    scratchCtx.imageSmoothingEnabled = false;
+    scratchCtx.drawImage(levels[0], 0, 0, w, h);
+    const line = Math.max(1, Math.round((gd * h) / (prows * td)));
+    scratchCtx.fillStyle = INK_CSS;
+    for (let k = 1; k <= pcols; k += 1) scratchCtx.fillRect(Math.round((k * w) / pcols) - line, 0, line, h);
+    for (let k = 1; k <= prows; k += 1) scratchCtx.fillRect(0, Math.round((k * h) / prows) - line, w, line);
+    // Gustavo: the finer level, cut to his cells.
+    layerCtx.globalCompositeOperation = 'source-over';
+    layerCtx.clearRect(0, 0, w, h);
+    layerCtx.imageSmoothingEnabled = smooth;
+    layerCtx.drawImage(image, 0, 0, w, h);
+    layerCtx.globalCompositeOperation = 'destination-in';
+    layerCtx.imageSmoothingEnabled = false;
+    layerCtx.drawImage(personMask, 0, 0, w, h);
+    layerCtx.globalCompositeOperation = 'source-over';
+    scratchCtx.drawImage(layer, 0, 0, w, h, 0, 0, w, h);
+    // Ragged edge plus erosion.
+    scratchCtx.globalCompositeOperation = 'destination-in';
+    scratchCtx.drawImage(edgeMask, 0, 0, w, h);
     scratchCtx.globalCompositeOperation = 'source-over';
     ctx.drawImage(scratch, 0, 0, w, h, Math.round(rect.x), Math.round(rect.y), w, h);
   }
@@ -673,9 +775,9 @@ export function createPixelWall(canvas: HTMLCanvasElement, options: Options): Pi
     if (step === 0 && restCanvas) {
       ctx.drawImage(restCanvas, Math.round(rect.x), Math.round(rect.y));
       if (lens.r > 2) drawLens();
-    } else if (step === 1) drawPortraitImage(levels[3], rect, pcols * 4, prows * 4, false);
-    else if (step === 2) drawPortraitImage(levels[4], rect, pcols * 6, prows * 6, false);
-    else drawPortraitImage(full, rect, 0, 0, true);
+    } else if (step === 1) drawTravelling(levels[3], rect, false, p);
+    else if (step === 2) drawTravelling(levels[4], rect, false, p);
+    else drawTravelling(full, rect, true, p);
   }
 
   function render(now: number) {

@@ -76,7 +76,7 @@ export default function Contact() {
       <div className="contact__inner">
         <div className="contact__copy">
           <p className="kicker kicker--wall" data-calm="2">{ui.contact.kicker}</p>
-          <h2 id="contact-title" data-calm="1">{ui.contact.title}</h2>
+          <h2 id="contact-title" data-calm="2">{ui.contact.title}</h2>
           <p className="contact__lead" data-calm="2">{ui.contact.description}</p>
         </div>
         <ul className="contact__channels">

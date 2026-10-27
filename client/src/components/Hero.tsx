@@ -9,6 +9,9 @@ import { useReducedMotion } from './pixelWall/useReducedMotion';
 type WallState = 'loading' | 'entering' | 'idle' | 'static' | 'off';
 
 const PORTRAIT_RATIO = 7 / 9;
+// Keep in sync with the engine and index.css: hero copy is gone at 0.18, the topbar turns to paper at 0.3.
+const TEXT_GONE = 0.18;
+const TOPBAR_PAPER = 0.3;
 
 function relative(el: Element, base: DOMRect): Rect {
   const r = el.getBoundingClientRect();
@@ -89,6 +92,7 @@ export default function Hero() {
     const measure = (): WallLayout => {
       const base = canvas.getBoundingClientRect();
       const calm: CalmRect[] = [];
+      const late: Rect[] = [];
       story.querySelectorAll<HTMLElement>('[data-calm]').forEach((el) => {
         const rect = relative(el, base);
         if (rect.w > 0) calm.push({ ...rect, level: el.dataset.calm === '1' ? 1 : 2 });
@@ -96,7 +100,10 @@ export default function Hero() {
       // The fixed topbar sits over the top of the wall whenever the hero is on screen.
       document.querySelectorAll<HTMLElement>('.topbar [data-calm]').forEach((el) => {
         const r = el.getBoundingClientRect();
-        if (r.width > 0) calm.push({ x: r.left - base.left, y: r.top, w: r.width, h: r.height, level: 2 });
+        if (r.width === 0) return;
+        const rect = { x: r.left - base.left, y: r.top, w: r.width, h: r.height };
+        calm.push({ ...rect, level: 2 });
+        late.push(rect);
       });
       const early = Array.from(story.querySelectorAll('[data-early]')).map((el) => relative(el, base));
       return {
@@ -105,6 +112,7 @@ export default function Hero() {
         tile: base.width < 760 ? 9 : 12,
         calm,
         early,
+        late,
         hero: relative(frame, base),
         about: motion ? relative(aboutSlot, base) : null,
       };
@@ -128,14 +136,14 @@ export default function Hero() {
         story.style.setProperty('--p', progress.toFixed(4));
         wall?.setProgress(progress);
       }
-      const hide = progress > 0.3;
+      const hide = progress >= TEXT_GONE; // same point where the copy reaches opacity 0
       if (hide !== ctaHidden) {
         ctaHidden = hide;
         actions.inert = hide;
       }
       const topbarHeight = document.querySelector<HTMLElement>('.topbar__inner')?.offsetHeight ?? 64;
       const onWall = motion && wall
-        ? progress < 0.1 && rect.bottom > topbarHeight
+        ? progress < TOPBAR_PAPER && rect.bottom > topbarHeight
         : rect.top + heroBox.offsetHeight > topbarHeight * 1.5;
       setTopbarSurface(onWall ? 'wall' : 'paper');
     };
@@ -274,7 +282,7 @@ export default function Hero() {
             <canvas className="story__canvas" ref={canvasRef} aria-hidden="true" />
             <section id="home" className="hero" aria-labelledby="hero-title">
               <p className="hero__hello" data-calm="2">{ui.hero.hello}</p>
-              <h1 id="hero-title" className="hero__name" data-calm="1">
+              <h1 id="hero-title" className="hero__name" data-calm="2">
                 <span>{profile.firstName}</span> <span>{profile.lastName}</span>
                 {hiddenSurname && <span className="sr-only"> {hiddenSurname}</span>}
               </h1>
