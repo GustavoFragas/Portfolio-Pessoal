@@ -16,13 +16,13 @@ function getPublicUrl(locale: PortfolioLocale) {
   return url.toString();
 }
 
-function updateStructuredData(url: string, language: string, description: string) {
+function updateStructuredData(url: string, language: string, description: string, jobTitle: string) {
   const script = document.querySelector<HTMLScriptElement>('script[type="application/ld+json"]');
   if (!script?.textContent) return;
 
   try {
     const data = JSON.parse(script.textContent) as Record<string, unknown>;
-    script.textContent = JSON.stringify({ ...data, url, inLanguage: language, description });
+    script.textContent = JSON.stringify({ ...data, url, inLanguage: language, description, jobTitle });
   } catch {
     // Keep the static, CSP-approved JSON-LD if a browser extension changes its contents.
   }
@@ -60,7 +60,7 @@ export function LocaleProvider({ children }: { children: ReactNode }) {
     setMeta('meta[name="twitter:description"]', meta.socialDescription);
     setMeta('meta[name="twitter:image:alt"]', meta.socialImageAlt);
     document.querySelector<HTMLLinkElement>('link[rel="canonical"]')?.setAttribute('href', publicUrl);
-    updateStructuredData(publicUrl, meta.htmlLang, meta.description);
+    updateStructuredData(publicUrl, meta.htmlLang, meta.description, content.profile.officialTitle);
   }, [content, locale]);
 
   const value = useMemo<LocaleContextValue>(
