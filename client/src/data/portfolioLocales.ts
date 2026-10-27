@@ -93,7 +93,7 @@ const ptUi = {
     facts: [
       ['Base', 'São Paulo'],
       ['Idiomas', 'português, espanhol e inglês'],
-      ['Estudando', 'Software Development na BYU–Idaho'],
+      ['Estudando', 'Software Development na BYU\u2011Idaho'],
     ],
   },
   projects: {
@@ -129,7 +129,8 @@ const ptUi = {
   certificates: {
     kicker: 'Credenciais',
     title: 'Aprender também faz parte do trabalho',
-    hint: 'Passe o mouse, use Tab ou toque para virar.',
+    hintPointer: 'Passe o mouse ou use Tab para virar.',
+    hintTouch: 'Toque para virar.',
     flip: 'Virar credencial',
     open: 'Ver credencial',
     openPdf: 'Ver certificado (PDF)',
@@ -211,7 +212,7 @@ const enUi: Ui = {
     facts: [
       ['Based in', 'São Paulo'],
       ['Languages', 'Portuguese, Spanish and English'],
-      ['Studying', 'Software Development at BYU–Idaho'],
+      ['Studying', 'Software Development at BYU\u2011Idaho'],
     ],
   },
   projects: {
@@ -247,7 +248,8 @@ const enUi: Ui = {
   certificates: {
     kicker: 'Credentials',
     title: 'Learning is part of the job',
-    hint: 'Hover, tab or tap to flip.',
+    hintPointer: 'Hover or press Tab to flip.',
+    hintTouch: 'Tap to flip.',
     flip: 'Flip credential',
     open: 'View credential',
     openPdf: 'View certificate (PDF)',
@@ -315,7 +317,7 @@ const esUi: Ui = {
     facts: [
       ['Base', 'São Paulo'],
       ['Idiomas', 'portugués, español e inglés'],
-      ['Estudiando', 'Software Development en BYU–Idaho'],
+      ['Estudiando', 'Software Development en BYU\u2011Idaho'],
     ],
   },
   projects: {
@@ -351,7 +353,8 @@ const esUi: Ui = {
   certificates: {
     kicker: 'Credenciales',
     title: 'Aprender también es parte del trabajo',
-    hint: 'Pasa el mouse, usa Tab o toca para girar.',
+    hintPointer: 'Pasa el mouse o usa Tab para girar.',
+    hintTouch: 'Toca para girar.',
     flip: 'Girar credencial',
     open: 'Ver credencial',
     openPdf: 'Ver certificado (PDF)',
@@ -390,7 +393,7 @@ const enCases: CaseItem[] = [
     validation: [
       'Parallel validation before switching off the previous cache.',
       'Local SQS/DLQ tests covering consumption, visibility timeout, retries and redrive.',
-      'RTM evidence and hand-off to acceptance testing when the scope required it.',
+      'I logged the tests and handed off to acceptance testing when the scope called for it.',
     ],
     tools: ['C#/.NET', 'TypeScript/Node.js', 'Lambda', 'S3', 'SQS/DLQ', 'EventBridge', 'Datadog', 'Notion API'],
     caveat: 'Anonymized for confidentiality: no client, metrics or internal details.',
@@ -410,7 +413,7 @@ const enCases: CaseItem[] = [
     validation: [
       'Specs for controller, use case, queue, logger, masking and the global exception filter.',
       'Local tests for consumption, retry and DLQ forwarding.',
-      'Technical evidence before promoting between environments.',
+      'Everything documented before moving up an environment.',
     ],
     tools: ['TypeScript', 'REST API', 'SQS FIFO', 'DLQ', 'Jest', 'structured logs'],
     caveat: 'Heavily anonymized: no client, business domain or internal architecture.',
@@ -465,7 +468,7 @@ const esCases: CaseItem[] = [
     validation: [
       'Validación en paralelo antes de apagar el caché anterior.',
       'Pruebas locales con SQS/DLQ que cubren consumo, visibility timeout, retries y redrive.',
-      'Evidencias RTM y paso a homologación cuando el alcance lo pedía.',
+      'Registré las pruebas y pasé a homologación cuando el alcance lo pedía.',
     ],
     tools: ['C#/.NET', 'TypeScript/Node.js', 'Lambda', 'S3', 'SQS/DLQ', 'EventBridge', 'Datadog', 'Notion API'],
     caveat: 'Anonimizado por confidencialidad: sin cliente, métricas ni detalles internos.',
@@ -485,7 +488,7 @@ const esCases: CaseItem[] = [
     validation: [
       'Specs para controller, caso de uso, cola, logger, enmascaramiento y filtro global de excepciones.',
       'Pruebas locales de consumo, retry y envío a la DLQ.',
-      'Evidencia técnica antes de promover entre entornos.',
+      'Todo documentado antes de subir de entorno.',
     ],
     tools: ['TypeScript', 'API REST', 'SQS FIFO', 'DLQ', 'Jest', 'logs estructurados'],
     caveat: 'Muy anonimizado: sin cliente, dominio de negocio ni arquitectura interna.',
@@ -529,7 +532,7 @@ const enCapabilities: Capability[] = [
   ['SaaS integrations', 'Routines that connect Notion, Datadog, DocuSign CLM and other APIs, with error handling and per-source tracing.', 'Notion API, Datadog, DocuSign CLM, webhooks and EventBridge'],
   ['Data', 'Deduplication, freshness, backfill and reconciliation: data arriving right before it turns into a dashboard.', 'SQL, Athena, S3 and QuickSight'],
   ['AWS and delivery', 'I shipped a frontend on Amplify, and I use or have reviewed workloads on App Runner, Lambda, S3 and SQS.', 'Amplify, Lambda, S3, SQS/DLQ, App Runner, GitHub Actions and Docker'],
-  ['Testing and observability', 'Local tests, decisive scenarios and evidence before anything goes to acceptance testing.', 'Datadog, Sonar, Gitleaks and integration tests'],
+  ['Testing and observability', 'I test the scenarios that matter locally before anything goes to acceptance testing.', 'Datadog, Sonar, Gitleaks and integration tests'],
   ['Engineering with agents', 'Agent chains, MCPs and Learning Loop to split context and review work. Scope, code, tests and the final call stay with me.', 'Codex, Kiro, MCP and Learning Loop'],
 ];
 
@@ -538,7 +541,7 @@ const esCapabilities: Capability[] = [
   ['Integraciones SaaS', 'Rutinas que conectan Notion, Datadog, DocuSign CLM y otras APIs, con manejo de errores y trazabilidad por fuente.', 'Notion API, Datadog, DocuSign CLM, webhooks y EventBridge'],
   ['Datos', 'Deduplicación, freshness, backfill y conciliación: que el dato llegue bien antes de convertirse en panel.', 'SQL, Athena, S3 y QuickSight'],
   ['AWS y entrega', 'Publiqué un frontend en Amplify, y uso o revisé workloads en App Runner, Lambda, S3 y SQS.', 'Amplify, Lambda, S3, SQS/DLQ, App Runner, GitHub Actions y Docker'],
-  ['Pruebas y observabilidad', 'Prueba local, escenario decisivo y evidencia antes de pasar a homologación.', 'Datadog, Sonar, Gitleaks y pruebas de integración'],
+  ['Pruebas y observabilidad', 'Pruebo localmente los escenarios que importan antes de pasar a homologación.', 'Datadog, Sonar, Gitleaks y pruebas de integración'],
   ['Ingeniería con agentes', 'Cadenas de agentes, MCPs y Learning Loop para dividir contexto y revisar entregas. El alcance, el código, las pruebas y la decisión final siguen siendo míos.', 'Codex, Kiro, MCP y Learning Loop'],
 ];
 
@@ -561,13 +564,13 @@ const esExperiences: ExperienceItem[] = [
 ];
 
 const enEducation: EducationItem[] = [
-  ['May 2025 – Dec 2027', 'Brigham Young University–Idaho', 'Bachelor of Science in Software Development (in progress)'],
+  ['May 2025 – Dec 2027', 'Brigham Young University\u2011Idaho', 'Bachelor of Science in Software Development (in progress)'],
   ['Oct 2025 – Jul 2027', 'UFBRA', 'Technology degree in Systems Analysis and Development (in progress)'],
   ['Feb 2020 – Nov 2022', 'ETEC Parque Belém', 'Technical diploma in Systems Development'],
 ];
 
 const esEducation: EducationItem[] = [
-  ['may. 2025 – dic. 2027', 'Brigham Young University–Idaho', 'Bachelor of Science en Software Development (en curso)'],
+  ['may. 2025 – dic. 2027', 'Brigham Young University\u2011Idaho', 'Bachelor of Science en Software Development (en curso)'],
   ['oct. 2025 – jul. 2027', 'UFBRA', 'Tecnología en Análisis y Desarrollo de Sistemas (en curso)'],
   ['feb. 2020 – nov. 2022', 'ETEC Parque Belém', 'Técnico en Desarrollo de Sistemas'],
 ];

@@ -40,7 +40,7 @@ export const cases = [
     validation: [
       'Validação em paralelo antes de desligar o cache anterior.',
       'Testes locais com SQS/DLQ cobrindo consumo, visibility timeout, retries e redrive.',
-      'Evidências RTM e envio para homologação quando o escopo pedia.',
+      'Registrei os testes e passei para homologação quando o escopo pedia.',
     ],
     tools: ['C#/.NET', 'TypeScript/Node.js', 'Lambda', 'S3', 'SQS/DLQ', 'EventBridge', 'Datadog', 'Notion API'],
     caveat: 'Anonimizado por confidencialidade: sem cliente, métricas ou detalhes internos.',
@@ -63,7 +63,7 @@ export const cases = [
     validation: [
       'Specs para controller, caso de uso, fila, logger, mascaramento e filtro global de exceções.',
       'Testes locais de consumo, retry e envio para a DLQ.',
-      'Evidência técnica antes de promover entre ambientes.',
+      'Tudo documentado antes de subir de ambiente.',
     ],
     tools: ['TypeScript', 'API REST', 'SQS FIFO', 'DLQ', 'Jest', 'logs estruturados'],
     caveat: 'Bem anonimizado: sem cliente, domínio de negócio ou arquitetura interna.',
@@ -112,7 +112,7 @@ export const capabilities = [
   ['Integrações SaaS', 'Rotinas que conectam Notion, Datadog, DocuSign CLM e outras APIs, com tratamento de erro e rastreio por fonte.', 'Notion API, Datadog, DocuSign CLM, webhooks e EventBridge'],
   ['Dados', 'Deduplicação, freshness, backfill e reconciliação: o dado chegando certo antes de virar painel.', 'SQL, Athena, S3 e QuickSight'],
   ['AWS e entrega', 'Publiquei frontend no Amplify e uso ou revisei workloads em App Runner, Lambda, S3 e SQS.', 'Amplify, Lambda, S3, SQS/DLQ, App Runner, GitHub Actions e Docker'],
-  ['Testes e observabilidade', 'Teste local, cenário decisivo e evidência antes de mandar para homologação.', 'Datadog, Sonar, Gitleaks e testes de integração'],
+  ['Testes e observabilidade', 'Testo localmente os cenários que importam antes de mandar para homologação.', 'Datadog, Sonar, Gitleaks e testes de integração'],
   ['Engenharia com agentes', 'Cadeias de agentes, MCPs e Learning Loop para dividir contexto e revisar entregas. Escopo, código, teste e decisão final continuam comigo.', 'Codex, Kiro, MCP e Learning Loop'],
 ] as const;
 
@@ -126,7 +126,7 @@ export const experiences = [
 ] as const;
 
 export const education = [
-  ['mai/2025 – dez/2027', 'Brigham Young University–Idaho', 'Bachelor of Science em Software Development (em andamento)'],
+  ['mai/2025 – dez/2027', 'Brigham Young University\u2011Idaho', 'Bachelor of Science em Software Development (em andamento)'],
   ['out/2025 – jul/2027', 'UFBRA', 'Tecnologia em Análise e Desenvolvimento de Sistemas (em andamento)'],
   ['fev/2020 – nov/2022', 'ETEC Parque Belém', 'Técnico em Desenvolvimento de Sistemas'],
 ] as const;

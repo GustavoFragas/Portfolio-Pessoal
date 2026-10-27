@@ -438,16 +438,19 @@ h2 {
   background: var(--wall-pink);
 }
 
-.hero__hint-touch {
+.hero__hint-touch,
+.pointer-coarse {
   display: none;
 }
 
 @media (pointer: coarse) {
-  .hero__hint-pointer {
+  .hero__hint-pointer,
+  .pointer-fine {
     display: none;
   }
 
-  .hero__hint-touch {
+  .hero__hint-touch,
+  .pointer-coarse {
     display: inline;
   }
 }
@@ -1143,36 +1146,54 @@ h2 {
 }
 
 .cred__front {
-  align-items: center;
-  justify-content: center;
+  container-type: inline-size;
+  flex-direction: column;
   background: var(--paper-deep);
   box-shadow: inset 0 0 0 2px var(--ink);
 }
 
-.cred__front img {
-  width: 72%;
-  height: 72%;
+.cred__emblem {
+  flex: 1 1 auto;
+  min-height: 0;
+  display: grid;
+  place-items: center;
+}
+
+.cred__emblem img {
+  width: auto;
+  height: 74%;
+  max-width: 80%;
   object-fit: contain;
 }
 
-.cred:nth-child(4) .cred__front,
-.cred:nth-child(5) .cred__front {
+/* Lettered plate for issuers without official art: same footprint as a badge. */
+.cred__plate {
+  display: grid;
+  place-items: center;
+  height: 66%;
+  aspect-ratio: 1;
   background: var(--wall-navy);
-  box-shadow: none;
-}
-
-.cred__type {
   color: var(--wall-pink);
-  font-size: clamp(1.4rem, 2.4vw, 2.1rem);
+  font-size: 7.4cqi;
   font-stretch: 125%;
   font-weight: 880;
-  letter-spacing: -0.02em;
+  letter-spacing: -0.01em;
   text-transform: uppercase;
 }
 
-.cred:nth-child(5) .cred__type {
+.cred__plate--short {
+  font-size: 16cqi;
   color: var(--paper);
-  font-size: clamp(2rem, 4vw, 3.4rem);
+}
+
+.cred__caption {
+  padding: 0 0.75rem 0.7rem;
+  color: var(--ink-soft);
+  font-size: 0.6875rem;
+  font-weight: 750;
+  letter-spacing: 0.08em;
+  text-align: center;
+  text-transform: uppercase;
 }
 
 .cred__back {
@@ -1614,6 +1635,11 @@ h2 {
 
   .cred-grid {
     grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .cred:last-child:nth-child(odd) {
+    grid-column: 1 / -1;
+    aspect-ratio: 2 / 1;
   }
 
   .contact__channels {

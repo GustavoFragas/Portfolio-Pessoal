@@ -16,7 +16,10 @@ export default function Certificates() {
             <p className="kicker">{copy.kicker}</p>
             <h2 id="credentials-title">{copy.title}</h2>
           </div>
-          <p>{copy.hint}</p>
+          <p>
+            <span className="pointer-fine">{copy.hintPointer}</span>
+            <span className="pointer-coarse">{copy.hintTouch}</span>
+          </p>
         </header>
         <ul className="cred-grid">
           {credentials.map((item) => {
@@ -25,12 +28,18 @@ export default function Certificates() {
             return (
               <li className="cred" key={item.issuer + item.name} data-flipped={isFlipped}>
                 <div className="cred__card">
+                  {/* Same front for every credential: an emblem (issuer art, or a lettered plate when there is none) over the issuer. */}
                   <div className="cred__face cred__front">
-                    {item.art ? (
-                      <img src={item.art} alt={`${copy.badge}: ${item.name}`} loading="lazy" decoding="async" width={600} height={600} />
-                    ) : (
-                      <span className="cred__type" aria-hidden="true">{item.issuer}</span>
-                    )}
+                    <span className="cred__emblem">
+                      {item.art ? (
+                        <img src={item.art} alt={`${copy.badge}: ${item.name}`} loading="lazy" decoding="async" width={600} height={600} />
+                      ) : (
+                        <span className={`cred__plate ${item.issuer.length <= 4 ? 'cred__plate--short' : ''}`} aria-hidden="true">
+                          {item.issuer}
+                        </span>
+                      )}
+                    </span>
+                    <span className="cred__caption" aria-hidden="true">{item.issuer}</span>
                   </div>
                   <div className="cred__face cred__back">
                     <p className="cred__issuer">{copy.issuedBy} {item.issuer}</p>
