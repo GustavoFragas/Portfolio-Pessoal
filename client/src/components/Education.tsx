@@ -6,9 +6,18 @@ export default function EducationSection() {
 
   return (
     <section id="formacao" className="section study" aria-labelledby="study-title">
-      <div className="section__inner study__grid">
-        <div>
-          <header className="section__head section__head--single">
+      <div className="section__inner">
+        <p className="kicker">{ui.education.languagesKicker}</p>
+        <ul className="study__languages" aria-label={ui.education.languagesTitle}>
+          {languages.map(([name, code, level]) => (
+            <li key={code}>
+              <span className="study__language" lang={code}>{name}</span>
+              <span className="study__level">{level}</span>
+            </li>
+          ))}
+        </ul>
+        <div className="study__grid">
+          <header className="study__head">
             <p className="kicker">{ui.education.kicker}</p>
             <h2 id="study-title">{ui.education.title}</h2>
           </header>
@@ -21,20 +30,6 @@ export default function EducationSection() {
               </li>
             ))}
           </ol>
-        </div>
-        <div>
-          <header className="section__head section__head--single">
-            <p className="kicker">{ui.education.languagesKicker}</p>
-            <h2>{ui.education.languagesTitle}</h2>
-          </header>
-          <ul className="study__languages">
-            {languages.map(([name, code, level]) => (
-              <li key={code}>
-                <span className="study__language" lang={code}>{name}</span>
-                <span className="study__level">{level}</span>
-              </li>
-            ))}
-          </ul>
         </div>
       </div>
     </section>

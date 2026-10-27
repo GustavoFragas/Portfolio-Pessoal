@@ -11,12 +11,12 @@ export default function Certificates() {
   return (
     <section id="credenciais" className="section credentials" aria-labelledby="credentials-title">
       <div className="section__inner">
-        <header className="section__head">
+        <header className="cred-head">
           <div>
             <p className="kicker">{copy.kicker}</p>
             <h2 id="credentials-title">{copy.title}</h2>
           </div>
-          <p className="section__intro">{copy.hint}</p>
+          <p>{copy.hint}</p>
         </header>
         <ul className="cred-grid">
           {credentials.map((item) => {

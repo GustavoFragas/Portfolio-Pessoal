@@ -159,7 +159,7 @@ svg {
 }
 
 h2 {
-  font-size: clamp(2.25rem, 5.6vw, 5rem);
+  font-size: clamp(2rem, 4.2vw, 4rem);
   font-stretch: 118%;
   font-weight: 820;
   line-height: 0.95;
@@ -686,7 +686,7 @@ h2 {
 
 .section__head {
   display: grid;
-  grid-template-columns: minmax(0, 1.2fr) minmax(0, 0.8fr);
+  grid-template-columns: minmax(0, 1.45fr) minmax(0, 0.55fr);
   align-items: end;
   gap: 1.5rem 4rem;
   margin-bottom: clamp(2.5rem, 5vw, 4.5rem);
@@ -709,6 +709,11 @@ h2 {
   border-bottom: 2px solid var(--ink);
 }
 
+.project + .project,
+.project:first-child {
+  border-top: 2px solid var(--ink);
+}
+
 .project {
   position: relative;
   display: grid;
@@ -719,49 +724,28 @@ h2 {
 
 .project__band {
   position: absolute;
-  inset: 0 0 auto;
+  inset: -2px 0 auto;
   display: grid;
-  grid-auto-flow: column;
-  grid-auto-columns: 12px;
+  grid-template-columns: repeat(auto-fill, 12px);
+  grid-auto-rows: 12px;
   gap: 1.5px;
   height: 12px;
   overflow: hidden;
+  pointer-events: none;
 }
 
+/* At rest the row is a plain solid rule; on hover/focus a band of wall tiles flips in as a wave. */
 .project__band span {
-  position: relative;
-}
-
-.project__band span::before,
-.project__band span::after {
-  content: "";
-  position: absolute;
-  inset: 0;
-}
-
-.project__band span::before {
-  background: var(--ink);
-  transform: scaleY(0.18);
-  transform-origin: 50% 0;
-  transition: transform 0.14s ease-in calc(var(--i) * 9ms + 0.14s);
-}
-
-.project__band span::after {
   background: var(--c);
   transform: scaleY(0);
-  transition: transform 0.14s ease-out calc(var(--i) * 9ms);
+  transform-origin: 50% 0;
+  transition: transform 0.16s ease-in calc(var(--i) * 8ms);
 }
 
-.project:hover .project__band span::before,
-.project:focus-within .project__band span::before {
-  transform: scaleY(0);
-  transition: transform 0.14s ease-in calc(var(--i) * 9ms);
-}
-
-.project:hover .project__band span::after,
-.project:focus-within .project__band span::after {
+.project:hover .project__band span,
+.project:focus-within .project__band span {
   transform: scaleY(1);
-  transition: transform 0.14s ease-out calc(var(--i) * 9ms + 0.14s);
+  transition: transform 0.18s ease-out calc(var(--i) * 8ms);
 }
 
 .project__num {
@@ -1017,53 +1001,34 @@ h2 {
   font-size: 0.9375rem;
 }
 
-/* study + languages */
-
-.study__grid {
-  display: grid;
-  grid-template-columns: minmax(0, 1.15fr) minmax(0, 0.85fr);
-  gap: clamp(3rem, 7vw, 6rem);
-}
-
-.study__list {
-  border-top: 2px solid var(--ink);
-}
-
-.study__list li {
-  padding: 1.35rem 0;
-  border-bottom: 1px solid var(--paper-line);
-}
-
-.study__period {
-  color: var(--ink-soft);
-  font-size: 0.9375rem;
-  font-weight: 650;
-}
-
-.study__list h3 {
-  margin: 0.2rem 0 0.15rem;
-  font-size: 1.3rem;
-  font-stretch: 112%;
-  font-weight: 760;
-}
+/* study: the three languages open the section as a type band, then a side header */
 
 .study__languages {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  margin-bottom: clamp(3.5rem, 7vw, 6rem);
   border-top: 2px solid var(--ink);
+  border-bottom: 2px solid var(--ink);
 }
 
 .study__languages li {
   display: grid;
-  gap: 0.2rem;
-  padding: 1.1rem 0 1.25rem;
-  border-bottom: 1px solid var(--paper-line);
+  align-content: start;
+  gap: 0.4rem;
+  padding: clamp(1.25rem, 2.5vw, 2rem) clamp(1rem, 2vw, 1.75rem) clamp(1.25rem, 2.5vw, 2rem) 0;
+}
+
+.study__languages li + li {
+  padding-left: clamp(1rem, 2vw, 1.75rem);
+  border-left: 1px solid var(--paper-line);
 }
 
 .study__language {
-  font-size: clamp(2rem, 4vw, 3.25rem);
+  font-size: clamp(2.25rem, 5.2vw, 4.5rem);
   font-stretch: 125%;
   font-weight: 860;
-  line-height: 1;
-  letter-spacing: -0.03em;
+  line-height: 0.95;
+  letter-spacing: -0.035em;
 }
 
 .study__languages li:nth-child(2) .study__language {
@@ -1074,7 +1039,75 @@ h2 {
   color: var(--ink-soft);
 }
 
+.study__grid {
+  display: grid;
+  grid-template-columns: minmax(0, 0.7fr) minmax(0, 1.3fr);
+  align-items: start;
+  gap: 2rem clamp(3rem, 7vw, 6rem);
+}
+
+.study__head h2 {
+  font-size: clamp(1.75rem, 3vw, 2.75rem);
+}
+
+.study__list {
+  border-top: 2px solid var(--ink);
+}
+
+.study__list li {
+  display: grid;
+  grid-template-columns: minmax(8rem, 11rem) minmax(0, 1fr);
+  gap: 0.15rem 1.5rem;
+  padding: 1.35rem 0;
+  border-bottom: 1px solid var(--paper-line);
+}
+
+.study__list li > :not(.study__period) {
+  grid-column: 2;
+}
+
+.study__period {
+  grid-row: span 2;
+  color: var(--ink-soft);
+  font-size: 0.9375rem;
+  font-weight: 650;
+}
+
+.study__list h3 {
+  font-size: 1.3rem;
+  font-stretch: 112%;
+  font-weight: 760;
+}
+
 /* credentials: square tiles that flip */
+
+.cred-head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 0.5rem 2rem;
+  margin-bottom: clamp(1.75rem, 3vw, 2.5rem);
+  padding-bottom: 1rem;
+  border-bottom: 2px solid var(--ink);
+}
+
+.cred-head .kicker {
+  margin: 0 1rem 0 0;
+}
+
+.cred-head h2 {
+  display: inline;
+  font-size: clamp(1.5rem, 2.6vw, 2.25rem);
+  font-stretch: 112%;
+  line-height: 1.1;
+}
+
+.cred-head p:last-child {
+  color: var(--ink-soft);
+  font-size: 0.9375rem;
+}
+
 
 .cred-grid {
   display: grid;
@@ -1547,8 +1580,36 @@ h2 {
   }
 
   .tools__list,
-  .study__grid {
+  .study__grid,
+  .study__languages {
     grid-template-columns: 1fr;
+  }
+
+  .study__languages li + li {
+    padding-left: 0;
+    border-left: 0;
+    border-top: 1px solid var(--paper-line);
+  }
+
+  .study__list li {
+    grid-template-columns: 1fr;
+  }
+
+  .study__list li > :not(.study__period) {
+    grid-column: 1;
+  }
+
+  .study__period {
+    grid-row: auto;
+  }
+
+  .cred-head .kicker {
+    display: flex;
+    margin: 0 0 0.6rem;
+  }
+
+  .cred-head h2 {
+    display: block;
   }
 
   .cred-grid {
