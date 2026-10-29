@@ -1,0 +1,205 @@
+/* Hero credential row: each emblem is a small 3D badge that floats and spins slowly.
+   Front and back faces are the art itself; the thickness is a stack of slices masked by the
+   same art (an opaque art becomes a rectangular plate with an edge, which is fine), shaded in
+   steps instead of a gradient. A floor of pixel tiles stands in for the soft shadow.
+   Only transform and opacity animate. It spins only while the row carries data-spin="on"
+   (Hero.tsx: on screen and not faded out by the story); the open menu pauses it, hover and focus do not.
+   Loaded after index.css, so same-specificity rules here win over the .hero__cred* ones there. */
+
+.hero__cred-emblem {
+  --t: 6px; /* badge thickness */
+  --edge: var(--paper-line); /* thickness colour, per badge below */
+  position: relative;
+  perspective: 16rem;
+}
+
+/* Edge colours sampled from each art: AWS teal body, Google's grey ring, BYU blue. */
+.hero__cred-emblem[data-badge="aws-devops-professional"] {
+  --edge: #088898;
+}
+
+.hero__cred-emblem[data-badge="google-generative-ai-leader"] {
+  --edge: #b8c4c6;
+}
+
+.hero__cred-emblem[data-badge="byu-idaho"] {
+  --edge: #0668b3;
+}
+
+/* The plate now lives on the faces, so it turns with the badge (the logo stays on a light surface). */
+.hero__cred-emblem--logo {
+  padding: 0;
+  background: none;
+}
+
+.hero__cred-float,
+.hero__cred-sculpt {
+  position: absolute;
+  inset: 0;
+  transform-style: preserve-3d;
+}
+
+.hero__cred-float {
+  animation: hero-cred-float 6s ease-in-out infinite;
+  animation-delay: calc(var(--i, 0) * -2s);
+}
+
+.hero__cred-sculpt {
+  transform: rotateX(-8deg);
+  animation: hero-cred-spin calc(18s + var(--i, 0) * 1.3s) linear infinite;
+}
+
+.hero__cred-face {
+  position: absolute;
+  inset: 0;
+  display: block;
+  backface-visibility: hidden;
+  -webkit-backface-visibility: hidden;
+  transform: translateZ(calc(var(--t) / 2));
+}
+
+.hero__cred-face--back {
+  transform: rotateY(180deg) translateZ(calc(var(--t) / 2));
+}
+
+.hero__cred-emblem .hero__cred-face img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+}
+
+.hero__cred-emblem--logo .hero__cred-face {
+  padding: 0.25rem 0.35rem;
+  background: var(--paper-deep); /* official logos stay on a light plate, also on the dark theme */
+}
+
+.hero__cred-slice {
+  position: absolute;
+  inset: 0;
+  background: color-mix(in srgb, var(--edge), #000 var(--shade, 16%));
+  transform: translateZ(var(--z, 0));
+  -webkit-mask-image: var(--art);
+  mask-image: var(--art);
+  -webkit-mask-size: contain;
+  mask-size: contain;
+  -webkit-mask-position: center;
+  mask-position: center;
+  -webkit-mask-repeat: no-repeat;
+  mask-repeat: no-repeat;
+}
+
+/* The plate is a plain rectangle: no mask needed. */
+.hero__cred-emblem--logo .hero__cred-slice {
+  -webkit-mask-image: none;
+  mask-image: none;
+}
+
+/* Seven slices between the faces (at +-3px), darker towards the middle in flat steps. */
+.hero__cred-slice:nth-child(1) { --z: -2.25px; --shade: 10%; }
+.hero__cred-slice:nth-child(2) { --z: -1.5px; --shade: 18%; }
+.hero__cred-slice:nth-child(3) { --z: -0.75px; --shade: 26%; }
+.hero__cred-slice:nth-child(4) { --z: 0px; --shade: 30%; }
+.hero__cred-slice:nth-child(5) { --z: 0.75px; --shade: 26%; }
+.hero__cred-slice:nth-child(6) { --z: 1.5px; --shade: 18%; }
+.hero__cred-slice:nth-child(7) { --z: 2.25px; --shade: 10%; }
+
+/* Pixel shadow on the floor: square tiles, no blur; it thins out as the badge rises. */
+.hero__cred-floor {
+  position: absolute;
+  top: calc(100% + 3px);
+  right: 0;
+  left: 0;
+  display: flex;
+  justify-content: center;
+  gap: 1px;
+  pointer-events: none;
+  animation: hero-cred-floor 6s ease-in-out infinite;
+  animation-delay: calc(var(--i, 0) * -2s);
+}
+
+.hero__cred-floor i {
+  width: 4px;
+  height: 4px;
+  background: currentColor; /* paper on the wall, text colour on the flow row: follows the theme */
+  opacity: 0.34;
+}
+
+/* Stacked row after the story (phones): room for each floor before the next badge. */
+.hero__creds--flow {
+  gap: 1rem;
+}
+
+.hero__cred-floor i:first-child,
+.hero__cred-floor i:last-child {
+  opacity: 0.16;
+  animation: hero-cred-floor-edge 6s ease-in-out infinite;
+  animation-delay: calc(var(--i, 0) * -2s);
+}
+
+@keyframes hero-cred-spin {
+  from {
+    transform: rotateX(-8deg) rotateY(0deg);
+  }
+
+  to {
+    transform: rotateX(-8deg) rotateY(360deg);
+  }
+}
+
+@keyframes hero-cred-float {
+  0%,
+  100% {
+    transform: translateY(1px) rotate(-2deg);
+  }
+
+  50% {
+    transform: translateY(-2px) rotate(2deg);
+  }
+}
+
+@keyframes hero-cred-floor {
+  0%,
+  100% {
+    opacity: 1;
+  }
+
+  50% {
+    opacity: 0.6;
+  }
+}
+
+@keyframes hero-cred-floor-edge {
+  0%,
+  100% {
+    opacity: 0.16;
+  }
+
+  50% {
+    opacity: 0;
+  }
+}
+
+/* Paused until Hero.tsx says the row is on screen, and while under the menu. Hover and focus keep it
+   spinning (round 5): the underline on the titles is the hover cue. */
+.hero__creds:not([data-spin="on"]) :is(.hero__cred-float, .hero__cred-sculpt, .hero__cred-floor, .hero__cred-floor i),
+html.menu-open .hero__creds :is(.hero__cred-float, .hero__cred-sculpt, .hero__cred-floor, .hero__cred-floor i) {
+  animation-play-state: paused;
+}
+
+/* Reduced motion: the flat art, facing front, as before. */
+@media (prefers-reduced-motion: reduce) {
+  .hero__cred-float,
+  .hero__cred-sculpt,
+  .hero__cred-face {
+    transform: none;
+    transform-style: flat;
+    animation: none;
+  }
+
+  .hero__cred-slice,
+  .hero__cred-face--back,
+  .hero__cred-floor {
+    display: none;
+  }
+}

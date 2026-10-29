@@ -1,0 +1,278 @@
+/* 8-bit footer (RetroFooter.tsx). Always dark: wall tokens used directly.
+   "Press Start 2P" (SIL OFL 1.1, CodeMan38), self-hosted; provenance in
+   docs/pixel-wall/asset-sources.md. Only the footer uses it. */
+
+/* latin-ext */
+@font-face {
+  font-family: "Press Start 2P";
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: url("/fonts/press-start-2p-latin-ext.woff2") format("woff2");
+  unicode-range: U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7, U+02DD-02FF, U+0304, U+0308, U+0329, U+1D00-1DBF, U+1E00-1E9F, U+1EF2-1EFF, U+2020, U+20A0-20AB, U+20AD-20C0, U+2113, U+2C60-2C7F, U+A720-A7FF;
+}
+
+/* latin */
+@font-face {
+  font-family: "Press Start 2P";
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: url("/fonts/press-start-2p-latin.woff2") format("woff2");
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
+
+/* The only footer rule (the old .site-footer row left index.css); the root keeps the .site-footer
+   class for the menu's inert. Always dark on both themes, so it keeps the wall tokens. */
+.site-footer.retro-footer {
+  --retro-font: "Press Start 2P", ui-monospace, Menlo, monospace;
+  --retro-step: 6px; /* one "pixel" of the stepped border */
+  display: block;
+  padding: 2rem var(--gutter) 1.5rem;
+  background: var(--wall-ink);
+  color: var(--paper);
+  font-size: 0.875rem;
+  --focus: var(--paper);
+}
+
+.retro-footer__menu {
+  position: relative;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 1rem 1.25rem;
+}
+
+.retro-footer__item {
+  position: relative;
+}
+
+.retro-footer__item--start {
+  margin-left: auto;
+}
+
+/* Triggers: small game buttons with bitten corners. */
+.retro-footer__trigger {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.75rem;
+  min-height: 2.75rem;
+  margin: 3px;
+  padding: 0 1rem;
+  border: 0;
+  background: var(--wall-navy);
+  color: var(--paper);
+  font-family: var(--retro-font);
+  font-size: 0.75rem;
+  line-height: 1;
+  text-transform: uppercase;
+  cursor: pointer;
+  box-shadow:
+    3px 0 0 0 var(--wall-pink-soft),
+    -3px 0 0 0 var(--wall-pink-soft),
+    0 -3px 0 0 var(--wall-pink-soft),
+    0 3px 0 0 var(--wall-pink-soft);
+}
+
+.retro-footer__trigger:hover {
+  color: var(--wall-pink-soft);
+}
+
+.retro-footer__trigger[aria-expanded="true"] {
+  background: var(--wall-pink);
+  color: var(--wall-ink);
+}
+
+.retro-footer__trigger:focus-visible,
+.retro-footer__start:focus-visible {
+  outline: 3px solid var(--focus);
+  outline-offset: 6px;
+}
+
+.retro-footer__chevron {
+  width: 0.75rem;
+  height: auto;
+  transition: transform 0.15s steps(2, end);
+}
+
+.retro-footer__trigger[aria-expanded="true"] .retro-footer__chevron {
+  transform: rotate(180deg);
+}
+
+/* Panel: opens upwards, stepped pixel border on the four sides (corners stay bitten). */
+.retro-footer__panel {
+  position: absolute;
+  bottom: calc(100% + var(--retro-step) + 0.75rem);
+  left: calc(var(--retro-step) + 3px);
+  z-index: 6;
+  width: max-content;
+  min-width: 15rem;
+  max-width: calc(100vw - 2 * var(--gutter) - 2 * var(--retro-step));
+  padding: 0.5rem;
+  background: var(--wall-navy);
+  color: var(--paper);
+  box-shadow:
+    var(--retro-step) 0 0 0 var(--wall-pink),
+    calc(-1 * var(--retro-step)) 0 0 0 var(--wall-pink),
+    0 calc(-1 * var(--retro-step)) 0 0 var(--wall-pink),
+    0 var(--retro-step) 0 0 var(--wall-pink);
+}
+
+.retro-footer__panel[hidden] {
+  display: none;
+}
+
+.retro-footer__links {
+  display: grid;
+  gap: 2px;
+}
+
+/* Each entry has a game-menu cursor (►) that shows on hover/focus. */
+.retro-footer__link {
+  position: relative;
+  display: grid;
+  gap: 0.4rem;
+  min-height: 2.75rem;
+  align-content: center;
+  padding: 0.65rem 0.85rem 0.65rem 1.85rem;
+  color: var(--paper);
+}
+
+.retro-footer__link::before {
+  content: "";
+  position: absolute;
+  left: 0.7rem;
+  top: 50%;
+  width: 6px;
+  height: 10px;
+  margin-top: -5px;
+  background: currentColor;
+  clip-path: polygon(0 0, 33% 0, 33% 20%, 67% 20%, 67% 40%, 100% 40%, 100% 60%, 67% 60%, 67% 80%, 33% 80%, 33% 100%, 0 100%);
+  opacity: 0;
+}
+
+.retro-footer__link:hover,
+.retro-footer__link:focus-visible {
+  background: var(--wall-pink);
+  color: var(--wall-ink);
+}
+
+.retro-footer__link:hover::before,
+.retro-footer__link:focus-visible::before {
+  opacity: 1;
+}
+
+.retro-footer__link:focus-visible {
+  outline: 3px solid var(--paper);
+  outline-offset: -3px;
+}
+
+.retro-footer__label {
+  font-family: var(--retro-font);
+  font-size: 0.75rem;
+  line-height: 1.4;
+}
+
+.retro-footer__value {
+  color: var(--wall-pink-soft);
+  font-size: 0.9375rem;
+  line-height: 1.3;
+  overflow-wrap: anywhere;
+}
+
+.retro-footer__link:hover .retro-footer__value,
+.retro-footer__link:focus-visible .retro-footer__value {
+  color: var(--wall-ink);
+}
+
+/* Back to the top, in game words. */
+.retro-footer__start {
+  display: inline-flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.35rem 0.7rem;
+  min-height: 2.75rem;
+  color: var(--wall-pink-soft);
+}
+
+.retro-footer__triangle {
+  width: 0.875rem;
+  height: auto;
+}
+
+.retro-footer__start-word {
+  font-family: var(--retro-font);
+  font-size: 0.875rem;
+  line-height: 1;
+  text-transform: uppercase;
+}
+
+.retro-footer__start:hover .retro-footer__start-word {
+  color: var(--paper);
+}
+
+/* Closing line under a strip of tiles (the wall, one last time): pixel font, small, paper on ink
+   (16:1), name on the left and "Player 1 · São Paulo" on the right; stacked on phones. */
+.retro-footer__legal {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  gap: 0.75rem 2rem;
+  margin-top: 1.5rem;
+  padding-top: 1.1rem;
+  background: repeating-linear-gradient(90deg, var(--wall-navy) 0 12px, transparent 12px 14px) top left / 100% 6px no-repeat;
+  color: var(--paper);
+  font-family: var(--retro-font);
+  font-size: 0.625rem;
+  line-height: 1.8;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .retro-footer__panel:not([hidden]) {
+    animation: retro-footer-open 0.16s steps(3, end) both;
+  }
+
+  @keyframes retro-footer-open {
+    from {
+      opacity: 0;
+      transform: translateY(var(--retro-step));
+    }
+
+    to {
+      opacity: 1;
+      transform: none;
+    }
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .retro-footer__chevron {
+    transition: none;
+  }
+}
+
+/* Phones: the panels span the menu width, still opening upwards. */
+@media (max-width: 640px) {
+  .retro-footer__item {
+    position: static;
+  }
+
+  .retro-footer__item--start {
+    margin-left: 0;
+    flex-basis: 100%;
+  }
+
+  .retro-footer__legal {
+    flex-direction: column;
+  }
+
+  .retro-footer__panel {
+    right: var(--retro-step);
+    left: var(--retro-step);
+    width: auto;
+    min-width: 0;
+    max-width: none;
+  }
+}

@@ -1,0 +1,805 @@
+/* Journey (Rodada 5b, 6B; Experience.tsx). The claim "De estagiário a pleno em 12 meses" is the H2, with
+   the staircase of wall tiles beside it from 1024 px (one step per Alest role, date on the tread), the
+   three roles under their steps, the team lines, "Liderança na prática", then a compact "Antes da Alest"
+   strip. From 1024 px a left column holds the titles and the three step columns hold the rest, so roles,
+   lines and the strip stay under the steps. Semantic tokens only. */
+
+.journey {
+  --ladder-unit: clamp(2.25rem, 4.4vw, 4rem); /* height of one step */
+  --ladder-tile: var(--tile, 12px);
+  --ladder-grout: var(--grout, 1.5px);
+  --journey-gap: clamp(3.5rem, 7vw, 6rem); /* between the blocks */
+}
+
+.journey__top h2 {
+  max-width: 22ch;
+  margin-bottom: clamp(1.5rem, 4vw, 2.75rem);
+}
+
+.ladder__where {
+  margin-bottom: 0.6rem;
+  color: var(--text-soft);
+  font-size: 0.875rem;
+  font-weight: 750;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+/* The staircase: three columns sharing one floor, risers touching like the panel's tiles. */
+.ladder__steps {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  align-items: end;
+  border-bottom: 2px solid var(--rule);
+  view-timeline: --ladder block;
+}
+
+.ladder__step {
+  display: grid;
+  align-content: end;
+  min-width: 0;
+}
+
+.ladder__step:nth-child(1) {
+  --riser: var(--surface-tint);
+}
+
+.ladder__step:nth-child(2) {
+  --riser: var(--accent-soft);
+}
+
+.ladder__step:nth-child(3) {
+  --riser: var(--accent);
+}
+
+.ladder__tread {
+  display: grid;
+  gap: 0.25rem;
+  padding: 0 0.75rem 0.85rem 0;
+}
+
+.ladder__tread strong {
+  font-size: clamp(1.05rem, 3vw, 2.25rem);
+  font-stretch: 112%;
+  font-weight: 820;
+  line-height: 1.05;
+}
+
+.ladder__date {
+  color: var(--text-soft);
+  font-size: clamp(0.875rem, 1.3vw, 1.0625rem);
+  font-weight: 650;
+  font-variant-numeric: tabular-nums;
+}
+
+/* Riser = a block of wall tiles: grout lines over the step colour, the same module as the hero. */
+.ladder__riser {
+  display: block;
+  height: calc(var(--ladder-unit) * (var(--s, 0) + 1));
+  background:
+    linear-gradient(90deg, var(--surface) var(--ladder-grout), transparent 0) 0 0 / var(--ladder-tile) var(--ladder-tile),
+    linear-gradient(var(--surface) var(--ladder-grout), transparent 0) 0 0 / var(--ladder-tile) var(--ladder-tile),
+    var(--riser);
+  transform-origin: 50% 100%;
+}
+
+/* Step heights in whole tiles, so no row is cut at the top or on the floor (P3-6). */
+@supports (height: round(1px, 1px)) {
+  .ladder__riser {
+    height: calc(round(var(--ladder-unit), var(--ladder-tile)) * (var(--s, 0) + 1));
+  }
+}
+
+/* At 1x a 1.5 px grout lands on half pixels and Gecko draws it 1 or 2 px wide along the same step
+   (moiré in Zen at 1440×900). One device pixel keeps every line the same; 2x screens keep 1.5 px. */
+@media (max-resolution: 1.49dppx) {
+  .journey {
+    --ladder-grout: 1px;
+  }
+}
+
+/* From 2x a step also holds whole columns: `round` stretches the tile a fraction of a pixel to fit the
+   step's width, which stays crisp there (at 1x it would blur the 1 px grout, so 1x keeps `repeat`). */
+@media (min-resolution: 1.5dppx) {
+  .ladder__riser {
+    background-repeat: round repeat;
+  }
+}
+
+/* Roles + team lines, then "Liderança na prática": one gap between the blocks. */
+.ladder,
+.leadership {
+  margin-bottom: var(--journey-gap);
+}
+
+/* The three Alest roles, each under its own step. */
+.ladder__roles {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  margin-top: 1.4rem;
+}
+
+.ladder__role {
+  min-width: 0;
+  padding-right: clamp(1rem, 2.6vw, 2.5rem);
+}
+
+.ladder__period {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.35rem 0.6rem;
+  color: var(--text-soft);
+  font-size: 0.9375rem;
+  font-weight: 650;
+  font-variant-numeric: tabular-nums;
+}
+
+/* Literal wall colours on purpose: ink on pink is 5.0:1 on either theme. */
+.ladder__now {
+  padding: 0.1rem 0.5rem;
+  background: var(--wall-pink);
+  color: var(--ink);
+  font-size: 0.75rem;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.ladder__role h3 {
+  margin: 0.4rem 0 0.8rem;
+  font-size: clamp(1.15rem, 1.7vw, 1.45rem);
+  font-stretch: 112%;
+  font-weight: 760;
+  line-height: 1.15;
+}
+
+.ladder__role ul {
+  display: grid;
+  gap: 0.4rem;
+  color: var(--text-soft);
+}
+
+.ladder__role li {
+  position: relative;
+  padding-left: 1.1rem;
+}
+
+.ladder__role li::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  top: 0.62em;
+  width: 0.45rem;
+  height: 0.45rem;
+  background: var(--mark);
+}
+
+/* "With the Alest team": quiet lines under the roles. */
+.ladder__team {
+  display: grid;
+  gap: 0.4rem;
+  margin-top: clamp(1.75rem, 3.5vw, 2.75rem);
+  padding-top: 1rem;
+  border-top: 1px solid var(--line);
+  color: var(--text-soft);
+  font-size: 0.875rem;
+  line-height: 1.5;
+}
+
+.ladder__team-lead {
+  font-weight: 650;
+}
+
+.ladder__team .text-link {
+  display: inline;
+}
+
+/* The date (and the arrow) never end up alone on a line. */
+.ladder__team-tail {
+  white-space: nowrap;
+}
+
+.ladder__team .text-link svg {
+  display: inline-block;
+  vertical-align: -0.15em;
+}
+
+/* Block titles ("Liderança na prática", "Antes da Alest"): one tile mark each. */
+.journey__label {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  margin-bottom: 0.9rem;
+  font-size: clamp(1.15rem, 1.8vw, 1.5rem);
+  font-stretch: 112%;
+  font-weight: 780;
+}
+
+.journey__label::before {
+  content: "";
+  flex: none;
+  width: 0.7rem;
+  height: 0.7rem;
+  background: var(--mark);
+}
+
+/* Leadership in practice (Rodada 6C): the featured role, then compact lines, one wall tile each as the
+   signature, then the one testimonial: quiet, no card, no name. */
+
+/* The featured role: the same rows as the lines, a size up. Its mark is a 2×2 piece of the wall (the
+   lines get one tile); its figures read like the drawer's numbers, compact, ending in a pink seal. */
+.lead-feature {
+  position: relative;
+  padding: 1.1rem 0 1.35rem 1.4rem;
+  border-top: 2px solid var(--rule);
+  border-bottom: 1px solid var(--line);
+}
+
+.lead-feature::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  top: 1.35rem;
+  width: 0.95rem;
+  height: 0.95rem;
+  --q: calc(50% - 1px); /* one tile of the 2×2, a 2 px grout between them */
+  background:
+    linear-gradient(var(--wall-pink) 0 0) 0 0 / var(--q) var(--q) no-repeat,
+    linear-gradient(var(--wall-pink-soft) 0 0) 100% 0 / var(--q) var(--q) no-repeat,
+    linear-gradient(var(--surface-tint) 0 0) 0 100% / var(--q) var(--q) no-repeat,
+    linear-gradient(var(--wall-pink) 0 0) 100% 100% / var(--q) var(--q) no-repeat;
+}
+
+.lead-feature h4 {
+  display: grid;
+  gap: 0.15rem;
+  font-size: 1rem;
+  font-stretch: 106%;
+  font-weight: 700;
+  line-height: 1.25;
+}
+
+.lead-feature__role {
+  font-size: clamp(1.3rem, 2vw, 1.6rem);
+  font-stretch: 112%;
+  font-weight: 820;
+  line-height: 1.1;
+}
+
+.lead-feature__where {
+  margin-top: 0.3rem;
+  color: var(--text-soft);
+  font-size: 0.9375rem;
+  font-weight: 650;
+}
+
+/* Figures strip: number over unit in quiet tiles (pink corner mark), the approval as a pink seal (ink on
+   pink, 5.0:1). One row from 360 px: the units wrap under their number, never the other way. */
+.lead-feature__figures {
+  display: grid;
+  grid-template-columns: auto auto minmax(0, 1fr);
+  gap: 0.4rem;
+  max-width: 34rem;
+  margin: 1rem 0 0.95rem;
+}
+
+.lead-feature__figures li {
+  position: relative;
+  display: grid;
+  align-content: start;
+  gap: 0.2rem;
+  min-width: 0;
+  max-width: 10rem;
+  padding: 0.55rem 0.8rem 0.6rem;
+  border: 2px solid var(--line);
+}
+
+.lead-feature__figures li::before {
+  content: "";
+  position: absolute;
+  top: -2px;
+  left: -2px;
+  width: 0.45rem;
+  height: 0.45rem;
+  background: var(--wall-pink);
+}
+
+.lead-feature__figures strong {
+  font-size: clamp(1.6rem, 2.6vw, 2.125rem);
+  font-stretch: 125%;
+  font-weight: 880;
+  line-height: 1;
+  letter-spacing: -0.03em;
+}
+
+.lead-feature__figures span {
+  color: var(--text-soft);
+  font-size: 0.875rem;
+  font-weight: 650;
+  line-height: 1.25;
+}
+
+.lead-feature__figures .lead-feature__seal {
+  align-content: center;
+  justify-self: start;
+  max-width: 13rem;
+  border-color: var(--wall-pink);
+  background: var(--wall-pink);
+  color: var(--ink);
+  font-size: 0.9375rem;
+  font-stretch: 106%;
+  font-weight: 800;
+  line-height: 1.2;
+  text-wrap: balance;
+}
+
+.lead-feature__figures .lead-feature__seal::before {
+  background: var(--wall-ink);
+}
+
+.lead-feature__points {
+  display: grid;
+  gap: 0.45rem;
+  max-width: 62ch;
+  text-wrap: pretty;
+}
+
+.lead-feature__points li {
+  position: relative;
+  padding-left: 1.1rem;
+}
+
+.lead-feature__points li::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  top: 0.62em;
+  width: 0.45rem;
+  height: 0.45rem;
+  background: var(--mark);
+}
+
+.lead-feature__more {
+  margin-top: 0.85rem;
+}
+
+/* Lines A–E. */
+.leadership__lines {
+  margin-bottom: 1.75rem;
+}
+
+.leadership__line {
+  position: relative;
+  padding: 0.85rem 0 0.85rem 1.4rem;
+  border-bottom: 1px solid var(--line);
+}
+
+.leadership__line::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  top: 1.2rem;
+  width: 0.6rem;
+  height: 0.6rem;
+  background: var(--wall-pink);
+}
+
+.leadership__line:nth-child(3n + 2)::before {
+  background: var(--accent-soft);
+}
+
+.leadership__line:nth-child(3n)::before {
+  background: var(--mark);
+}
+
+.leadership__meta {
+  color: var(--text-soft);
+  font-size: 0.9375rem;
+  font-weight: 650;
+}
+
+/* The label: role · scope, in the text colour; the role a weight up. Sector · period under it. */
+.leadership__label {
+  display: block;
+  color: var(--text);
+  text-wrap: balance;
+}
+
+.leadership__label strong {
+  font-weight: 780;
+}
+
+.leadership__where {
+  display: block;
+}
+
+/* "Jan–May 2026" never breaks after the dash (P3-5). */
+.leadership__period {
+  white-space: nowrap;
+}
+
+.leadership__text {
+  max-width: 62ch;
+  margin-top: 0.2rem;
+  text-wrap: pretty;
+}
+
+.leadership__quote {
+  max-width: 40rem;
+  margin: 0;
+}
+
+.leadership__quote blockquote {
+  margin: 0;
+  font-size: clamp(1.0625rem, 1.55vw, 1.375rem);
+  font-stretch: 106%;
+  font-weight: 580;
+  line-height: 1.35;
+  text-wrap: pretty;
+}
+
+.leadership__quote figcaption {
+  margin-top: 0.7rem;
+  color: var(--text-soft);
+  font-size: 0.9375rem;
+  font-weight: 650;
+}
+
+.leadership__by::before {
+  content: "— " / "";
+}
+
+/* "traduzido do português": a discreet note on its own line (EN/ES only). */
+.leadership__note {
+  display: block;
+  margin-top: 0.15rem;
+  font-size: 0.8125rem;
+  font-weight: 500;
+}
+
+/* Before Alest: one line per role — period, role, place. */
+
+.prior-roles__list {
+  border-top: 2px solid var(--rule);
+}
+
+/* Same three columns as the staircase above, so period, role and place line up with its steps. */
+.prior-roles__row {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  align-items: baseline;
+  padding: 0.95rem 0;
+  border-bottom: 1px solid var(--line);
+}
+
+.prior-roles__row > * {
+  min-width: 0;
+  padding-right: clamp(1rem, 2.6vw, 2.5rem);
+}
+
+.prior-roles__period {
+  color: var(--text-soft);
+  font-size: 0.9375rem;
+  font-weight: 650;
+  font-variant-numeric: tabular-nums;
+}
+
+.prior-roles__role {
+  font-weight: 700;
+}
+
+.prior-roles__place {
+  color: var(--text);
+}
+
+/* From 1024 px: the H2 and the block titles in a left column, the staircase beside the H2 and the
+   rest under its three steps. Column and H2 size keep "De estagiário" / "semi senior" whole on a line
+   from 1024 px up. Baselines align each block title with its first line. */
+@media (min-width: 1024px) {
+  .journey__top,
+  .ladder,
+  .leadership,
+  .prior-roles {
+    display: grid;
+    grid-template-columns: minmax(0, 1.45fr) repeat(3, minmax(0, 1fr));
+  }
+
+  .journey__top {
+    align-items: start;
+  }
+
+  .journey__top h2 {
+    margin: 0;
+    padding-right: clamp(1.5rem, 3vw, 3rem);
+    font-size: clamp(2.25rem, 3.3vw, 3rem);
+    line-height: 1;
+  }
+
+  /* Step names a size below the H2, so the claim leads and the steps prove it. */
+  .ladder__tread strong {
+    font-size: clamp(1.25rem, 2.1vw, 1.875rem);
+  }
+
+  .leadership,
+  .prior-roles {
+    align-items: baseline;
+  }
+
+  .journey__label {
+    margin: 0;
+    padding-right: clamp(1.5rem, 3vw, 3rem);
+  }
+
+  .ladder__climb,
+  .ladder > *,
+  .leadership__body,
+  .prior-roles__list {
+    grid-column: 2 / -1;
+  }
+}
+
+/* The leadership rows as label | sentence from 1100 px. At 1024–1099 px the label stays over its sentence,
+   as below 1024. The label column is its own width, not a step's (a step is 226–288 px and broke the
+   role in the middle, P2-1): 20rem, 22rem from 1200 px. From 1200 px the role keeps one line, the scope
+   one line (two for the featured role in PT/ES) and sector · period one line; at 1100–1199 px the role
+   still keeps one line, the rest may take two. */
+@media (min-width: 1100px) {
+  .leadership {
+    --lead-label: 20rem;
+  }
+
+  /* A leadership line on one row: role, scope, then sector · period on their own lines in the label
+     column (the tile beside the role), the sentence beside them. */
+  .leadership__line {
+    display: grid;
+    grid-template-columns: minmax(0, var(--lead-label)) minmax(0, 1fr);
+    align-items: baseline;
+    padding-left: 0;
+  }
+
+  .leadership__meta {
+    padding: 0 1.75rem 0 1.4rem;
+  }
+
+  .leadership__label strong {
+    display: block;
+    white-space: nowrap;
+  }
+
+  /* The role/scope dot: the role's own line replaces it on screen; screen readers still hear it. */
+  .leadership__sep {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    clip-path: inset(50%);
+    white-space: nowrap;
+  }
+
+  .leadership__text {
+    grid-column: 2 / -1;
+    margin-top: 0;
+  }
+
+  /* The featured role in the same columns: role, scope, sector and period (and the mark) in the label
+     column; figures, points and the link to case 01 beside them. */
+  .lead-feature {
+    display: grid;
+    grid-template-columns: minmax(0, var(--lead-label)) minmax(0, 1fr);
+    grid-template-rows: auto auto 1fr;
+    align-items: start;
+    padding-left: 0;
+  }
+
+  /* Centred on the first line of the larger role name. */
+  .lead-feature::before {
+    top: 1.5rem;
+  }
+
+  .lead-feature__head {
+    grid-row: 1 / -1;
+    padding: 0 1.75rem 0 1.4rem;
+  }
+
+  .lead-feature__role {
+    white-space: nowrap;
+  }
+
+  /* PT/ES scopes take two lines here: two even ones, not a last word alone. */
+  .lead-feature__scope {
+    text-wrap: balance;
+  }
+
+  .lead-feature__figures,
+  .lead-feature__points,
+  .lead-feature__more {
+    grid-column: 2 / -1;
+  }
+
+  .lead-feature__figures {
+    margin-top: 0;
+  }
+}
+
+@media (min-width: 1200px) {
+  .leadership {
+    --lead-label: 22rem;
+  }
+}
+
+/* Phones: the staircase keeps its three steps; roles and the strip stack. */
+@media (max-width: 759px) {
+  .journey {
+    --ladder-unit: 2.75rem;
+    --ladder-tile: 9px;
+    --journey-gap: 3rem;
+  }
+
+  .ladder__tread {
+    padding-right: 0.4rem;
+  }
+
+  .ladder__tread strong {
+    font-size: 1.125rem;
+  }
+
+  .ladder__roles {
+    grid-template-columns: 1fr;
+  }
+
+  .ladder__role {
+    padding: 1.1rem 0 1.25rem;
+    border-bottom: 1px solid var(--line);
+  }
+
+  .ladder__role:first-child {
+    padding-top: 0;
+  }
+
+  .ladder__role:last-child {
+    border-bottom: 0;
+  }
+
+  /* Phones (P2-1): each role is its period and name, the staircase above already shows the climb;
+     only the current role keeps its first line. Desktop keeps every line. */
+  .ladder__role:not(.ladder__role--now) ul,
+  .ladder__role--now li + li {
+    display: none;
+  }
+
+  .ladder__role:not(.ladder__role--now) h3 {
+    margin-bottom: 0;
+  }
+
+  /* Two lines per entry: the period, then role · place flowing together. */
+  .prior-roles__row {
+    display: block;
+    padding: 0.8rem 0;
+  }
+
+  .prior-roles__row > * {
+    padding-right: 0;
+  }
+
+  .prior-roles__period {
+    display: block;
+    margin-bottom: 0.15rem;
+  }
+
+  .prior-roles__place::before {
+    content: " · " / "";
+    color: var(--text-soft);
+  }
+
+  /* Leadership on phones (Rodada 6C): the same blocks, set a step smaller and tighter, so the featured
+     role and the five lines fit about where the six old lines did. Text never under 13 px. */
+  /* Like the desktop rows: the label sits beside its mark, the body runs the full width under it. */
+  .lead-feature {
+    padding: 0.9rem 0 1rem;
+  }
+
+  .lead-feature::before {
+    top: 1.12rem;
+  }
+
+  .lead-feature__head {
+    padding-left: 1.4rem;
+  }
+
+  .lead-feature__role {
+    font-size: 1.25rem;
+  }
+
+  .lead-feature__where {
+    margin-top: 0.15rem;
+    font-size: 0.875rem;
+  }
+
+  .lead-feature__figures {
+    gap: 0.35rem;
+    margin: 0.75rem 0 0.8rem;
+  }
+
+  .lead-feature__figures li {
+    max-width: 9rem;
+    padding: 0.4rem 0.6rem 0.45rem;
+  }
+
+  .lead-feature__figures strong {
+    font-size: 1.45rem;
+  }
+
+  .lead-feature__figures span {
+    font-size: 0.8125rem;
+  }
+
+  .lead-feature__figures .lead-feature__seal {
+    max-width: none;
+    justify-self: stretch;
+    font-size: 0.875rem;
+  }
+
+  .lead-feature__points {
+    gap: 0.35rem;
+    font-size: 0.9375rem;
+    line-height: 1.4;
+  }
+
+  .lead-feature__points li::before {
+    top: 0.5em;
+  }
+
+  .lead-feature__more {
+    margin-top: 0.6rem;
+    line-height: 1.3;
+  }
+
+  .leadership__lines {
+    margin-bottom: 1.25rem;
+  }
+
+  .leadership__line {
+    padding: 0.55rem 0 0.6rem;
+  }
+
+  .leadership__line::before {
+    top: 0.83rem;
+  }
+
+  .leadership__meta {
+    padding-left: 1.4rem;
+    font-size: 0.875rem;
+    line-height: 1.35;
+  }
+
+  .leadership__text {
+    margin-top: 0.25rem;
+    font-size: 0.9375rem;
+    line-height: 1.4;
+  }
+}
+
+/* The steps rise one after the other as the staircase scrolls in (transform/opacity only).
+   Done by the time the floor reaches the middle of the screen; static with reduced motion. */
+@supports (animation-timeline: view()) {
+  @media (prefers-reduced-motion: no-preference) {
+    .ladder__riser {
+      animation: ladder-rise linear both;
+      animation-timeline: --ladder;
+      animation-range: cover calc(4% + var(--s, 0) * 5%) cover calc(16% + var(--s, 0) * 5%);
+    }
+  }
+}
+
+@keyframes ladder-rise {
+  from {
+    opacity: 0.35;
+    transform: scaleY(0.12);
+  }
+
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}

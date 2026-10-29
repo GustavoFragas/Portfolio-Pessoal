@@ -1,0 +1,73 @@
+/* Section stops: where a link to a section lands (kinetic menu, footer "Navegar", hero links and a
+   #hash on load, which App.tsx scrolls with scrollIntoView). The top bar is already kept clear by
+   `html { scroll-padding-top: var(--topbar-h) }` (64 px desktop, 56 px on phones), so these margins
+   only pull each target past its own top padding: `.section` in index.css pads
+   clamp(4.5rem, 9vw, 8rem); keep the two in sync. Target: the head (eyebrow/title) ~28 px under
+   the bar (measured in Chrome and Zen at 1440×900, 1280×720 and 390×844).
+   Sobre and Projetos keep their own stops (story landing and rail). */
+
+/* Credenciais: on wide screens the eyebrow sits on the title's baseline and the title's box starts
+   6 px above the padding edge; on phones (index.css, max-width 759px) the eyebrow gets its own line
+   at the edge. Head at ~28 px either way; at 1440×900 both rows of tiles stay whole in view. */
+#credenciais {
+  scroll-margin-top: calc(34px - clamp(4.5rem, 9vw, 8rem));
+}
+
+@media (max-width: 759px) {
+  #credenciais {
+    scroll-margin-top: calc(28px - clamp(4.5rem, 9vw, 8rem));
+  }
+}
+
+/* Trajetória: no eyebrow since Rodada 6B; the H2's box starts at the padding edge. */
+#trajetoria {
+  scroll-margin-top: calc(29px - clamp(4.5rem, 9vw, 8rem));
+}
+
+/* Contato: the stop is the end of the page, so the contact, the footer's "Navegar" and "▲ START"
+   show together. The fallback margin moves the target's top edge down to the contact's bottom (its
+   min-height in index.css), below the last scroll position, so the jump clamps at the very end.
+   Rodada 6B: when the end would leave the title less than ~16 px under the top bar (or under it:
+   1024×600, phones), App.tsx sets --contact-stop right before the jump so the title stops ~24 px
+   under the bar instead. */
+#contato {
+  scroll-margin-top: var(--contact-stop, calc(-1 * min(100svh, 56rem)));
+}
+
+/* The long sections after Projetos skip their rendering (style, layout, paint) until they come near
+   the viewport, so a cold load and every web font that arrives lay out less of the page. Until a
+   section has been rendered once its height is the estimate below (`auto` keeps the real one after),
+   and a jump computed with estimates would land off its stop. So App.tsx renders them for good
+   (html.cv-off) right before any jump inside the page: a #link (menu, footer, CTAs), a #hash on load
+   or changed, Tab focus, End, and a reload or back/forward (scroll restore). Not on Contato (its wall
+   measures itself at mount) nor on the footer (its panels open above it: paint containment would clip
+   them). Estimates: measured heights at 1440 and 390 px (PT; Trajetória, Ferramentas and Formação re-measured
+   in Rodada 6B; again in 6B-C: Formação with the marks in place of the repeated names, 1223 and 1626;
+   and in fix cycle 2 (C2): Trajetória with the shorter "Liderança na prática" lines and, on phones, the
+   roles without their bullets, 2157 px at 1440 and 2509 at 390; and in Rodada 6C: Ferramentas with the
+   tools as chips and "visto em", 1141 and 2247, and Trajetória with the rewritten leadership block,
+   2604 and 2601; in the 6C adjustments: Ferramentas with smaller tiles on phones, 1872 at 390, and
+   Formação, 1300 and 1703; in the 6C final fixes: Ferramentas on phones without each group's sentence,
+   1362 at 390). */
+#trajetoria,
+#ferramentas,
+#formacao,
+#credenciais {
+  content-visibility: auto;
+}
+
+#trajetoria { contain-intrinsic-block-size: auto 2600px; }
+#ferramentas { contain-intrinsic-block-size: auto 1140px; }
+#formacao { contain-intrinsic-block-size: auto 1300px; }
+#credenciais { contain-intrinsic-block-size: auto 1010px; }
+
+@media (max-width: 759px) {
+  #trajetoria { contain-intrinsic-block-size: auto 2600px; }
+  #ferramentas { contain-intrinsic-block-size: auto 1360px; }
+  #formacao { contain-intrinsic-block-size: auto 1700px; }
+  #credenciais { contain-intrinsic-block-size: auto 1600px; }
+}
+
+html.cv-off :is(#trajetoria, #ferramentas, #formacao, #credenciais) {
+  content-visibility: visible;
+}

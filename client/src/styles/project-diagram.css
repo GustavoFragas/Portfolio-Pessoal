@@ -1,0 +1,160 @@
+/* Pixel architecture diagram of a project card and of its drawer (ProjectDiagram.tsx). Dark tokens only.
+   Measured on --surface-raised (#2e2150, rail/carousel cards and the drawer) and --surface-alt
+   (#22163a, stack): block labels --text on --surface 16.1:1, ink on pink 5.0:1; notes --text-soft
+   8.0 / 9.3:1; arrows --text-soft 8.0 / 9.3:1, retry arrows --accent-soft 7.6 / 8.8:1, the ✕ --accent
+   3.9 / 4.6:1; block edges --text-soft (or the pink fill) 8.0 / 3.9:1 and more against the card;
+   step numbers ink on --wall-pink-soft 9.7:1, the tile itself 7.6:1 on the drawer.
+   Text is 12 units: the card never draws the diagram narrower than its 263 units, so >= 12 px. */
+
+.pdiag {
+  display: grid;
+  align-content: start;
+  gap: 0.45rem;
+  width: 100%;
+  max-width: 22rem;
+  min-width: 0;
+}
+
+.pdiag__label {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  color: var(--accent-soft);
+  font-size: 0.75rem;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  line-height: 1.2;
+  text-transform: uppercase;
+}
+
+.pdiag__label::before {
+  content: "";
+  width: 0.6rem;
+  height: 0.6rem;
+  background: var(--wall-pink);
+  box-shadow: 0.75rem 0 0 var(--mark);
+  margin-right: 0.75rem;
+}
+
+.pdiag__svg {
+  display: block;
+  width: 100%;
+  height: auto;
+  overflow: visible;
+  shape-rendering: crispEdges;
+}
+
+.pdiag__block rect {
+  fill: var(--surface);
+  stroke: var(--text-soft);
+  stroke-width: 1.5px;
+}
+
+.pdiag__block--key rect {
+  fill: var(--wall-pink);
+  stroke: none;
+}
+
+.pdiag__text,
+.pdiag__note {
+  font-family: var(--font-sans);
+  font-stretch: 87.5%;
+  text-rendering: geometricPrecision;
+}
+
+.pdiag__text {
+  fill: var(--text);
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.pdiag__sub {
+  fill: var(--text-soft);
+  font-size: 12px;
+  font-weight: 550;
+}
+
+.pdiag__block--key .pdiag__text,
+.pdiag__block--key .pdiag__sub {
+  fill: var(--wall-ink);
+}
+
+.pdiag__note {
+  fill: var(--text-soft);
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.pdiag__link {
+  fill: var(--text-soft);
+}
+
+.pdiag__link--retry {
+  fill: var(--accent-soft);
+}
+
+.pdiag__cut {
+  fill: var(--accent);
+}
+
+/* Hover/focus on the card: the arrows light up in the order of the flow, one tile-step at a time. */
+@media (prefers-reduced-motion: no-preference) {
+  .project:hover .pdiag__link,
+  .project:focus-within .pdiag__link {
+    animation: pdiag-flow 0.36s steps(3, end) both;
+    animation-delay: calc(var(--k) * 110ms);
+  }
+}
+
+/* Drawer: the enlarged drawing, numbered by step. It lights one step at a time once half of it is in
+   view inside the drawer (TechDrawer sets data-lit on .tech-flow; the delay leaves room for the slide
+   when it is in view at opening) and waits dimmed until then; with reduced motion it is simply drawn
+   whole, numbers included. */
+.pdiag--steps {
+  max-width: none;
+}
+
+.pdiag__badge rect {
+  fill: var(--wall-pink-soft);
+  stroke: var(--surface-raised);
+  stroke-width: 1.5px;
+}
+
+/* 10.5 units: >= 12 px down to a 360 px phone, where the drawer draws the diagram 320 px wide. */
+.pdiag__badge text {
+  fill: var(--wall-ink);
+  font-family: var(--font-sans);
+  font-size: 10.5px;
+  font-weight: 800;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .tech-flow:not([data-lit]) .pdiag--steps [data-step],
+  .tech-flow:not([data-lit]) .pdiag--steps .pdiag__badge {
+    opacity: 0.16;
+  }
+
+  .tech-flow[data-lit] .pdiag--steps [data-step],
+  .tech-flow[data-lit] .pdiag--steps .pdiag__badge {
+    animation: pdiag-light 0.36s steps(3, end) both;
+    animation-delay: calc(0.5s + var(--s) * 0.75s);
+  }
+}
+
+@keyframes pdiag-light {
+  from {
+    opacity: 0.16;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes pdiag-flow {
+  from {
+    opacity: 0.25;
+  }
+  to {
+    opacity: 1;
+  }
+}

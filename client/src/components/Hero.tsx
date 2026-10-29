@@ -1,8 +1,10 @@
-import { useLayoutEffect, useRef, useState } from 'react';
+import { useEffect, useLayoutEffect, useRef, useState, type CSSProperties, type Ref } from 'react';
 import { ArrowDownRight } from 'lucide-react';
+import '../styles/hero-badges.css';
 import { usePortfolioContent } from '../LocaleContext';
 import About, { AboutFacts } from './About';
 import { createPixelWall, type CalmRect, type PixelWall, type Rect, type WallLayout } from './pixelWall/engine';
+import { createStoryGlide } from './pixelWall/storyGlide';
 import { useReducedMotion } from './pixelWall/useReducedMotion';
 
 /** Mirrors the engine lifecycle; also the hook for tests and the CSS fallback. */
@@ -28,6 +30,67 @@ function setTopbarSurface(surface: 'wall' | 'paper') {
   if (root.dataset.topbar !== surface) root.dataset.topbar = surface;
 }
 
+type HeroCredsProps = { flow?: boolean; near: boolean; ref?: Ref<HTMLAnchorElement> };
+
+/** Slices of the badge's thickness (depth and shade per slice live in hero-badges.css). */
+const EDGE_SLICES = [0, 1, 2, 3, 4, 5, 6];
+/** Pixel shadow under each badge: 5 floor tiles. */
+const FLOOR_TILES = [0, 1, 2, 3, 4];
+
+/** Compact row of the key credentials; links to the full section. The art (faces and the slices'
+    mask) only exists once the row is near the viewport (`near`, from Hero), so the row that CSS
+    hides at this width, or the phone row still below the story, never downloads it at load. */
+function HeroCreds({ flow = false, near, ref }: HeroCredsProps) {
+  const { content } = usePortfolioContent();
+  const { hero } = content.ui;
+  return (
+    <a
+      className={`hero__creds ${flow ? 'hero__creds--flow' : ''}`}
+      href="#credenciais"
+      data-calm={flow ? undefined : '2'}
+      ref={ref}
+      aria-label={`${hero.credsLabel}: ${hero.creds.map((c) => `${c.title} ${c.sub}`).join(', ')}. ${hero.credsMore}`}
+    >
+      {hero.creds.map((cred, index) => (
+        <span className="hero__cred" key={cred.title} aria-hidden="true">
+          {/* A small 3D badge: the art as front and back faces, slices masked by the art as its thickness.
+              It only spins while the row says data-spin="on" (hero-badges.css). The <img> asks for the art
+              in CORS mode, like the mask, so faces and slices share one download of the same file. */}
+          <span
+            className={`hero__cred-emblem ${cred.logo ? 'hero__cred-emblem--logo' : ''}`}
+            data-badge={cred.art.split('/').pop()?.replace(/(-\d+)?\.\w+$/, '')}
+            style={{ '--i': index, ...(near && { '--art': `url("${cred.art}")` }) } as CSSProperties}
+          >
+            <span className="hero__cred-float">
+              <span className="hero__cred-sculpt">
+                {near && EDGE_SLICES.map((slice) => (
+                  <i className="hero__cred-slice" key={slice} />
+                ))}
+                <span className="hero__cred-face">
+                  {near && <img src={cred.art} alt="" crossOrigin="anonymous" decoding="async" fetchPriority="low" />}
+                </span>
+                <span className="hero__cred-face hero__cred-face--back">
+                  {near && <img src={cred.art} alt="" crossOrigin="anonymous" decoding="async" fetchPriority="low" />}
+                </span>
+              </span>
+            </span>
+            <span className="hero__cred-floor">
+              {FLOOR_TILES.map((tile) => (
+                <i key={tile} />
+              ))}
+            </span>
+          </span>
+          <span className="hero__cred-text">
+            <strong>{cred.title}</strong>
+            <span>{cred.sub}</span>
+          </span>
+          <span className="hero__cred-short">{cred.short}</span>
+        </span>
+      ))}
+    </a>
+  );
+}
+
 export default function Hero() {
   const { content } = usePortfolioContent();
   const { profile, ui } = content;
@@ -40,9 +103,48 @@ export default function Hero() {
   const frameBoxRef = useRef<HTMLDivElement>(null);
   const frameRef = useRef<HTMLDivElement>(null);
   const actionsRef = useRef<HTMLDivElement>(null);
+  const credsRef = useRef<HTMLAnchorElement>(null);
+  const flowCredsRef = useRef<HTMLAnchorElement>(null);
   const aboutSlotRef = useRef<HTMLDivElement>(null);
+  const [credsNear, setCredsNear] = useState(false);
+  const [flowCredsNear, setFlowCredsNear] = useState(false);
   const image = profile.image;
   const hiddenSurname = profile.name.replace(`${profile.firstName} ${profile.lastName}`, '').trim();
+
+  // Each credential row gets its art once it is within half a screen of the viewport. A row hidden by
+  // CSS never intersects, so it never loads; the portrait (LCP) keeps the bandwidth at load.
+  useEffect(() => {
+    const hero = credsRef.current;
+    const rows = [hero, flowCredsRef.current].filter((row): row is HTMLAnchorElement => row !== null);
+    const observer = new IntersectionObserver(
+      (entries) => {
+        for (const entry of entries) {
+          if (!entry.isIntersecting) continue;
+          observer.unobserve(entry.target);
+          if (entry.target === hero) setCredsNear(true);
+          else setFlowCredsNear(true);
+        }
+      },
+      { rootMargin: '50% 0px' },
+    );
+    rows.forEach((row) => observer.observe(row));
+    return () => observer.disconnect();
+  }, []);
+
+  // Phones: the badges in the row after the story spin only while that row is on screen
+  // (hidden by CSS elsewhere, so it never intersects there).
+  useEffect(() => {
+    const row = flowCredsRef.current;
+    if (!row) return;
+    const observer = new IntersectionObserver(([entry]) => {
+      row.dataset.spin = entry.isIntersecting ? 'on' : 'off';
+    });
+    observer.observe(row);
+    return () => {
+      observer.disconnect();
+      delete row.dataset.spin;
+    };
+  }, []);
 
   useLayoutEffect(() => {
     const story = storyRef.current;
@@ -52,8 +154,9 @@ export default function Hero() {
     const frameBox = frameBoxRef.current;
     const frame = frameRef.current;
     const actions = actionsRef.current;
+    const creds = credsRef.current;
     const aboutSlot = aboutSlotRef.current;
-    if (!story || !stage || !heroBox || !canvas || !frameBox || !frame || !actions || !aboutSlot) return;
+    if (!story || !stage || !heroBox || !canvas || !frameBox || !frame || !actions || !creds || !aboutSlot) return;
 
     const motion = !reduced;
     let disposed = false;
@@ -115,13 +218,22 @@ export default function Hero() {
         late,
         hero: relative(frame, base),
         about: motion ? relative(aboutSlot, base) : null,
+        // Same breakpoint as the stacked (portrait) layout in index.css.
+        fringe: window.matchMedia('(max-width: 759px), (max-aspect-ratio: 4/5)').matches ? 'steps' : 'scatter',
       };
     };
 
     let lastProgress = -1;
     let ctaHidden = false;
+    let visible = true;
     let scrollRaf = 0;
     let layoutRaf = 0;
+
+    // The credential badges spin only while the hero is on screen and its copy has not faded out.
+    const syncSpin = () => {
+      const spin = visible && !ctaHidden ? 'on' : 'off';
+      if (creds.dataset.spin !== spin) creds.dataset.spin = spin;
+    };
 
     const update = () => {
       scrollRaf = 0;
@@ -140,7 +252,9 @@ export default function Hero() {
       if (hide !== ctaHidden) {
         ctaHidden = hide;
         actions.inert = hide;
+        creds.inert = hide;
       }
+      syncSpin();
       const topbarHeight = document.querySelector<HTMLElement>('.topbar__inner')?.offsetHeight ?? 64;
       const onWall = motion && wall
         ? progress < TOPBAR_PAPER && rect.bottom > topbarHeight
@@ -217,11 +331,11 @@ export default function Hero() {
     const topbarInner = document.querySelector('.topbar__inner');
     if (topbarInner) resizeObserver.observe(topbarInner);
 
-    let visible = true;
     const syncActive = () => wall?.setActive(visible && !document.hidden);
     const intersection = new IntersectionObserver(([entry]) => {
       visible = entry.isIntersecting;
       syncActive();
+      syncSpin();
     });
     intersection.observe(heroBox);
     document.addEventListener('visibilitychange', syncActive);
@@ -230,9 +344,12 @@ export default function Hero() {
     document.fonts?.ready.then(() => {
       if (!disposed) scheduleLayout();
     });
+    // Hero → About plays whole, never skipped by a fast scroll (motion only).
+    const stopGlide = motion && wall ? createStoryGlide(story, stage) : () => {};
 
     return () => {
       disposed = true;
+      stopGlide();
       cancelAnimationFrame(scrollRaf);
       cancelAnimationFrame(layoutRaf);
       wall?.destroy();
@@ -247,6 +364,8 @@ export default function Hero() {
       stage.removeEventListener('pointercancel', onPointerEnd);
       stage.removeEventListener('pointerleave', onPointerLeave);
       actions.inert = false;
+      creds.inert = false;
+      delete creds.dataset.spin;
       story.style.removeProperty('--p');
       delete document.documentElement.dataset.topbar;
     };
@@ -293,6 +412,8 @@ export default function Hero() {
                 </a>
                 <a className="btn btn--line" href="#contato">{ui.hero.secondaryCta}</a>
               </div>
+              {/* The credentials that change the game, right at the start (on phones they follow the story). */}
+              <HeroCreds ref={credsRef} near={credsNear} />
             </section>
           </div>
           <About slotRef={aboutSlotRef} />
@@ -301,6 +422,9 @@ export default function Hero() {
       </div>
       <div className="about-facts-flow">
         <AboutFacts className="about__facts--flow" />
+      </div>
+      <div className="creds-flow">
+        <HeroCreds flow ref={flowCredsRef} near={flowCredsNear} />
       </div>
     </>
   );

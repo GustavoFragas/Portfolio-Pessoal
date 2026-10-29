@@ -8,15 +8,21 @@ export default defineConfig({
   build: {
     sourcemap: false,
     chunkSizeWarningLimit: 900,
+    // Fonts always ship as files: the production CSP (vercel.json, font-src 'self') blocks data: fonts.
+    assetsInlineLimit: (filePath) => (/\.woff2?(\?|$)/i.test(filePath) ? false : undefined),
     rollupOptions: {
       output: {
         manualChunks(id) {
           if (id.includes('node_modules')) {
-            if (id.includes('react') || id.includes('react-dom')) {
+            if (/[\\/]node_modules[\\/](react|react-dom|scheduler)[\\/]/.test(id)) {
               return 'react-vendor';
             }
             if (id.includes('lucide-react')) {
               return 'icons';
+            }
+            // Let Rollup split motion: the menu's animation features load on demand.
+            if (/[\\/]node_modules[\\/](motion|framer-motion|motion-dom|motion-utils)[\\/]/.test(id)) {
+              return undefined;
             }
             return 'vendor';
           }

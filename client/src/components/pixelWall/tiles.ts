@@ -14,7 +14,9 @@ export const PALETTE: readonly Rgb[] = [
   [0x22, 0x16, 0x3a], // --wall-navy
   [0xec, 0x43, 0x85], // --wall-pink
   [0xf6, 0xa3, 0xc4], // --wall-pink-soft
-  [0xf4, 0xee, 0xe6], // --paper
+  // --paper. The dissolve destination now follows the CSS --surface token (engine.ts readSurface);
+  // this entry is only its fallback.
+  [0xf4, 0xee, 0xe6],
 ];
 
 export const INK_CSS = '#160F29';
@@ -124,12 +126,14 @@ export function buildWall(cols: number, rows: number, zones: readonly TileZone[]
  * tile from the outside in (p 0.14 → ~0.48), leaving a ragged halo of panel
  * around him, so the crop never travels as a rectangle. Gustavo never erodes.
  */
-export function buildErosion(cols: number, rows: number, seed = 7): Float32Array {
+export function buildErosion(cols: number, rows: number, seed = 7, tidy = false): Float32Array {
   const out = new Float32Array(cols * rows);
   for (let j = 0; j < rows; j += 1) {
     for (let i = 0; i < cols; i += 1) {
-      // Dithered so the halo edge never follows the silhouette's straight sides.
-      const d = silhouetteDistance((i + 0.5) / cols, (j + 0.5) / rows) + (hash2(i, j, seed + 61) - 0.5) * 0.06;
+      // Dithered so the halo edge never follows the silhouette's straight sides; the tidy
+      // variant (narrow screens) keeps a clean stepped outline instead.
+      const dither = tidy ? 0 : (hash2(i, j, seed + 61) - 0.5) * 0.06;
+      const d = silhouetteDistance((i + 0.5) / cols, (j + 0.5) / rows) + dither;
       const near = 1 - Math.min(1, Math.max(0, (d - HALO) / 0.3));
       out[j * cols + i] = d <= HALO ? NEVER : 0.14 + 0.26 * near + 0.08 * hash2(i, j, seed + 60);
     }
@@ -190,6 +194,16 @@ const HEAD_SHAPE = { x: 0.49, y: 0.15, rx: 0.15, ry: 0.13 } as const;
 const BODY_SHAPE = { u0: 0.17, u1: 0.81, v0: 0.27 } as const;
 /** Width of panel that stays around him once the rest has eroded. */
 export const HALO = 0.05;
+
+/** Distance in pixels from a point (px, relative to a portrait box w×h) to the silhouette; 0 inside. */
+export function silhouetteDistancePx(x: number, y: number, w: number, h: number): number {
+  const bx = Math.max(BODY_SHAPE.u0 * w - x, 0, x - BODY_SHAPE.u1 * w);
+  const by = Math.max(BODY_SHAPE.v0 * h - y, 0);
+  const rx = HEAD_SHAPE.rx * w;
+  const ry = HEAD_SHAPE.ry * h;
+  const norm = Math.hypot((x - HEAD_SHAPE.x * w) / rx, (y - HEAD_SHAPE.y * h) / ry);
+  return Math.min(Math.hypot(bx, by), Math.max(0, norm - 1) * Math.min(rx, ry));
+}
 
 /** Approximate distance (in crop widths) from a crop point to Gustavo's silhouette; 0 inside. */
 export function silhouetteDistance(u: number, v: number): number {

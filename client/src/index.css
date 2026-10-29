@@ -1,14 +1,14 @@
 @import "tailwindcss";
 @source not "./components/* 2.tsx";
 
-/* Parede de pixels — tokens sampled from the AWS Summit panel behind Gustavo. */
+/* Parede de pixels — tokens sampled from the AWS Summit panel behind Gustavo. These are literal
+   colours (the hero wall, the contact wall, the menu panels and the logo plates use them as such). */
 :root {
-  color-scheme: light;
   --wall-ink: #160f29;
   --wall-navy: #22163a;
   --wall-pink: #ec4385;
   --wall-pink-soft: #f6a3c4;
-  --wall-pink-deep: #b5215c; /* pink that still reads as text on paper (5.4:1) */
+  --wall-pink-deep: #b5215c; /* pink that still reads as text on paper (5.4:1); not on dark (2.9:1) */
   --sweater: #7a2326;
   --paper: #f4eee6;
   --paper-deep: #e8dfd3;
@@ -22,8 +22,50 @@
   --content: 80rem;
   --tile: 12px;
   --grout: 1.5px;
+}
+
+/* ---------- theme: semantic tokens ----------
+   Everything outside the hero wall, the contact wall and the kinetic menu panels paints with these.
+   Dark (active): the whole site sits on the wall's own darks, ink and navy alternating by section,
+   paper text, pink as the accent. The pixel wall dissolves into --surface (engine.ts reads it).
+   Contrast (WCAG 2.x, measured): text 16.1 / 14.6 / 12.6 :1 on surface / alt / raised;
+   text-soft 10.2 / 9.3 / 8.0 :1 (6.5:1 on tint); accent-soft 9.7 / 8.8 / 7.6 :1;
+   accent (pink) 5.0 / 4.6 / 3.9 :1, so small text uses accent-soft and pink stays for display
+   sizes, marks and fills; focus ring 9.7 / 8.8 / 7.6 :1 against the three surfaces. */
+:root {
+  color-scheme: dark;
+  --surface: var(--wall-ink); /* page, About (the wall's destination), Journey, Study */
+  --surface-alt: var(--wall-navy); /* alternate sections: Projects, Tools, Credentials */
+  --surface-raised: #2e2150; /* cards, drawer, steppers */
+  --surface-tint: #3d2f60; /* tile faces, tags, quiet tiles of the dividers */
+  --text: var(--paper);
+  --text-soft: #c6bdcf;
+  --line: #463866; /* thin rule */
+  --rule: var(--paper); /* strong rule, card edges */
+  --mark: var(--text-soft); /* the small square marks that are navy on paper */
+  --accent: var(--wall-pink);
+  --accent-soft: var(--wall-pink-soft); /* accent for small text and links */
+  --focus: var(--wall-pink-soft);
+}
+
+/* Light (previous mapping). To revert: delete the dark :root block above and uncomment this one.
+   On paper the soft pink fails as text, so both accents fall back to the deep pink.
+:root {
+  color-scheme: light;
+  --surface: var(--paper);
+  --surface-alt: var(--paper);
+  --surface-raised: var(--paper);
+  --surface-tint: var(--paper-deep);
+  --text: var(--ink);
+  --text-soft: var(--ink-soft);
+  --line: var(--paper-line);
+  --rule: var(--ink);
+  --mark: var(--wall-navy);
+  --accent: var(--wall-pink-deep);
+  --accent-soft: var(--wall-pink-deep);
   --focus: var(--wall-pink-deep);
 }
+*/
 
 * {
   box-sizing: border-box;
@@ -31,7 +73,7 @@
 
 html {
   overflow-x: clip;
-  background: var(--paper);
+  background: var(--surface);
   scroll-behavior: smooth;
   scroll-padding-top: var(--topbar-h);
 }
@@ -40,8 +82,8 @@ body {
   min-width: 320px;
   margin: 0;
   overflow-x: clip;
-  background: var(--paper);
-  color: var(--ink);
+  background: var(--surface);
+  color: var(--text);
   font-family: var(--font-sans);
   font-size: 1.0625rem;
   line-height: 1.6;
@@ -116,9 +158,9 @@ svg {
   left: 0.75rem;
   z-index: 100;
   transform: translateY(-200%);
-  background: var(--paper);
-  color: var(--ink);
-  border: 2px solid var(--ink);
+  background: var(--surface);
+  color: var(--text);
+  border: 2px solid var(--rule);
   padding: 0.75rem 1rem;
   font-weight: 700;
 }
@@ -134,7 +176,7 @@ svg {
   align-items: center;
   gap: 0.6rem;
   margin-bottom: 1rem;
-  color: var(--wall-pink-deep);
+  color: var(--accent-soft);
   font-size: 0.8125rem;
   font-weight: 750;
   letter-spacing: 0.09em;
@@ -146,16 +188,8 @@ svg {
   width: 0.75rem;
   height: 0.75rem;
   background: var(--wall-pink);
-  box-shadow: 0.85rem 0 0 var(--wall-navy);
+  box-shadow: 0.85rem 0 0 var(--mark);
   margin-right: 0.85rem;
-}
-
-.kicker--wall {
-  color: var(--wall-pink-soft);
-}
-
-.kicker--wall::before {
-  box-shadow: 0.85rem 0 0 var(--paper);
 }
 
 h2 {
@@ -170,7 +204,7 @@ h2 {
   display: inline-flex;
   align-items: center;
   gap: 0.3rem;
-  color: var(--wall-pink-deep);
+  color: var(--accent-soft);
   font-weight: 700;
   text-decoration: underline;
   text-decoration-thickness: 2px;
@@ -178,7 +212,7 @@ h2 {
 }
 
 .text-link:hover {
-  color: var(--ink);
+  color: var(--text);
 }
 
 .btn {
@@ -220,19 +254,23 @@ h2 {
   position: fixed;
   inset: 0 0 auto;
   z-index: 50;
-  color: var(--ink);
-  background: var(--paper);
-  border-bottom: 1px solid var(--paper-line);
+  /* After the hero (data-topbar="paper"): a solid bar of the page surface with a thin rule,
+     distinct from the transparent bar over the wall. */
+  color: var(--text);
+  background: var(--surface);
+  border-bottom: 1px solid var(--line);
   transition: background-color 0.25s ease, color 0.25s ease, border-color 0.25s ease;
 }
 
-:root[data-topbar="wall"] .topbar:not(.topbar--open) {
+:root[data-topbar="wall"] .topbar:not(.topbar--menu) {
   background: transparent;
   color: var(--paper);
   border-bottom-color: transparent;
 }
 
 .topbar__inner {
+  position: relative;
+  z-index: 2; /* above the open menu, which lives inside the header */
   display: flex;
   align-items: center;
   gap: clamp(1rem, 3vw, 2.5rem);
@@ -241,6 +279,7 @@ h2 {
 }
 
 .brand {
+  white-space: nowrap;
   display: inline-flex;
   align-items: center;
   gap: 0.7rem;
@@ -269,36 +308,22 @@ h2 {
   background: currentColor;
 }
 
-.topbar__nav {
-  display: flex;
-  gap: clamp(1rem, 2.4vw, 2rem);
-}
-
-.topbar__nav a {
-  font-size: 0.9375rem;
-  font-weight: 650;
-  padding: 0.4rem 0;
-  border-bottom: 2px solid transparent;
-}
-
-.topbar__nav a:hover {
-  border-bottom-color: currentColor;
-}
-
 .language-switcher {
   display: inline-flex;
   border: 1.5px solid currentColor;
+  /* The ring crosses both the paper panel and the pressed (ink) button: pink holds 3.2:1 and 5.0:1. */
+  --focus: var(--wall-pink);
 }
 
 .language-switcher button {
-  min-width: 2.5rem;
-  min-height: 2.25rem;
+  min-width: 2.75rem;
+  min-height: 2.5rem;
   padding: 0 0.5rem;
   border: 0;
   background: transparent;
   color: inherit;
   font: inherit;
-  font-size: 0.8125rem;
+  font-size: 0.875rem;
   font-weight: 750;
   letter-spacing: 0.04em;
   cursor: pointer;
@@ -313,29 +338,235 @@ h2 {
   background: var(--ink);
 }
 
-:root[data-topbar="wall"] .topbar:not(.topbar--open) .language-switcher button[aria-pressed="true"] {
-  color: var(--ink);
-  background: var(--paper);
-}
-
-.topbar__menu {
-  display: none;
-  place-items: center;
-  width: 2.75rem;
+/* "Menu +": the label slides up to "Close" and the plus turns 315° into a cross. */
+.menu-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.65rem;
   height: 2.75rem;
+  padding: 0 0.95rem;
   border: 1.5px solid currentColor;
   background: transparent;
   color: inherit;
+  font: inherit;
+  font-size: 0.875rem;
+  font-stretch: 110%;
+  font-weight: 780;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
   cursor: pointer;
 }
 
-.topbar__menu svg {
-  width: 1.4rem;
-  height: 1.4rem;
+.menu-btn__label {
+  display: grid;
+  height: 1.2em;
+  overflow: hidden;
+  line-height: 1.2;
 }
 
-.mobile-nav {
-  display: none;
+.menu-btn__label > span {
+  transition: transform 0.5s cubic-bezier(0.76, 0, 0.24, 1);
+}
+
+.menu-btn[aria-expanded="true"] .menu-btn__label > span {
+  transform: translateY(-100%);
+}
+
+.menu-btn__icon {
+  position: relative;
+  width: 0.85rem;
+  height: 0.85rem;
+  transition: transform 0.6s cubic-bezier(0.76, 0, 0.24, 1);
+}
+
+.menu-btn__icon::before,
+.menu-btn__icon::after {
+  content: "";
+  position: absolute;
+  top: 50%;
+  left: 0;
+  width: 100%;
+  height: 2px;
+  margin-top: -1px;
+  background: currentColor;
+}
+
+.menu-btn__icon::after {
+  transform: rotate(90deg);
+}
+
+.menu-btn[aria-expanded="true"] .menu-btn__icon {
+  transform: rotate(315deg);
+}
+
+.menu-btn:hover .menu-btn__icon {
+  transform: rotate(90deg);
+}
+
+.menu-btn[aria-expanded="true"]:hover .menu-btn__icon {
+  transform: rotate(405deg);
+}
+
+/* Open menu: the bar sits over the panels; the button lands on the paper panel. */
+.topbar--menu {
+  border-bottom-color: transparent;
+  background: transparent;
+  color: var(--paper);
+  --focus: var(--paper);
+}
+
+.topbar--menu .menu-btn {
+  color: var(--ink);
+  --focus: var(--wall-pink-deep);
+}
+
+/* The menu and the drawer lock the page scroll. The gutter stays reserved, so a classic scrollbar
+   does not vanish on open: the page would widen and both pixel-wall canvases would be resized. */
+html {
+  scrollbar-gutter: stable;
+}
+
+html.menu-open {
+  overflow: hidden;
+}
+
+/* Kinetic menu: overlay, three panels sliding in from the right, huge condensed links. */
+.kmenu {
+  --menu-w: min(46rem, 100vw);
+  position: fixed;
+  inset: 0;
+  z-index: 1;
+}
+
+/* Closed: still laid out, so opening never pays a layout; invisible, unfocusable and out of the
+   accessibility tree (KineticMenu.tsx). */
+.kmenu[data-closed] {
+  visibility: hidden;
+  pointer-events: none;
+}
+
+.kmenu__overlay {
+  position: absolute;
+  inset: 0;
+  background: rgb(22 15 41 / 0.66);
+}
+
+.kmenu__panel {
+  position: absolute;
+  top: 0;
+  right: 0;
+  height: 100%;
+}
+
+.kmenu__panel--ink {
+  width: calc(var(--menu-w) + 30px);
+  background: var(--wall-ink);
+}
+
+.kmenu__panel--pink {
+  width: calc(var(--menu-w) + 15px);
+  background: var(--wall-pink);
+}
+
+.kmenu__panel--paper {
+  display: flex;
+  flex-direction: column;
+  width: var(--menu-w);
+  padding: calc(var(--topbar-h) + clamp(1.25rem, 5svh, 3rem)) clamp(1.5rem, 4vw, 3.25rem) clamp(1.5rem, 4svh, 2.5rem);
+  overflow-y: auto;
+  /* The one light surface left on the dark site: it marks the new layer. Literal paper and ink,
+     with the light focus colour (the dark one does not show on paper). */
+  background: var(--paper);
+  color: var(--ink);
+  color-scheme: light; /* its own scrollbar stays light */
+  --focus: var(--wall-pink-deep);
+}
+
+.kmenu__list {
+  position: relative;
+  z-index: 1;
+  display: grid;
+  gap: clamp(0.15rem, 1.2svh, 0.6rem);
+}
+
+.kmenu__clip {
+  overflow: hidden;
+  /* Room inside the reveal mask for accents, the cedilla (Ç) and the focus outline. */
+  padding: max(0.12em, 9px) 0.3em max(0.16em, 10px) 9px;
+  margin: calc(-1 * max(0.08em, 7px)) 0 calc(-1 * max(0.12em, 8px)) -9px;
+}
+
+.kmenu__link {
+  position: relative;
+  display: inline-block;
+  padding: 0.04em 0.18em 0 0.06em;
+  font-size: clamp(2.6rem, min(7.2vw, 9.5svh), 5.75rem);
+  font-stretch: 75%;
+  font-weight: 860;
+  line-height: 0.95;
+  letter-spacing: -0.01em;
+  text-transform: uppercase;
+  transform-origin: 0 100%; /* the rise pivots on the baseline's start (KineticMenu.tsx) */
+}
+
+/* Hover/focus: a light band slides in behind the link. */
+.kmenu__link::before {
+  content: "";
+  position: absolute;
+  inset: 0.1em -0.12em 0.04em -0.12em;
+  z-index: -1;
+  background: var(--wall-pink-soft);
+  transform: scaleX(0);
+  transform-origin: 0 50%;
+  transition: transform 0.32s cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+
+.kmenu__link[data-active="true"]::before {
+  transform: scaleX(1);
+}
+
+.kmenu__link:focus-visible {
+  outline: 3px solid var(--ink);
+  outline-offset: 3px;
+}
+
+/* Tile compositions in the lower part of the panel, one per link. */
+.kmenu__shapes {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  overflow: hidden;
+  pointer-events: none;
+}
+
+.kmenu__shape {
+  position: absolute;
+  right: clamp(1rem, 3vw, 2.5rem);
+  bottom: clamp(1rem, 3svh, 1.75rem);
+  display: grid;
+  grid-template-columns: repeat(6, 1fr);
+  grid-template-rows: repeat(5, 1fr);
+  gap: 4px;
+  width: min(46%, 19rem, 36svh);
+  aspect-ratio: 6 / 5;
+}
+
+.kmenu__shape i {
+  background: var(--c);
+  transform: scale(0);
+  transition: transform 0.22s ease-in;
+}
+
+.kmenu__shape[data-on="true"] i {
+  transform: scale(1);
+  transition: transform 0.38s cubic-bezier(0.2, 0.8, 0.2, 1) calc(var(--d) * 28ms);
+}
+
+.kmenu__foot {
+  position: relative;
+  z-index: 1;
+  margin-top: auto;
+  padding-top: 1.5rem;
 }
 
 /* ---------- hero: the wall becomes Gustavo ---------- */
@@ -414,6 +645,7 @@ h2 {
 }
 
 .hero__hint {
+  white-space: nowrap;
   position: absolute;
   right: 0;
   bottom: 0;
@@ -510,6 +742,101 @@ h2 {
   gap: 0.75rem;
 }
 
+/* The credentials that change the game, right below the CTAs (calm zone behind them). */
+.hero__creds {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 0.75rem 1.1rem;
+  width: min(100%, 40rem);
+  margin-top: clamp(1.1rem, 2.6svh, 1.6rem);
+  padding-top: 0.95rem;
+  border-top: 1px solid rgb(244 238 230 / 0.28);
+  color: var(--paper);
+}
+
+.hero__cred {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  min-width: 0;
+}
+
+.hero__cred-emblem {
+  display: grid;
+  flex: none;
+  place-items: center;
+  width: 2.5rem;
+  height: 2.5rem;
+}
+
+.hero__cred-emblem img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+}
+
+.hero__cred-emblem--logo {
+  width: 3.1rem;
+  height: 2.2rem;
+  padding: 0.25rem 0.35rem;
+  background: var(--paper-deep);
+}
+
+.hero__cred-text {
+  display: grid;
+  min-width: 0;
+  font-size: 0.8125rem;
+  line-height: 1.22;
+}
+
+.hero__cred-text strong {
+  font-weight: 760;
+}
+
+.hero__creds:hover strong {
+  text-decoration: underline;
+  text-underline-offset: 0.18em;
+}
+
+/* Landscape tablets, app panels and short laptops: one short line per credential. */
+@media (max-width: 1023px) and (min-aspect-ratio: 4/5), (max-height: 680px) and (min-aspect-ratio: 1/1) {
+  .hero .hero__cred-text {
+    display: none;
+  }
+
+  .hero .hero__cred-short {
+    display: block;
+    font-size: 0.75rem;
+    font-weight: 760;
+    line-height: 1.2;
+  }
+}
+
+.hero__cred-short {
+  display: none;
+}
+
+/* Phones only: the same credentials, right after the story, on the page surface. */
+.creds-flow {
+  display: none;
+  /* Room before the tile rule that opens Projects. */
+  padding: 1.5rem var(--gutter) clamp(2.5rem, 8vw, 3.5rem);
+}
+
+.hero__creds--flow {
+  grid-template-columns: 1fr;
+  gap: 0.7rem;
+  width: min(100%, 40rem);
+  margin: 0;
+  padding-top: 1rem;
+  border-top: 2px solid var(--rule);
+  color: var(--text);
+}
+
+.hero__creds--flow .hero__cred-text span {
+  color: var(--text-soft);
+}
+
 .about {
   position: absolute;
   inset: 0;
@@ -518,7 +845,7 @@ h2 {
   align-items: center;
   gap: clamp(2rem, 5vw, 5rem);
   padding: var(--topbar-h) var(--gutter) 1.5rem;
-  color: var(--ink);
+  color: var(--text);
   pointer-events: none;
 }
 
@@ -560,7 +887,7 @@ h2 {
   gap: 0.35rem;
   margin-top: 1.6rem;
   padding-top: 1.1rem;
-  border-top: 2px solid var(--ink);
+  border-top: 2px solid var(--rule);
   font-size: 0.9375rem;
 }
 
@@ -571,7 +898,7 @@ h2 {
 
 .about__facts dt {
   min-width: 6.5rem;
-  color: var(--wall-pink-deep);
+  color: var(--accent-soft);
   font-weight: 750;
 }
 
@@ -605,7 +932,7 @@ h2 {
   height: auto;
   min-height: 0;
   overflow: visible;
-  background: var(--paper);
+  background: var(--surface);
 }
 
 .story[data-wall="static"] .story__hero,
@@ -654,7 +981,7 @@ h2 {
   top: max(100svh, 34rem);
 }
 
-/* ---------- paper sections ---------- */
+/* ---------- content sections (theme tokens; ink and navy alternate) ---------- */
 
 .tile-rule {
   display: block;
@@ -663,7 +990,7 @@ h2 {
 }
 
 .tile--paper {
-  fill: var(--paper-deep);
+  fill: var(--surface-tint);
 }
 
 .tile--pink {
@@ -687,6 +1014,14 @@ h2 {
   margin: 0 auto;
 }
 
+/* Rhythm: About, Journey and Study sit on --surface; these three on --surface-alt. */
+.projects,
+.tools,
+.credentials {
+  --tile-grout: var(--surface-alt); /* TileReveal's grout matches the section */
+  background: var(--surface-alt);
+}
+
 .section__head {
   display: grid;
   grid-template-columns: minmax(0, 1.45fr) minmax(0, 0.55fr);
@@ -702,27 +1037,37 @@ h2 {
 
 .section__intro {
   max-width: 30rem;
-  color: var(--ink-soft);
+  color: var(--text-soft);
   font-size: 1.0625rem;
 }
 
-/* projects: numbered rows; a band of tiles flips in a wave on hover/focus */
+/* projects: plain-language panels. Wide screens: a rail driven by the page scroll.
+   Narrower: a native horizontal carousel with scroll snap. Reduced motion: a stacked list. */
+
+.projects__stage {
+  max-width: var(--content);
+  margin: 0 auto;
+}
+
+.projects__progress {
+  display: none;
+}
 
 .project-list {
-  border-bottom: 2px solid var(--ink);
+  border-bottom: 2px solid var(--rule);
 }
 
 .project + .project,
 .project:first-child {
-  border-top: 2px solid var(--ink);
+  border-top: 2px solid var(--rule);
 }
 
 .project {
   position: relative;
   display: grid;
-  grid-template-columns: clamp(4.5rem, 11vw, 9.5rem) minmax(0, 1fr);
-  gap: 0 clamp(1rem, 3vw, 2.5rem);
-  padding: clamp(2.25rem, 4vw, 3.25rem) 0 clamp(2rem, 3.5vw, 2.75rem);
+  align-content: start;
+  gap: 1.05rem;
+  padding: clamp(2rem, 3.5vw, 2.75rem) 0;
 }
 
 .project__band {
@@ -751,8 +1096,24 @@ h2 {
   transition: transform 0.18s ease-out calc(var(--i) * 8ms);
 }
 
+/* The tiles are created on the card's first hover/focus (Projects.tsx), already hovered: start them
+   folded so that first time plays the same wave. */
+@starting-style {
+  .project:hover .project__band span,
+  .project:focus-within .project__band span {
+    transform: scaleY(0);
+  }
+}
+
+.project__top {
+  display: grid;
+  grid-template-columns: clamp(4.25rem, 8vw, 7rem) minmax(0, 1fr);
+  align-items: end;
+  gap: 0 clamp(1rem, 2.5vw, 2rem);
+}
+
 .project__num {
-  font-size: clamp(3rem, 7.5vw, 6.5rem);
+  font-size: clamp(3rem, 6.5vw, 5.5rem);
   font-stretch: 125%;
   font-weight: 880;
   line-height: 0.82;
@@ -762,60 +1123,141 @@ h2 {
 
 .project:hover .project__num,
 .project:focus-within .project__num {
-  color: var(--wall-pink-deep);
+  color: var(--accent); /* display size: 3:1 is enough, pink holds 3.9:1 even on raised */
 }
 
 .project__label {
-  margin-bottom: 0.45rem;
-  color: var(--ink-soft);
+  margin-bottom: 0.35rem;
+  color: var(--text-soft);
   font-size: 0.875rem;
   font-weight: 700;
 }
 
 .project h3 {
-  font-size: clamp(1.5rem, 2.8vw, 2.4rem);
+  font-size: clamp(1.5rem, 2.6vw, 2.25rem);
   font-stretch: 112%;
   font-weight: 780;
   line-height: 1.05;
   letter-spacing: -0.015em;
 }
 
-.project__summary {
-  max-width: 44rem;
-  margin-top: 0.9rem;
-  font-size: clamp(1.0625rem, 1.3vw, 1.1875rem);
+.project__what {
+  max-width: 46rem;
+  font-size: clamp(1.1rem, 1.45vw, 1.28rem);
+  line-height: 1.42;
 }
 
-.project__tools {
-  max-width: 44rem;
-  margin-top: 0.6rem;
-  color: var(--ink-soft);
-  font-size: 0.9375rem;
+/* Result headline: the line a recruiter reads first, in display type (pink only at display size:
+   >= 20 px at weight 830, 3.9:1 on --surface-raised, 4.6:1 on --surface-alt). */
+.project__headline {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 0.15rem 0.75rem;
 }
 
-.project__details {
-  margin-top: 1.25rem;
+.project__headline-text {
+  color: var(--accent);
+  font-size: clamp(1.35rem, 2.6vw, 2.25rem);
+  font-stretch: 108%;
+  font-weight: 830;
+  line-height: 1.05;
+  letter-spacing: -0.015em;
 }
 
-.project__details summary {
+.project__headline-note {
+  color: var(--text-soft);
+  font-size: 0.875rem;
+  font-weight: 650;
+}
+
+.project__foot {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem 1.75rem;
+}
+
+/* Wide screens (rail and the reduced-motion stack): the diagram sits beside the title, the
+   headline and the one sentence; tags and the details button close the card at full width. */
+@media (min-width: 1024px) {
+  .projects:is([data-rail="rail"], [data-rail="stack"]) .project {
+    grid-template-columns: minmax(0, 1fr) var(--diag-w, 22rem);
+    grid-template-rows: auto auto 1fr auto;
+    grid-template-areas:
+      "top diagram"
+      "headline diagram"
+      "what diagram"
+      "foot foot";
+    column-gap: clamp(1.5rem, 3vw, 3rem);
+  }
+
+  .projects:is([data-rail="rail"], [data-rail="stack"]) .project__top {
+    grid-area: top;
+  }
+
+  .projects:is([data-rail="rail"], [data-rail="stack"]) .project__headline {
+    grid-area: headline;
+  }
+
+  .projects:is([data-rail="rail"], [data-rail="stack"]) .project__what {
+    grid-area: what;
+  }
+
+  .projects:is([data-rail="rail"], [data-rail="stack"]) .project > .pdiag {
+    grid-area: diagram;
+    max-width: none;
+  }
+
+  .projects:is([data-rail="rail"], [data-rail="stack"]) .project__foot {
+    grid-area: foot;
+  }
+}
+
+.project__tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem;
+}
+
+.project__tags li {
+  padding: 0.22rem 0.6rem;
+  background: var(--surface-tint);
+  font-size: 0.8125rem;
+  font-weight: 700;
+}
+
+.project__actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.75rem 1.75rem;
+}
+
+.project__disclosure {
   display: inline-flex;
   align-items: center;
   gap: 0.7rem;
   min-height: 2.75rem;
+  padding: 0;
+  border: 0;
+  background: none;
+  color: inherit;
+  font: inherit;
   font-weight: 750;
   cursor: pointer;
-  list-style: none;
 }
 
-.project__details summary::-webkit-details-marker {
-  display: none;
+.project__disclosure:hover {
+  color: var(--accent-soft);
 }
 
 .project__toggle {
   position: relative;
   width: 1.5rem;
   height: 1.5rem;
-  background: var(--ink);
+  background: var(--text);
 }
 
 .project__toggle::before,
@@ -826,137 +1268,723 @@ h2 {
   left: 50%;
   width: 0.7rem;
   height: 2px;
-  background: var(--paper);
+  background: var(--surface-raised);
   transform: translate(-50%, -50%);
 }
 
 .project__toggle::after {
   transform: translate(-50%, -50%) rotate(90deg);
-  transition: transform 0.2s ease;
 }
 
-.project__details[open] .project__toggle {
-  background: var(--wall-pink);
-}
-
-.project__details[open] .project__toggle::before,
-.project__details[open] .project__toggle::after {
-  background: var(--ink);
-}
-
-.project__details[open] .project__toggle::after {
-  transform: translate(-50%, -50%) rotate(0deg);
-}
-
-.project__details summary:hover {
-  color: var(--wall-pink-deep);
-}
-
-.project__grid {
+.project__tech {
   display: grid;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
+  grid-template-columns: repeat(var(--cols, 3), minmax(0, 1fr)); /* --cols: the columns the case has */
   gap: 1.5rem clamp(1.5rem, 3vw, 2.5rem);
-  margin-top: 1.25rem;
-  padding-top: 1.25rem;
-  border-top: 1px solid var(--paper-line);
-  font-size: 0.9688rem;
+  font-size: 0.9375rem;
 }
 
-.project__grid h4 {
-  margin-bottom: 0.5rem;
-  font-size: 0.8125rem;
-  font-weight: 800;
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
-}
-
-.project__grid ul,
-.journey__row ul {
-  display: grid;
-  gap: 0.4rem;
-}
-
-.project__grid li,
-.journey__row li {
-  position: relative;
-  padding-left: 1.1rem;
-}
-
-.project__grid li::before,
-.journey__row li::before {
-  content: "";
-  position: absolute;
-  left: 0;
-  top: 0.62em;
-  width: 0.45rem;
-  height: 0.45rem;
-  background: var(--wall-navy);
-}
-
-.project__grid p + ul {
-  margin-top: 0.6rem;
-}
-
-.project__caveat {
-  margin-top: 0.8rem;
-  color: var(--ink-soft);
-  font-size: 0.875rem;
-  font-style: italic;
-}
-
-.project .text-link {
-  margin-top: 1rem;
-}
-
-/* journey */
-
-.journey__list {
-  border-top: 2px solid var(--ink);
-}
-
-.journey__row {
-  display: grid;
-  grid-template-columns: minmax(9rem, 14rem) minmax(0, 1fr);
-  gap: 0.5rem clamp(1.5rem, 4vw, 3rem);
-  padding: 1.75rem 0;
-  border-bottom: 1px solid var(--paper-line);
-}
-
-.journey__period {
-  display: flex;
-  flex-direction: column;
-  align-items: flex-start;
-  gap: 0.5rem;
-  color: var(--ink-soft);
-  font-weight: 650;
-  font-variant-numeric: tabular-nums;
-}
-
-.journey__now {
-  padding: 0.1rem 0.5rem;
-  background: var(--wall-pink);
-  color: var(--ink);
+.project__tech h4 {
+  margin-bottom: 0.45rem;
   font-size: 0.75rem;
   font-weight: 800;
   letter-spacing: 0.08em;
   text-transform: uppercase;
 }
 
-.journey__row h3 {
-  font-size: clamp(1.3rem, 2.2vw, 1.75rem);
-  font-stretch: 112%;
-  font-weight: 760;
-  line-height: 1.15;
+.project__tech p + h4 {
+  margin-top: 0.9rem;
 }
 
-.journey__org {
-  margin: 0.25rem 0 0.75rem;
+.project__tech ul {
+  display: grid;
+  gap: 0.4rem;
+}
+
+.project__tech li {
+  position: relative;
+  padding-left: 1.1rem;
+}
+
+.project__tech li::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  top: 0.62em;
+  width: 0.45rem;
+  height: 0.45rem;
+  background: var(--mark);
+}
+
+.project__caveat {
+  margin-top: 0.8rem;
+  color: var(--text-soft);
+  font-size: 0.875rem;
+  font-style: italic;
+}
+
+.projects__progress-tiles {
+  display: flex;
+  gap: 3px;
+}
+
+.projects__progress-tiles span {
+  position: relative;
+  width: 12px;
+  height: 12px;
+  background: var(--line);
+}
+
+.projects__progress-tiles span:nth-child(6n) {
+  margin-right: 9px;
+}
+
+.projects__progress-tiles span::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: var(--wall-pink);
+  opacity: clamp(0, calc(var(--rail-p, 0) * var(--n) - var(--i) + 1), 1);
+}
+
+.projects__progress-hint {
+  color: var(--text-soft);
+  font-size: 0.875rem;
+}
+
+/* ---- Rail: pinned for a short stretch, sized by the viewport height so a card always fits. ---- */
+.projects[data-rail="rail"] {
+  padding: 0;
+}
+
+.projects[data-rail="rail"] .projects__stage {
+  position: sticky;
+  top: 0;
+  display: flex;
+  flex-direction: column;
+  max-width: none;
+  height: 100svh;
+  padding: calc(var(--topbar-h) + clamp(0.6rem, 2.6svh, 2rem)) 0 clamp(0.6rem, 2.4svh, 1.75rem);
+  overflow: clip;
+}
+
+.projects[data-rail="rail"] .projects__head,
+.projects[data-rail="rail"] .projects__progress {
+  width: 100%;
+  max-width: calc(var(--content) + 2 * var(--gutter));
+  margin-inline: auto;
+  padding-inline: var(--gutter);
+}
+
+.projects[data-rail="rail"] .projects__head {
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); /* the intro wraps in fewer lines: more room for the cards */
+  align-items: end;
+  margin-bottom: clamp(0.5rem, 2svh, 1.5rem);
+}
+
+.projects[data-rail="rail"] .projects__head .kicker {
+  margin-bottom: clamp(0.3rem, 1svh, 1rem);
+}
+
+.projects[data-rail="rail"] .projects__head h2 {
+  font-size: clamp(1.6rem, min(3.4vw, 5.6svh), 3.25rem);
+}
+
+.projects[data-rail="rail"] .section__intro {
+  font-size: clamp(0.85rem, 1.9svh, 1.0625rem);
+}
+
+.projects[data-rail="rail"] .projects__progress {
+  display: flex;
+  align-items: center;
+  gap: 1.25rem;
+  margin-bottom: clamp(0.5rem, 2svh, 1.4rem);
+}
+
+/* The cards are one glance tall now: the row sits in the middle of the room left under the head. */
+.projects[data-rail="rail"] .project-list {
+  display: flex;
+  flex: none;
+  align-items: flex-start; /* cards keep their own height: no empty tails */
+  margin-block: auto;
+  gap: clamp(1.5rem, 3vw, 2.75rem);
+  width: max-content;
+  min-height: 0;
+  padding: 0 var(--gutter);
+  border: 0;
+}
+
+/* An explicit width (not a flex-basis): Gecko sizes the max-content track from the cards' own
+   max-content (every line unwrapped), which made the rail ~3.5× too long in Firefox/Zen. */
+.projects[data-rail="rail"] .project {
+  flex: none;
+  width: min(76vw, 60rem);
+  gap: clamp(0.4rem, 1.4svh, 0.95rem);
+  padding: clamp(0.8rem, 2.3svh, 1.6rem) clamp(1.1rem, 2vw, 2rem);
+  border: 2px solid var(--rule);
+  background: var(--surface-raised);
+}
+
+.projects[data-rail="rail"] .project__band {
+  inset: 0 0 auto;
+}
+
+.projects[data-rail="rail"] .project__num {
+  font-size: clamp(2rem, min(5vw, 7svh), 4.25rem);
+}
+
+.projects[data-rail="rail"] .project h3 {
+  font-size: clamp(1.15rem, min(2.4vw, 3.6svh), 2.1rem);
+}
+
+.projects[data-rail="rail"] .project__label {
+  margin-bottom: 0.2rem;
+  font-size: clamp(0.75rem, 1.6svh, 0.875rem);
+}
+
+.projects[data-rail="rail"] .project__what {
+  font-size: clamp(0.95rem, min(1.4vw, 2.3svh), 1.22rem);
+  line-height: 1.38;
+}
+
+/* The diagram scales with the height: 263 units wide, never drawn narrower than 264 px, so its
+   12-unit labels stay >= 12 px on every rail (600 px tall and up). */
+.projects[data-rail="rail"] .project {
+  --diag-w: clamp(16.5rem, 46svh, 26rem);
+}
+
+.projects[data-rail="rail"] .project__headline-text {
+  font-size: clamp(1.25rem, min(2.5vw, 3.9svh), 2.25rem);
+}
+
+.projects[data-rail="rail"] .project__headline-note {
+  font-size: clamp(0.75rem, 1.6svh, 0.875rem);
+}
+
+.projects[data-rail="rail"] .project > .pdiag {
+  gap: clamp(0.25rem, 0.8svh, 0.45rem);
+}
+
+.projects[data-rail="rail"] .pdiag__label {
+  margin-bottom: 0.2rem;
+}
+
+/* Short laptops: wider cards so 14 px text still fits in the height. */
+@media (max-height: 760px) {
+  .projects[data-rail="rail"] .project {
+    width: min(88vw, 64rem);
+  }
+}
+
+.projects[data-rail="rail"] .project__tags li {
+  padding: 0.15rem 0.5rem;
+  font-size: clamp(0.75rem, 1.55svh, 0.8125rem);
+}
+
+.projects[data-rail="rail"] .project__disclosure {
+  min-height: clamp(2rem, 5svh, 2.75rem);
+}
+
+/* ---- Carousel: one panel at a time with a peek of the next, native swipe and snap. ---- */
+.projects[data-rail="carousel"] .projects__progress {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.6rem 1rem;
+  margin-bottom: 1rem;
+}
+
+.projects[data-rail="carousel"] .projects__progress-tiles {
+  gap: 5px;
+}
+
+.projects[data-rail="carousel"] .projects__progress-tiles span {
+  width: 16px;
+  height: 16px;
+  margin-right: 0;
+}
+
+/* Carousel: only the current project lights up; the ones already seen keep a softer tone. */
+.projects[data-rail="carousel"] .projects__progress-tiles span::after {
+  opacity: 0;
+}
+
+.projects[data-rail="carousel"] .projects__progress-tiles span.is-past::after {
+  background: var(--wall-pink-soft);
+  opacity: 1;
+}
+
+.projects[data-rail="carousel"] .projects__progress-tiles span.is-current::after {
+  background: var(--wall-pink);
+  opacity: 1;
+}
+
+.projects[data-rail="carousel"] .projects__progress-hint {
+  flex-basis: 100%;
+  order: 3;
+}
+
+/* Tablets and narrow app panels: a compact head so the first card is on screen. */
+@media (min-width: 600px) {
+  .projects[data-rail="carousel"] .projects__head {
+    display: block;
+    margin-bottom: 1rem;
+  }
+
+  .projects[data-rail="carousel"] .projects__head h2 {
+    font-size: clamp(1.75rem, 4.2vw, 2.75rem);
+  }
+
+  .projects[data-rail="carousel"] .section__intro {
+    max-width: 40rem;
+    margin-top: 0.5rem;
+    font-size: 0.95rem;
+  }
+
+  .projects[data-rail="carousel"] .projects__progress-hint {
+    flex-basis: auto;
+    order: 0;
+  }
+}
+
+/* Carousel: previous / next right under the cards (the end of what was just read), around the
+   tile indicator. */
+.projects__pager {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  width: min(40rem, calc(100% - 2.75rem)); /* the card's width: the buttons line up with its edges */
+}
+
+.projects__step {
+  display: grid;
+  place-items: center;
+  width: 2.75rem;
+  height: 2.75rem;
+  border: 2px solid var(--rule);
+  background: var(--surface-raised);
+  color: var(--text);
+  cursor: pointer;
+}
+
+.projects__step:hover:not(:disabled) {
+  background: var(--wall-pink-soft);
+  color: var(--wall-ink);
+}
+
+.projects__step:disabled {
+  border-color: var(--line);
+  color: var(--line);
+  cursor: default;
+}
+
+.projects__step svg {
+  width: 1.2rem;
+  height: 1.2rem;
+}
+
+.projects[data-rail="carousel"] .project-list {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.9rem;
+  margin: 0 calc(-1 * var(--gutter));
+  padding: 0.25rem var(--gutter) 1rem;
+  overflow-x: auto;
+  overscroll-behavior-x: contain;
+  scroll-snap-type: x mandatory;
+  scroll-padding-inline: var(--gutter);
+  border: 0;
+  scrollbar-width: none;
+}
+
+.projects[data-rail="carousel"] .project-list::-webkit-scrollbar {
+  display: none;
+}
+
+.projects[data-rail="carousel"] .project {
+  /* Phones: wide enough for the diagram at full size (12 px labels at 390 px), still peeking the next. */
+  flex: 0 0 calc(100% - 2.75rem);
+  max-width: 40rem;
+  padding: 1.25rem 1.1rem 1.1rem;
+  border: 2px solid var(--rule);
+  background: var(--surface-raised);
+  scroll-snap-align: start;
+}
+
+.projects[data-rail="carousel"] .project__band {
+  inset: 0 0 auto;
+}
+
+/* Phones narrower than 390 px (375, 360): a smaller peek and padding keep the diagram at its full
+   263 units, so its labels stay >= 12 px. */
+@media (max-width: 389px) {
+  .projects[data-rail="carousel"] .project {
+    flex-basis: calc(100% - 1.5rem);
+    padding-inline: 0.85rem;
+  }
+
+  .projects__pager {
+    width: calc(100% - 1.5rem);
+  }
+}
+
+/* ---- Technical details: a drawer outside the cards (native modal dialog). ---- */
+html.dialog-open {
+  overflow: hidden;
+}
+
+.tech-drawer {
+  overscroll-behavior: contain;
+  width: min(64rem, 100vw);
+  max-width: 100vw;
+  height: 100dvh;
+  max-height: 100dvh;
+  margin: 0 0 0 auto;
+  padding: 0;
+  border: 0;
+  border-left: 2px solid var(--rule);
+  background: var(--surface-raised);
+  color: var(--text);
+}
+
+.tech-drawer::backdrop {
+  background: rgb(22 15 41 / 0.62);
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .tech-drawer[open] {
+    animation: drawer-in 0.42s cubic-bezier(0.2, 0.8, 0.2, 1);
+  }
+}
+
+@keyframes drawer-in {
+  from {
+    transform: translateX(100%);
+  }
+  to {
+    transform: none;
+  }
+}
+
+.tech-drawer__body {
+  --drawer-pad: clamp(1.25rem, 4vw, 3rem);
+  --drawer-top: clamp(1.25rem, 4svh, 2.75rem);
+  display: grid;
+  align-content: start;
+  gap: clamp(1rem, 3svh, 2rem);
+  min-height: 100%;
+  padding: var(--drawer-top) var(--drawer-pad);
+  box-shadow: inset 0 12px 0 var(--wall-pink);
+}
+
+.tech-drawer__head {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr) auto;
+  align-items: end;
+  gap: 0 1.25rem;
+  padding-bottom: clamp(0.75rem, 2svh, 1.25rem);
+  border-bottom: 2px solid var(--rule);
+}
+
+.tech-drawer__num {
+  font-size: clamp(2.25rem, 7svh, 4rem);
+  font-stretch: 125%;
+  font-weight: 880;
+  line-height: 0.82;
+  color: var(--accent); /* display size (>= 36 px): 3.9:1 on raised */
+}
+
+.tech-drawer__head h3 {
+  font-size: clamp(1.25rem, min(3.6svh, 6.4vw), 2rem);
+  font-stretch: 112%;
+  font-weight: 780;
+  line-height: 1.08;
+}
+
+.tech-drawer__close {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  height: 2.75rem;
+  padding: 0 0.9rem;
+  border: 1.5px solid var(--rule);
+  background: transparent;
+  color: var(--text);
+  font: inherit;
+  font-size: 0.875rem;
+  font-weight: 780;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  cursor: pointer;
+}
+
+.tech-drawer .project__tech {
+  padding-top: clamp(0.9rem, 2.4svh, 1.4rem);
+  border-top: 2px solid var(--line);
+  font-size: clamp(0.875rem, 2svh, 0.98rem);
+  line-height: 1.48;
+}
+
+/* A case left with a single column keeps a readable line length. */
+.tech-drawer .project__tech > div {
+  max-width: 46rem;
+}
+
+/* Section labels of the drawer: the same small caps as the technical columns. */
+.tech-drawer__body h4 {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-bottom: 0.5rem;
+  font-size: 0.75rem;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.pixel-arrow {
+  display: block;
+  flex: none;
+  fill: var(--accent); /* graphic: 3.9:1 on --surface-raised */
+}
+
+/* Before → after: the problem and the result, one short sentence on each side of a pixel arrow. */
+.tech-shift {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr);
+  align-items: stretch;
+  gap: 0.75rem clamp(0.75rem, 2vw, 1.5rem);
+}
+
+.tech-shift__side {
+  padding: 0.9rem 1.1rem 1.05rem;
+  border: 2px solid var(--line);
+  background: var(--surface);
+}
+
+.tech-shift__side--after {
+  border-color: var(--accent-soft); /* 7.6:1 on --surface-raised */
+}
+
+.tech-shift__side h4::before {
+  content: "";
+  width: 0.6rem;
+  height: 0.6rem;
+  background: var(--mark);
+}
+
+.tech-shift__side--after h4::before {
+  background: var(--wall-pink);
+}
+
+.tech-shift__side p {
+  font-size: clamp(1.02rem, 1.5vw, 1.2rem);
+  font-weight: 620;
+  line-height: 1.38;
+}
+
+.tech-shift__arrow {
+  align-self: center;
+  width: 2.75rem;
+  height: auto;
+}
+
+/* Verified numbers: big, with their qualifier right under them. */
+.tech-figure__label {
+  color: var(--text-soft);
+  font-size: 0.875rem;
+  font-weight: 700;
+}
+
+.tech-figure__value {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.15em 0.45em;
+  margin: 0.2rem 0 0.35rem;
+  font-size: clamp(2.25rem, min(5.5vw, 8svh), 4rem);
+  font-stretch: 125%;
+  font-weight: 880;
+  line-height: 1;
+  letter-spacing: -0.03em;
+}
+
+.tech-figure__value strong {
+  color: var(--accent); /* display size: 3.9:1 on --surface-raised */
+  font-weight: inherit;
+}
+
+.tech-figure__arrow {
+  width: 0.8em;
+  height: auto;
+  fill: var(--accent-soft);
+}
+
+.tech-figure__note {
+  color: var(--text-soft);
+  font-size: 0.9375rem;
   font-weight: 650;
 }
 
-.journey__row ul {
-  max-width: 44rem;
-  color: var(--ink-soft);
+/* Verified counts: one tile per number (a pink corner mark, the figure big, its unit right under it). */
+.tech-counts ul {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+
+/* Each tile as wide as its figure (never broken: "8 a 10" keeps no-break spaces), the unit wraps under it. */
+.tech-counts li {
+  position: relative;
+  display: grid;
+  align-content: start;
+  gap: 0.35rem;
+  min-width: 8.75rem;
+  max-width: 12rem;
+  padding: 0.85rem 1rem 0.9rem;
+  border: 2px solid var(--line);
+  background: var(--surface);
+}
+
+.tech-counts li::before {
+  content: "";
+  position: absolute;
+  top: -2px;
+  left: -2px;
+  width: 0.6rem;
+  height: 0.6rem;
+  background: var(--wall-pink);
+}
+
+.tech-counts strong {
+  font-size: clamp(1.75rem, min(4.2vw, 6svh), 2.75rem);
+  font-stretch: 125%;
+  font-weight: 880;
+  line-height: 1;
+  letter-spacing: -0.03em;
+}
+
+.tech-counts span {
+  color: var(--text-soft);
+  font-size: 0.875rem;
+  font-weight: 650;
+  line-height: 1.3;
+}
+
+/* How it works: the enlarged diagram, lit in order, beside its steps as an ordered list. */
+.tech-flow {
+  display: grid;
+  grid-template-columns: minmax(0, 26rem) minmax(0, 1fr);
+  align-items: center;
+  gap: 0.25rem clamp(1.5rem, 3.5vw, 2.75rem);
+}
+
+.tech-flow h4 {
+  grid-column: 1 / -1;
+}
+
+.tech-flow__steps {
+  display: grid;
+  gap: 0.6rem;
+  counter-reset: step;
+}
+
+.tech-flow__steps li {
+  display: grid;
+  grid-template-columns: 1.75rem minmax(0, 1fr);
+  align-items: start;
+  gap: 0.75rem;
+  font-size: clamp(0.95rem, 1.3vw, 1.05rem);
+  line-height: 1.4;
+  counter-increment: step;
+}
+
+/* The step's number tile: quiet tint (figure 10.3:1) until its step lights up (pink-soft, ink figure 9.7:1). */
+.tech-flow__num {
+  position: relative;
+  display: grid;
+  place-items: center;
+  height: 1.75rem;
+  margin-top: -0.12rem;
+  background: var(--surface-tint);
+  font-size: 0.875rem;
+  font-weight: 800;
+}
+
+.tech-flow__num::after {
+  content: counter(step);
+  position: absolute;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  background: var(--wall-pink-soft);
+  color: var(--wall-ink);
+}
+
+/* In step with the drawing (project-diagram.css): quiet until it is in view, then lit one by one. */
+@media (prefers-reduced-motion: no-preference) {
+  .tech-flow:not([data-lit]) .tech-flow__num::after {
+    opacity: 0;
+  }
+
+  .tech-flow[data-lit] .tech-flow__num::after {
+    animation: tech-step-light 0.36s steps(3, end) both;
+    animation-delay: calc(0.5s + var(--s) * 0.75s);
+  }
+}
+
+@keyframes tech-step-light {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+/* A real screenshot of the project at its own pixels (never enlarged), with a short caption. */
+.tech-drawer__shot {
+  justify-self: start;
+  width: min(100%, 46rem);
+  min-width: 0;
+  margin: 0;
+}
+
+.tech-drawer__shot img {
+  display: block;
+  width: 100%;
+  height: auto;
+  border: 2px solid var(--rule);
+}
+
+.tech-drawer__shot figcaption {
+  margin-top: 0.5rem;
+  color: var(--text-soft);
+  font-size: 0.875rem;
+}
+
+/* Stack: what the work used, as tiles, right under its label. */
+.tech-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem;
+}
+
+.tech-chips li {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.38rem 0.75rem 0.38rem 0.5rem;
+  background: var(--surface-tint);
+  font-size: 0.875rem;
+  font-weight: 700;
+}
+
+.tech-chips li::before {
+  content: "";
+  width: 0.7rem;
+  height: 0.7rem;
+  background: var(--c, var(--mark));
 }
 
 /* tools */
@@ -965,12 +1993,12 @@ h2 {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
   gap: 0 clamp(2rem, 5vw, 4.5rem);
-  border-top: 2px solid var(--ink);
+  border-top: 2px solid var(--rule);
 }
 
 .tools__row {
   padding: 1.6rem 0 1.75rem;
-  border-bottom: 1px solid var(--paper-line);
+  border-bottom: 1px solid var(--line);
 }
 
 .tools__row h3 {
@@ -991,17 +2019,11 @@ h2 {
 }
 
 .tools__row:nth-child(3n + 2) h3::before {
-  background: var(--wall-navy);
+  background: var(--mark);
 }
 
 .tools__row:nth-child(3n) h3::before {
   background: var(--wall-pink-soft);
-}
-
-.tools__stack {
-  margin-top: 0.5rem;
-  color: var(--ink-soft);
-  font-size: 0.9375rem;
 }
 
 /* study: the three languages open the section as a type band, then a side header */
@@ -1010,8 +2032,8 @@ h2 {
   display: grid;
   grid-template-columns: repeat(3, minmax(0, 1fr));
   margin-bottom: clamp(3.5rem, 7vw, 6rem);
-  border-top: 2px solid var(--ink);
-  border-bottom: 2px solid var(--ink);
+  border-top: 2px solid var(--rule);
+  border-bottom: 2px solid var(--rule);
 }
 
 .study__languages li {
@@ -1023,7 +2045,7 @@ h2 {
 
 .study__languages li + li {
   padding-left: clamp(1rem, 2vw, 1.75rem);
-  border-left: 1px solid var(--paper-line);
+  border-left: 1px solid var(--line);
 }
 
 .study__language {
@@ -1035,11 +2057,11 @@ h2 {
 }
 
 .study__languages li:nth-child(2) .study__language {
-  color: var(--wall-pink-deep);
+  color: var(--accent); /* display size */
 }
 
 .study__level {
-  color: var(--ink-soft);
+  color: var(--text-soft);
 }
 
 .study__grid {
@@ -1054,7 +2076,7 @@ h2 {
 }
 
 .study__list {
-  border-top: 2px solid var(--ink);
+  border-top: 2px solid var(--rule);
 }
 
 .study__list li {
@@ -1062,7 +2084,7 @@ h2 {
   grid-template-columns: minmax(8rem, 11rem) minmax(0, 1fr);
   gap: 0.15rem 1.5rem;
   padding: 1.35rem 0;
-  border-bottom: 1px solid var(--paper-line);
+  border-bottom: 1px solid var(--line);
 }
 
 .study__list li > :not(.study__period) {
@@ -1071,9 +2093,16 @@ h2 {
 
 .study__period {
   grid-row: span 2;
-  color: var(--ink-soft);
+  color: var(--text-soft);
   font-size: 0.9375rem;
   font-weight: 650;
+}
+
+.study__logo {
+  display: inline-flex;
+  align-items: center;
+  margin: 0 0.75rem 0.35rem 0;
+  vertical-align: middle;
 }
 
 .study__list h3 {
@@ -1092,7 +2121,7 @@ h2 {
   gap: 0.5rem 2rem;
   margin-bottom: clamp(1.75rem, 3vw, 2.5rem);
   padding-bottom: 1rem;
-  border-bottom: 2px solid var(--ink);
+  border-bottom: 2px solid var(--rule);
 }
 
 .cred-head .kicker {
@@ -1107,34 +2136,77 @@ h2 {
 }
 
 .cred-head p:last-child {
-  color: var(--ink-soft);
+  color: var(--text-soft);
   font-size: 0.9375rem;
 }
 
 
+/* Seven tiles: centred rows (4 + 3 on desktop) so the last one is never left alone at the edge. */
 .cred-grid {
-  display: grid;
-  grid-template-columns: repeat(5, minmax(0, 1fr));
-  gap: clamp(0.75rem, 1.6vw, 1.25rem);
+  --cols: 4;
+  --gap: clamp(1.25rem, 2.6vw, 2.25rem);
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: var(--gap);
 }
 
+/* Laptop widths: four narrower tiles, so a little taller to keep the back (dates, proof, link) clear. */
+@media (min-width: 1024px) and (max-width: 1399px) {
+  .cred-grid .cred {
+    aspect-ratio: 4 / 5;
+  }
+}
+
+@media (min-width: 1024px) and (max-width: 1179px) {
+  .cred-grid .cred {
+    aspect-ratio: 3 / 4;
+  }
+}
+
+@media (min-width: 1024px) and (max-width: 1099px) {
+  .cred-grid .cred {
+    aspect-ratio: 2 / 3;
+  }
+}
+
+/* A real tile: front, back and four sides with thickness --t, floating, tilting and spinning. */
 .cred {
+  --t: 14px;
   position: relative;
+  flex: 0 0 calc((100% - (var(--cols) - 1) * var(--gap)) / var(--cols));
   aspect-ratio: 1;
-  perspective: 900px;
+  perspective: 1100px;
+  touch-action: pan-y;
+  user-select: none;
+  -webkit-user-select: none;
 }
 
-.cred__card {
+.cred__float {
   position: absolute;
   inset: 0;
   transform-style: preserve-3d;
-  transition: transform 0.55s cubic-bezier(0.2, 0.7, 0.2, 1);
+  animation: cred-float 6s ease-in-out infinite;
+  animation-delay: calc(var(--n) * -1.1s);
 }
 
-.cred:hover .cred__card,
-.cred:focus-within .cred__card,
-.cred[data-flipped="true"] .cred__card {
-  transform: rotateY(180deg);
+.cred:hover .cred__float,
+.cred:focus-within .cred__float {
+  animation-play-state: paused;
+}
+
+.cred__card {
+  --rx: 0deg;
+  --ry: 0deg;
+  position: absolute;
+  inset: 0;
+  transform-style: preserve-3d;
+  transform: rotateX(var(--rx)) rotateY(var(--ry));
+  transition: transform 0.6s cubic-bezier(0.2, 0.7, 0.2, 1);
+}
+
+.cred__card[data-live] {
+  transition: transform 0.12s ease-out;
 }
 
 .cred__face {
@@ -1146,24 +2218,47 @@ h2 {
 }
 
 .cred__front {
-  container-type: inline-size;
+  container-type: size;
   flex-direction: column;
-  background: var(--paper-deep);
-  box-shadow: inset 0 0 0 2px var(--ink);
+  overflow: hidden;
+  background: var(--surface-tint);
+  box-shadow: inset 0 0 0 2px var(--rule);
+  transform: translateZ(calc(var(--t) / 2));
 }
 
 .cred__emblem {
   flex: 1 1 auto;
   min-height: 0;
-  display: grid;
-  place-items: center;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
 .cred__emblem img {
   width: auto;
   height: 74%;
-  max-width: 80%;
+  max-width: 84%;
   object-fit: contain;
+  pointer-events: none;
+}
+
+/* Official issuer marks in one light colour, without the old light plate (Rodada 6A): the mark's own
+   alpha masks a block of the text token, as .study__logo--mono does in Education. Same footprint the
+   logo had inside the plate (80% x 64% of it). */
+.cred__logo {
+  display: block;
+  width: 56cqw;
+  height: min(26.88cqw, 39.68cqh);
+  background: var(--text);
+  -webkit-mask: var(--logo) center / contain no-repeat;
+  mask: var(--logo) center / contain no-repeat;
+}
+
+/* Masks have no lazy loading: Certificates.tsx marks the section once it is about a screen away. */
+.credentials:not([data-near]) .cred__logo {
+  -webkit-mask: none;
+  mask: none;
+  visibility: hidden;
 }
 
 /* Lettered plate for issuers without official art: same footprint as a badge. */
@@ -1174,7 +2269,7 @@ h2 {
   aspect-ratio: 1;
   background: var(--wall-navy);
   color: var(--wall-pink);
-  font-size: 7.4cqi;
+  font-size: min(7.4cqi, 6.8cqh);
   font-stretch: 125%;
   font-weight: 880;
   letter-spacing: -0.01em;
@@ -1182,14 +2277,14 @@ h2 {
 }
 
 .cred__plate--short {
-  font-size: 16cqi;
+  font-size: min(16cqi, 14cqh);
   color: var(--paper);
 }
 
 .cred__caption {
   padding: 0 0.75rem 0.7rem;
-  color: var(--ink-soft);
-  font-size: 0.6875rem;
+  color: var(--text-soft);
+  font-size: 0.75rem; /* 12 px, the smallest text on a tile, front or back */
   font-weight: 750;
   letter-spacing: 0.08em;
   text-align: center;
@@ -1199,14 +2294,15 @@ h2 {
 .cred__back {
   flex-direction: column;
   justify-content: flex-start;
-  gap: 0.5rem;
-  padding: clamp(0.9rem, 1.6vw, 1.25rem);
+  gap: 0.4rem;
+  padding: clamp(0.9rem, 1.8vw, 1.3rem) clamp(0.9rem, 1.8vw, 1.3rem) 2.6rem;
   background: var(--wall-ink);
   color: var(--paper);
-  transform: rotateY(180deg);
+  transform: rotateY(180deg) translateZ(calc(var(--t) / 2));
 }
 
-.cred__issuer {
+.cred__issuer,
+.cred__proof-label {
   color: var(--wall-pink-soft);
   font-size: 0.75rem;
   font-weight: 750;
@@ -1215,10 +2311,71 @@ h2 {
 }
 
 .cred__back h3 {
-  font-size: clamp(1rem, 1.35vw, 1.2rem);
+  font-size: clamp(0.98rem, 1.5vw, 1.2rem);
   font-stretch: 108%;
   font-weight: 760;
   line-height: 1.2;
+}
+
+.cred__date {
+  font-size: 0.8125rem;
+  font-weight: 650;
+}
+
+.cred__proof {
+  margin-top: auto;
+  font-size: clamp(0.8rem, 1.1vw, 0.92rem);
+  line-height: 1.38;
+}
+
+.cred__proof-label {
+  display: block;
+  margin-bottom: 0.15rem;
+}
+
+.cred__side {
+  position: absolute;
+  background: var(--wall-ink);
+}
+
+.cred__side--right,
+.cred__side--left {
+  top: 0;
+  width: var(--t);
+  height: 100%;
+}
+
+.cred__side--top,
+.cred__side--bottom {
+  left: 0;
+  width: 100%;
+  height: var(--t);
+}
+
+.cred__side--right {
+  right: 0;
+  background: var(--wall-navy);
+  transform-origin: right center;
+  transform: translateZ(calc(var(--t) / -2)) rotateY(90deg);
+}
+
+.cred__side--left {
+  left: 0;
+  transform-origin: left center;
+  transform: translateZ(calc(var(--t) / -2)) rotateY(-90deg);
+}
+
+.cred__side--top {
+  top: 0;
+  background: var(--wall-navy);
+  transform-origin: center top;
+  transform: translateZ(calc(var(--t) / -2)) rotateX(90deg);
+}
+
+.cred__side--bottom {
+  bottom: 0;
+  transform-origin: center bottom;
+  transform: translateZ(calc(var(--t) / -2)) rotateX(-90deg);
 }
 
 .cred__toggle {
@@ -1227,33 +2384,115 @@ h2 {
   z-index: 1;
   border: 0;
   background: transparent;
-  cursor: pointer;
+  cursor: grab;
 }
 
 .cred__link {
   position: absolute;
-  left: clamp(0.9rem, 1.6vw, 1.25rem);
-  right: clamp(0.9rem, 1.6vw, 1.25rem);
-  bottom: clamp(0.9rem, 1.6vw, 1.25rem);
+  left: clamp(0.9rem, 1.8vw, 1.3rem);
+  right: clamp(0.9rem, 1.8vw, 1.3rem);
+  /* 24 px touch target; the 2 px of extra room each side keep the text where it was. */
+  bottom: calc(clamp(0.8rem, 1.6vw, 1.1rem) - 2px);
   z-index: 2;
   display: inline-flex;
   align-items: center;
   gap: 0.3rem;
+  min-height: 1.5rem;
+  padding-block: 2px;
   color: var(--paper);
-  font-size: 0.875rem;
+  font-size: 0.8125rem;
   font-weight: 750;
   text-decoration: underline;
   text-underline-offset: 0.2em;
   opacity: 0;
+  pointer-events: none;
   transition: opacity 0.2s ease;
   --focus: var(--wall-pink-soft);
 }
 
-.cred:hover .cred__link,
-.cred:focus-within .cred__link,
 .cred[data-flipped="true"] .cred__link {
   opacity: 1;
-  transition-delay: 0.2s;
+  pointer-events: auto;
+  transition-delay: 0.25s;
+}
+
+/* Entrance: wall tiles fly in, cover each badge and flip away (only when armed by JS). */
+.cred__assemble {
+  display: none;
+}
+
+[data-assemble] .cred__assemble {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  grid-template-columns: repeat(6, 1fr);
+  grid-template-rows: repeat(6, 1fr);
+  gap: 2px;
+  pointer-events: none;
+}
+
+[data-assemble] .cred__assemble span {
+  background: var(--c);
+}
+
+[data-assemble="armed"] .cred__assemble span {
+  opacity: 0;
+  transform: translate(var(--dx), var(--dy)) scale(0.4);
+}
+
+[data-assemble="armed"] .cred__emblem,
+[data-assemble="armed"] .cred__caption {
+  opacity: 0;
+}
+
+/* The whole entrance stays within 0.6 s: 0.42 s per tile + at most ~0.18 s of stagger. */
+[data-assemble="play"] .cred__assemble span {
+  animation: cred-assemble 0.42s cubic-bezier(0.2, 0.7, 0.2, 1) both;
+  animation-delay: calc(var(--n) * 0.024s + var(--k) * 0.006s);
+}
+
+[data-assemble="play"] .cred__emblem,
+[data-assemble="play"] .cred__caption {
+  animation: cred-show 0.01s linear both;
+  animation-delay: calc(var(--n) * 0.024s + 0.2s);
+}
+
+@keyframes cred-assemble {
+  0% {
+    opacity: 0;
+    transform: translate(var(--dx), var(--dy)) scale(0.4);
+  }
+  45% {
+    opacity: 1;
+    transform: none;
+  }
+  65% {
+    opacity: 1;
+    transform: scaleY(1);
+  }
+  100% {
+    opacity: 1;
+    transform: scaleY(0);
+  }
+}
+
+@keyframes cred-show {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes cred-float {
+  0%,
+  100% {
+    transform: translateY(0) rotateX(0deg);
+  }
+  50% {
+    transform: translateY(-7px) rotateX(3deg);
+  }
 }
 
 /* ---------- contact: the wall comes back ---------- */
@@ -1367,22 +2606,6 @@ h2 {
   line-height: 1;
 }
 
-.site-footer {
-  display: flex;
-  flex-wrap: wrap;
-  align-items: center;
-  justify-content: space-between;
-  gap: 0.75rem 2rem;
-  padding: 1.25rem var(--gutter) 1.5rem;
-  background: var(--wall-ink);
-  color: var(--paper);
-  font-size: 0.875rem;
-}
-
-.site-footer .text-link {
-  color: var(--paper);
-}
-
 .fatal-fallback {
   display: grid;
   align-content: center;
@@ -1394,48 +2617,113 @@ h2 {
   padding: var(--gutter);
 }
 
+/* ---------- scroll choreography in the tile language ----------
+   Only where CSS scroll-driven animations exist and motion is allowed; everywhere
+   else every element is already in its final, readable state. */
+
+.tile-reveal {
+  position: relative;
+  display: inline-block;
+  max-width: 100%;
+}
+
+.tile-reveal__cover {
+  display: none;
+}
+
+/* On the navy sections a navy cover tile vanishes into the background and reads as a hole in the
+   letters; there the cover's navy takes the wall's other dark, ink (its colours are var(--wall-*)). */
+.projects .tile-reveal__cover,
+.tools .tile-reveal__cover,
+.credentials .tile-reveal__cover {
+  --wall-navy: var(--wall-ink);
+}
+
+/* A cover tile is on or off, like a wall pixel: no half-height sliver at any scroll position
+   (run with steps(1, end) below). */
+@keyframes tile-off {
+  from {
+    opacity: 1;
+  }
+  to {
+    opacity: 0;
+  }
+}
+
+@keyframes row-in {
+  from {
+    opacity: 0;
+    transform: translateY(1.25rem);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+@keyframes tile-drop {
+  from {
+    opacity: 0;
+    transform: translateY(-1.5rem) rotate(-90deg);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+@supports (animation-timeline: view()) {
+  @media (prefers-reduced-motion: no-preference) {
+    .tile-reveal {
+      view-timeline: --reveal block;
+    }
+
+    /* No gap between the tiles: each one draws its own 1 px of grout in the section's colour, so a lit
+       tile never shows slivers of the title through the joints, and an unlit one takes its grout away. */
+    .tile-reveal__cover {
+      position: absolute;
+      inset: -0.06em -0.08em -0.12em; /* the bottom also covers descenders (q, j) */
+      display: grid;
+      grid-template-columns: repeat(12, 1fr);
+      grid-template-rows: repeat(3, 1fr);
+      pointer-events: none;
+    }
+
+    .tile-reveal__cover span {
+      background: var(--c);
+      box-shadow: inset 0 0 0 1px var(--tile-grout, var(--surface));
+      /* Each tile stays whole until its moment, then switches off in one step (left to right, with
+         jitter). All off within 40-180 px of scroll after the title enters at the bottom of the screen:
+         a fixed length, not a share of the cover phase, which a title on the pinned rail stretches ~3x. */
+      animation: tile-off steps(1, end) both;
+      animation-timeline: --reveal;
+      animation-range: cover 0px cover calc(40px + var(--o) * 140px);
+    }
+
+    .tools__row {
+      view-timeline: --row block;
+      animation: row-in linear both;
+      animation-timeline: --row;
+      animation-range: entry 0% cover 28%;
+    }
+
+    .tools__row h3::before {
+      animation: tile-drop linear both;
+      animation-timeline: --row;
+      animation-range: entry 10% cover 30%;
+    }
+  }
+}
+
 /* ---------- responsive ---------- */
 
 @media (max-width: 1023px) {
-  .topbar__nav {
-    display: none;
-  }
-
-  .topbar__languages {
-    display: none;
-  }
-
-  .topbar__menu {
-    display: inline-grid;
-  }
-
-  .mobile-nav--open {
-    display: block;
-    border-top: 1px solid var(--paper-line);
-    background: var(--paper);
-    color: var(--ink);
-  }
-
-  .mobile-nav nav {
-    display: grid;
-    gap: 0.25rem;
-    padding: 1rem var(--gutter) 1.5rem;
-  }
-
-  .mobile-nav a {
-    padding: 0.6rem 0;
-    font-size: 1.5rem;
-    font-stretch: 115%;
-    font-weight: 780;
-  }
-
-  .mobile-nav__languages {
-    width: fit-content;
-    margin-top: 0.75rem;
-  }
-
   .cred-grid {
-    grid-template-columns: repeat(3, minmax(0, 1fr));
+    --cols: 2;
+  }
+
+  .cred {
+    aspect-ratio: 5 / 4;
   }
 }
 
@@ -1486,26 +2774,58 @@ h2 {
     line-height: 1.45;
   }
 
-  .hero__actions .btn {
-    flex: 1 1 auto;
-    min-height: 2.875rem;
+  /* CTAs side by side down to 340 px. */
+  .hero__actions {
+    flex-wrap: nowrap;
   }
 
+  .hero__actions .btn {
+    flex: 1 1 0;
+    min-height: 2.875rem;
+    padding: 0 0.85rem;
+    white-space: nowrap;
+  }
+
+  @media (max-width: 339px) {
+    .hero__actions {
+      flex-wrap: wrap;
+    }
+  }
+
+  /* The credentials leave the one-screen hero so the approved portrait keeps its size. */
+  .hero .hero__creds {
+    display: none;
+  }
+
+  .creds-flow {
+    display: block;
+  }
+
+  /* The About fills the one-screen stage: text keeps its natural height and the resolved
+     portrait takes all the room left, centred, as large as the column allows. */
   .about {
     flex-direction: column;
     align-items: stretch;
     justify-content: flex-start;
-    gap: 1.1rem;
-    padding: calc(var(--topbar-h) + 0.75rem) var(--gutter) 1rem;
+    gap: clamp(0.75rem, 2svh, 1.25rem);
+    padding: calc(var(--topbar-h) + 0.75rem) var(--gutter) clamp(1rem, 3svh, 1.75rem);
   }
 
   .about__slot-col {
-    flex: 0 0 auto;
-    justify-content: flex-start;
+    flex: 1 1 0;
+    min-height: 7rem;
+    justify-content: center;
+    align-items: center;
+    padding-top: 0.75rem; /* room for the tile steps above the head */
   }
 
   .about__slot {
-    height: min(30svh, 18rem);
+    height: min(100%, calc((100vw - 2 * var(--gutter)) * 9 / 7));
+  }
+
+  .about__text {
+    flex: 0 0 auto;
+    max-width: 40rem;
   }
 
   .about__text h2 {
@@ -1544,14 +2864,6 @@ h2 {
       padding-bottom: 0.75rem;
     }
 
-    .about__slot {
-      height: min(26svh, 11rem);
-    }
-
-    .about__text .kicker {
-      margin-bottom: 0.5rem;
-    }
-
     .about__text h2 {
       margin-bottom: 0.55rem;
       font-size: clamp(1.4rem, 6.4vw, 1.9rem);
@@ -1579,25 +2891,127 @@ h2 {
     gap: 1rem;
   }
 
-  .project {
+  /* Phones: the number shares a row with the label, the title gets the full width under them. */
+  .project__top {
+    grid-template-columns: auto minmax(0, 1fr);
+    align-items: end;
+    column-gap: 0.85rem;
+  }
+
+  .project__top > div {
+    display: contents;
+  }
+
+  .project__top .project__label {
+    margin-bottom: 0.15rem;
+  }
+
+  .project__top h3 {
+    grid-column: 1 / -1;
+    margin-top: 0.55rem;
+  }
+
+  .project__tech {
     grid-template-columns: 1fr;
   }
 
-  .project__num {
-    margin-bottom: 0.75rem;
+  /* Phones: the drawer scrolls for a couple of screens, so its head (title and Close) stays on top, full
+     width and with the pink band; whatever the browser scrolls into view stops below it. */
+  .tech-drawer {
+    border-left: 0;
+    scroll-padding-top: 8rem; /* the head: 82-103 px on a 390 px phone, up to 124 px at 360 px */
   }
 
-  .project__grid {
-    grid-template-columns: 1fr;
+  .tech-drawer__body {
+    --drawer-top: 1.5rem;
   }
 
-  .journey__row {
-    grid-template-columns: 1fr;
+  .tech-drawer__head {
+    position: sticky;
+    top: 0;
+    z-index: 1;
+    grid-template-columns: minmax(0, 1fr) auto;
+    margin: calc(-1 * var(--drawer-top)) calc(-1 * var(--drawer-pad)) 0;
+    padding: var(--drawer-top) var(--drawer-pad) 0.75rem;
+    background: var(--surface-raised);
+    box-shadow: inset 0 12px 0 var(--wall-pink);
   }
 
-  .journey__period {
-    flex-direction: row;
-    align-items: center;
+  /* Kept short while it stays on top: a 20 px title, no kicker (the button just tapped said it). */
+  .tech-drawer__head h3 {
+    font-size: 1.25rem;
+  }
+
+  .tech-drawer__head .project__label {
+    display: none;
+  }
+
+  .tech-drawer__num {
+    display: none;
+  }
+
+  .tech-shift,
+  .tech-flow {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .tech-shift__arrow {
+    justify-self: center;
+    width: 2.25rem;
+    transform: rotate(90deg);
+  }
+
+  /* Phones: the real screen bleeds to the drawer's edges (390 px wide on a 390 px phone). */
+  .tech-drawer__shot {
+    justify-self: stretch; /* full width before the lazy image loads too (Gecko sized it to the caption) */
+    width: auto;
+    margin-inline: calc(-1 * var(--drawer-pad));
+  }
+
+  .tech-drawer__shot img {
+    border-inline: 0;
+  }
+
+  .tech-drawer__shot figcaption {
+    padding-inline: var(--drawer-pad);
+  }
+
+  .cred {
+    --t: 10px;
+  }
+
+  .topbar--menu {
+    color: var(--ink);
+  }
+
+  .cred__back {
+    gap: 0.25rem;
+    padding: 0.75rem 0.75rem 2.2rem;
+  }
+
+  .cred__back h3 {
+    font-size: 0.95rem;
+  }
+
+  .cred__issuer,
+  .cred__proof-label {
+    display: none;
+  }
+
+  .cred__date {
+    font-size: 0.78rem;
+  }
+
+  .cred__proof {
+    margin-top: 0.2rem;
+    font-size: 0.82rem;
+    line-height: 1.32;
+  }
+
+  .cred__link {
+    left: 0.75rem;
+    bottom: calc(0.65rem - 2px);
+    font-size: 0.78rem;
   }
 
   .tools__list,
@@ -1609,7 +3023,7 @@ h2 {
   .study__languages li + li {
     padding-left: 0;
     border-left: 0;
-    border-top: 1px solid var(--paper-line);
+    border-top: 1px solid var(--line);
   }
 
   .study__list li {
@@ -1624,6 +3038,23 @@ h2 {
     grid-row: auto;
   }
 
+  .study__logo {
+    display: flex;
+    width: fit-content;
+    margin: 0.35rem 0 0.5rem;
+  }
+
+  @media (max-width: 389px) {
+    .brand {
+      font-size: 0.95rem;
+    }
+
+    .menu-btn {
+      gap: 0.45rem;
+      padding: 0 0.7rem;
+    }
+  }
+
   .cred-head .kicker {
     display: flex;
     margin: 0 0 0.6rem;
@@ -1633,12 +3064,13 @@ h2 {
     display: block;
   }
 
+  /* Phones: one wide tile per row so the back (name, date, what it proves, link) reads comfortably. */
   .cred-grid {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
+    --cols: 1;
+    --gap: 1rem;
   }
 
-  .cred:last-child:nth-child(odd) {
-    grid-column: 1 / -1;
+  .cred {
     aspect-ratio: 2 / 1;
   }
 
@@ -1665,19 +3097,24 @@ h2 {
     animation: none !important;
   }
 
-  .cred:hover .cred__card,
-  .cred:focus-within .cred__card,
-  .cred[data-flipped="true"] .cred__card {
+  .cred__card {
     transform: none;
+    transform-style: flat;
+  }
+
+  .cred__front,
+  .cred__back {
+    transform: none;
+  }
+
+  .cred__side {
+    display: none;
   }
 
   .cred__back {
-    transform: none;
     opacity: 0;
   }
 
-  .cred:hover .cred__back,
-  .cred:focus-within .cred__back,
   .cred[data-flipped="true"] .cred__back {
     opacity: 1;
   }

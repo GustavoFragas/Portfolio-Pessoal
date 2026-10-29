@@ -23,7 +23,7 @@ export const experiencesData: Experience[] = [
     startDate: "2026-03-30",
     endDate: undefined,
     isCurrent: true,
-    description: "• Efetivado em 30/03/2026; Dev II em 14/05/2026; Dev III em 01/06/2026\n• Plataformas internas de dados e telemetria, integrações SaaS e serviços backend enterprise\n• Documentação, configuração, testes locais e validação sob orientação de liderança técnica"
+    description: "• Efetivado em 30/03/2026 (Júnior); Pleno desde out/2026\n• Plataformas internas de dados e telemetria, integrações SaaS e serviços backend enterprise\n• Documentação, configuração, testes locais e validação sob orientação de liderança técnica"
   },
   {
     id: "2",

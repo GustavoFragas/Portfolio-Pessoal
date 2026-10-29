@@ -1,0 +1,135 @@
+/* Rodada 4/5 content: About volunteer link, study lead, quiet links and one-colour study logos
+   (the Journey's team lines moved to journey.css).
+   Semantic tokens from the theme contract, with the current light values as fallback. */
+
+/* About: "volunteer service" as a discreet link. The About overlay ignores the pointer while it
+   is invisible over the hero; About.tsx marks the text live once it is readable. */
+.about__link {
+  color: inherit;
+  text-decoration: underline;
+  text-decoration-color: var(--accent, var(--wall-pink-deep));
+  text-decoration-thickness: 1.5px;
+  text-underline-offset: 0.2em;
+}
+
+.about__link:hover {
+  text-decoration-thickness: 2.5px;
+}
+
+.about__text[data-live="true"] .about__link {
+  pointer-events: auto;
+}
+
+/* Study: two degrees in progress + DIO, readable in a few seconds. */
+.study__lead {
+  max-width: 28rem;
+  margin-top: 1rem;
+  color: var(--text-soft, var(--ink-soft));
+  font-size: 1rem;
+  line-height: 1.55;
+}
+
+.study__detail {
+  color: var(--text-soft, var(--ink-soft));
+  font-size: 0.9375rem;
+}
+
+/* Rodada 5 — quiet external link: same colour as the text around it (never pink), a small ↗ that
+   stays visible for touch, underline on hover and keyboard focus. Used by Study and Journey. */
+.quiet-link {
+  color: inherit;
+  text-decoration: none;
+  text-decoration-thickness: 2px;
+  text-underline-offset: 0.2em;
+}
+
+.quiet-link svg {
+  display: inline-block;
+  width: 0.8em;
+  height: 0.8em;
+  margin-left: 0.2em;
+  vertical-align: -0.05em;
+  color: var(--text-soft, var(--ink-soft));
+  transition: transform 0.15s ease, color 0.15s ease;
+}
+
+.quiet-link:hover,
+.quiet-link:focus-visible {
+  text-decoration-line: underline;
+}
+
+.quiet-link:hover svg,
+.quiet-link:focus-visible svg {
+  color: currentColor;
+  transform: translate(0.08em, -0.08em);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .quiet-link svg {
+    transition: none;
+  }
+
+  .quiet-link:hover svg,
+  .quiet-link:focus-visible svg {
+    transform: none;
+  }
+}
+
+/* Study logos without the light plate: the official PNG's alpha masks a block of the text token,
+   so the mark keeps its exact shape in one light colour (and follows the theme if it ever flips).
+   Two classes beat .study__logo in index.css, including its phone override. */
+.study .study__logo--mono {
+  --logo-h: 2rem;
+  width: calc(var(--logo-h) * var(--ratio, 1));
+  height: var(--logo-h);
+  padding: 0;
+  background: var(--text, var(--ink));
+  -webkit-mask: var(--logo) center / contain no-repeat;
+  mask: var(--logo) center / contain no-repeat;
+}
+
+/* The mask image only loads once Education.tsx marks the section as near the viewport; until then
+   the block stays invisible instead of showing as a solid rectangle. */
+.study:not([data-near]) .study__logo--mono {
+  -webkit-mask: none;
+  mask: none;
+  visibility: hidden;
+}
+
+/* F8 (Rodada 6B): where the mark already shows the institution's name, the mark is the link's visible
+   content and the name lives only in its accessible name (Education.tsx). Mark and ↗ stay on one line
+   at every width, beating the phone rule of index.css that puts .study__logo on its own line. */
+.study .study__mark {
+  display: inline-flex;
+  align-items: center;
+  max-width: 100%;
+}
+
+.study .study__mark .study__logo--mono {
+  display: inline-block;
+  flex: none;
+  margin: 0;
+}
+
+/* Rodada 6C — the proof under Español: one quiet line of evidence beneath its level, a tile mark like the
+   Journey's lines, the big language name and the band left as they are. text-soft is 10.2:1 on --surface. */
+.study__proof {
+  position: relative;
+  max-width: 34ch;
+  margin-top: 0.35rem;
+  padding-left: 1rem;
+  color: var(--text-soft, var(--ink-soft));
+  font-size: 0.9375rem;
+  line-height: 1.45;
+  text-wrap: pretty;
+}
+
+.study__proof::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  top: 0.5em;
+  width: 0.45rem;
+  height: 0.45rem;
+  background: var(--accent, var(--wall-pink-deep));
+}

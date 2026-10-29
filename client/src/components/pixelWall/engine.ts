@@ -18,6 +18,8 @@ import {
   buildWall,
   hash2,
   silhouetteDistance,
+  silhouetteDistancePx,
+  type Rgb,
   type TileZone,
 } from './tiles';
 
@@ -35,6 +37,8 @@ export type WallLayout = {
   late?: readonly Rect[];
   hero?: Rect | null;
   about?: Rect | null;
+  /** How the last wall tiles hug the resolved portrait: scattered (wide) or in tidy steps (narrow). */
+  fringe?: 'scatter' | 'steps';
 };
 
 /** story = hero with scroll story, static = reduced motion hero, wall = footer wall without photo. */
@@ -55,6 +59,8 @@ export type PixelWall = {
 type Options = {
   mode: WallMode;
   motion: boolean;
+  /** Wall mode only: progress 0 → 1 assembles the wall from paper (the contact bookend). */
+  assemble?: boolean;
   onEntryEnd?: () => void;
 };
 
@@ -93,6 +99,23 @@ const shadeTable: string[][] = PALETTE.map(([r, g, b]) =>
 
 function shade(index: number, s: number): string {
   return shadeTable[index][Math.round(Math.min(1, Math.max(0, s)) * SHADES)];
+}
+
+/**
+ * Colour the wall dissolves into (hero → About) and reassembles from (contact): the page surface,
+ * read from the CSS token --surface (index.css theme block), so the wall always lands on the
+ * section's own background. Falls back to PALETTE[PAPER] if the token is missing or not an opaque
+ * colour; to pin the old paper destination regardless of the theme, return PALETTE[PAPER] here.
+ */
+function readSurface(el: Element, probe: CanvasRenderingContext2D): Rgb {
+  const value = getComputedStyle(el).getPropertyValue('--surface').trim();
+  const unset = '#010203';
+  probe.fillStyle = unset;
+  if (value) probe.fillStyle = value; // invalid values are ignored; opaque ones come back as #rrggbb
+  const hex = String(probe.fillStyle);
+  if (hex === unset || !/^#[0-9a-f]{6}$/i.test(hex)) return PALETTE[PAPER];
+  const n = parseInt(hex.slice(1), 16);
+  return [(n >> 16) & 255, (n >> 8) & 255, n & 255];
 }
 
 function clamp01(value: number): number {
@@ -144,6 +167,17 @@ function toZone(rect: Rect, dpr: number, td: number, cols: number, rows: number,
   };
 }
 
+// Every live wall, so a layer that covers the page (the kinetic menu) can pause all frame loops at once.
+const liveWalls = new Set<(suspended: boolean) => void>();
+let wallsSuspended = false;
+
+/** Pauses (true) or resumes (false) the frame loop of every wall; a resumed wall redraws its latest state. */
+export function setWallsSuspended(suspended: boolean): void {
+  if (suspended === wallsSuspended) return;
+  wallsSuspended = suspended;
+  liveWalls.forEach((onSuspend) => onSuspend(suspended));
+}
+
 export function createPixelWall(canvas: HTMLCanvasElement, options: Options): PixelWall | null {
   let maybeCtx: CanvasRenderingContext2D | null = null;
   try {
@@ -166,11 +200,15 @@ export function createPixelWall(canvas: HTMLCanvasElement, options: Options): Pi
   let colors: Uint8Array = new Uint8Array(0);
   let calm: Uint8Array = new Uint8Array(0);
   let thresholds: Float32Array = new Float32Array(0);
+  let assembleAt: Float32Array = new Float32Array(0);
   let wallCanvas = makeCanvas(1, 1);
   let paperCanvas = makeCanvas(1, 1);
   let wallData: ImageData | null = null;
   let paperData: ImageData | null = null;
   let grout: CanvasPattern | null = null;
+  // Destination of the dissolve ("paper" in the names below): the --surface token, see readSurface.
+  let surface: Rgb = PALETTE[PAPER];
+  let surfaceCss = shadeTable[PAPER][SHADES];
 
   // Portrait.
   let photo: CanvasImageSource | null = null;
@@ -197,6 +235,7 @@ export function createPixelWall(canvas: HTMLCanvasElement, options: Options): Pi
   let restLevels: Uint8Array = new Uint8Array(0);
   let restCanvas: HTMLCanvasElement | null = null;
   let portraitKey = '';
+  let tidy = false;
   const scratch = makeCanvas(1, 1);
   const scratchCtx = context2d(scratch);
 
@@ -217,8 +256,20 @@ export function createPixelWall(canvas: HTMLCanvasElement, options: Options): Pi
   const flips: Flip[] = [];
 
   function request() {
-    if (!raf && !destroyed) raf = requestAnimationFrame(frame);
+    if (!raf && !destroyed && !wallsSuspended) raf = requestAnimationFrame(frame);
   }
+
+  const onSuspend = (suspended: boolean) => {
+    if (suspended) {
+      if (raf) cancelAnimationFrame(raf);
+      raf = 0;
+      lastFrame = 0;
+    } else {
+      dirty = true;
+      request();
+    }
+  };
+  liveWalls.add(onSuspend);
 
   function rebuildPortrait() {
     if (!hero || pcols <= 0 || prows <= 0) return;
@@ -229,7 +280,7 @@ export function createPixelWall(canvas: HTMLCanvasElement, options: Options): Pi
     const maskImage = maskCtx.createImageData(pcols, prows);
     for (let i = 0; i < mask.length; i += 1) maskImage.data[i * 4 + 3] = mask[i] ? 255 : 0;
     maskCtx.putImageData(maskImage, 0, 0);
-    erosion = buildErosion(pcols, prows);
+    erosion = buildErosion(pcols, prows, 7, tidy);
     liveMask = makeCanvas(pcols, prows);
     liveMaskData = context2d(liveMask).createImageData(pcols, prows);
     liveMaskAt = -1;
@@ -331,6 +382,14 @@ export function createPixelWall(canvas: HTMLCanvasElement, options: Options): Pi
     for (let i = 0; i < calm.length; i += 1) {
       if (calm[i] === 2) thresholds[i] = Math.max(thresholds[i], TEXT_GONE + 0.1 * hash2(i % cols, Math.floor(i / cols), 71));
     }
+    if (options.assemble) {
+      // Mirror of the hero: tiles behind text arrive first, the rest in a noisy wave.
+      assembleAt = new Float32Array(cols * rows);
+      for (let i = 0; i < cols * rows; i += 1) {
+        const n = hash2(i % cols, Math.floor(i / cols), 73);
+        assembleAt[i] = calm[i] === 2 ? 0.02 + 0.08 * n : Math.min(0.9, Math.max(0.06, ((thresholds[i] - 0.12) / 0.5) * 0.8 + 0.08 * n));
+      }
+    }
     for (const rect of layout.late ?? []) {
       const z = toZone(rect, dpr, td, cols, rows, 1);
       for (let r = z.r0; r <= z.r1; r += 1) {
@@ -342,6 +401,7 @@ export function createPixelWall(canvas: HTMLCanvasElement, options: Options): Pi
     }
 
     const previous = portraitKey;
+    tidy = layout.fringe === 'steps';
     hero = null;
     about = null;
     if (layout.hero && mode !== 'wall') {
@@ -360,7 +420,9 @@ export function createPixelWall(canvas: HTMLCanvasElement, options: Options): Pi
           h,
         };
         // A few wall tiles survive around the eroded halo: the last pieces of the wall.
+        // Wide screens scatter them; narrow ones keep 1–2 tile steps glued to the outline.
         const blocked = early;
+        const haloPx = HALO * about.w;
         const c0 = Math.max(0, Math.floor(about.x / td) - 1);
         const c1 = Math.min(cols - 1, Math.floor((about.x + about.w) / td) + 1);
         const r0 = Math.max(0, Math.floor(about.y / td) - 1);
@@ -368,6 +430,12 @@ export function createPixelWall(canvas: HTMLCanvasElement, options: Options): Pi
         for (let r = r0; r <= r1; r += 1) {
           for (let c = c0; c <= c1; c += 1) {
             if (blocked.some((b) => c >= b.c0 && c <= b.c1 && r >= b.r0 && r <= b.r1)) continue;
+            if (tidy) {
+              const dPx = silhouetteDistancePx((c + 0.5) * td - about.x, (r + 0.5) * td - about.y, about.w, about.h);
+              const steps = 1 + ((Math.floor(r / 3) + (c * td < about.x + about.w / 2 ? 0 : 1)) % 2);
+              if (dPx > haloPx && dPx <= haloPx + steps * td) thresholds[r * cols + c] = NEVER;
+              continue;
+            }
             const u = ((c + 0.5) * td - about.x) / about.w;
             const v = ((r + 0.5) * td - about.y) / about.h;
             const d = silhouetteDistance(u, v);
@@ -376,7 +444,7 @@ export function createPixelWall(canvas: HTMLCanvasElement, options: Options): Pi
           }
         }
       }
-      portraitKey = `${pcols}x${prows}@${td}/${gd}`;
+      portraitKey = `${pcols}x${prows}@${td}/${gd}/${tidy ? 'steps' : 'scatter'}`;
       if (portraitKey !== previous || !maskCanvas || (photo && !levels.length)) rebuildPortrait();
     }
 
@@ -384,7 +452,9 @@ export function createPixelWall(canvas: HTMLCanvasElement, options: Options): Pi
     paperCanvas = makeCanvas(cols, rows);
     wallData = context2d(wallCanvas).createImageData(cols, rows);
     paperData = context2d(paperCanvas).createImageData(cols, rows);
-    const [pr, pg, pb] = PALETTE[PAPER];
+    surface = readSurface(canvas, ctx);
+    surfaceCss = `rgb(${surface[0]},${surface[1]},${surface[2]})`;
+    const [pr, pg, pb] = surface;
     for (let i = 0; i < cols * rows; i += 1) {
       paperData.data[i * 4] = pr;
       paperData.data[i * 4 + 1] = pg;
@@ -439,6 +509,7 @@ export function createPixelWall(canvas: HTMLCanvasElement, options: Options): Pi
   }
 
   function canBreathe(p: number): boolean {
+    if (mode === 'wall' && options.assemble) return motion && active && progress >= 0.999 && cols > 0;
     return motion && active && mode !== 'static' && p < 0.1 && cols > 0;
   }
 
@@ -467,11 +538,29 @@ export function createPixelWall(canvas: HTMLCanvasElement, options: Options): Pi
     const wd = wallData.data;
     const pd = paperData.data;
     const story = mode === 'story';
+    const assembling = mode === 'wall' && options.assemble === true && assembleAt.length === cols * rows && progress < 1;
     const flipSize = td - gd;
+    const paperCss = surfaceCss;
     for (let i = 0; i < cols * rows; i += 1) {
-      let index = colors[i];
+      const index = colors[i];
       let paper = false;
-      if (story && p > 0) {
+      if (assembling) {
+        const at = assembleAt[i];
+        if (progress < at) paper = true;
+        else if (progress < at + FLIP_WINDOW) {
+          paper = true;
+          const t = (progress - at) / FLIP_WINDOW;
+          flips.push({
+            x: (i % cols) * td,
+            y: Math.floor(i / cols) * td,
+            size: flipSize,
+            from: paperCss,
+            to: shade(index, Math.abs(Math.cos(Math.PI * t))),
+            t,
+            back: paperCss,
+          });
+        }
+      } else if (story && p > 0) {
         const th = thresholds[i];
         if (th < NEVER && p >= th + FLIP_WINDOW) paper = true;
         else if (th < NEVER && p > th) {
@@ -482,14 +571,13 @@ export function createPixelWall(canvas: HTMLCanvasElement, options: Options): Pi
             y: Math.floor(i / cols) * td,
             size: flipSize,
             from: shade(index, Math.abs(Math.cos(Math.PI * t))),
-            to: shadeTable[PAPER][SHADES],
+            to: paperCss,
             t,
-            back: shadeTable[PAPER][SHADES],
+            back: paperCss,
           });
         }
       }
-      if (paper) index = PAPER;
-      const color = PALETTE[index];
+      const color = paper ? surface : PALETTE[index];
       const o = i * 4;
       wd[o] = color[0];
       wd[o + 1] = color[1];
@@ -548,7 +636,8 @@ export function createPixelWall(canvas: HTMLCanvasElement, options: Options): Pi
     if (!maskCanvas || !liveMask || !liveMaskData || p < 0.14) return maskCanvas;
     if (p !== liveMaskAt) {
       const data = liveMaskData.data;
-      for (let k = 0; k < mask.length; k += 1) data[k * 4 + 3] = mask[k] && p < erosion[k] ? 255 : 0;
+      // Tidy (narrow): the hero's ragged dropouts fill back in while the portrait travels.
+      for (let k = 0; k < mask.length; k += 1) data[k * 4 + 3] = (mask[k] || (tidy && p >= 0.4)) && p < erosion[k] ? 255 : 0;
       context2d(liveMask).putImageData(liveMaskData, 0, 0);
       liveMaskAt = p;
     }
@@ -883,6 +972,7 @@ export function createPixelWall(canvas: HTMLCanvasElement, options: Options): Pi
     finishEntry,
     destroy() {
       destroyed = true;
+      liveWalls.delete(onSuspend);
       if (raf) cancelAnimationFrame(raf);
       raf = 0;
     },

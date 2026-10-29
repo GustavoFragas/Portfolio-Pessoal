@@ -1,85 +1,74 @@
-import { useEffect, useState } from 'react';
-import { Menu, X } from 'lucide-react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import { usePortfolioContent } from '../LocaleContext';
-import { supportedLocales, type PortfolioLocale } from '../data/portfolioLocales';
 
-type LanguageSwitcherProps = {
-  className: string;
-  label: string;
-  locale: PortfolioLocale;
-  onSelect: (locale: PortfolioLocale) => void;
-};
-
-function LanguageSwitcher({ className, label, locale, onSelect }: LanguageSwitcherProps) {
-  return (
-    <div className={`language-switcher ${className}`} role="group" aria-label={label} data-calm="2">
-      {supportedLocales.map((option) => (
-        <button type="button" key={option} aria-pressed={locale === option} onClick={() => onSelect(option)}>
-          {option.toUpperCase()}
-        </button>
-      ))}
-    </div>
-  );
-}
+// The animated menu (and the motion runtime it uses) stays out of the initial bundle. It is
+// prefetched when the browser is idle after the page's eager images (the hero photo is the LCP),
+// or as soon as the button is pointed at or focused, and then mounted closed, so a click opens it
+// at once. A click before that opens it as soon as its chunk arrives. No lazy()/Suspense (same as
+// the TechDrawer in Projects.tsx): a Suspense boundary would add React's reveal throttle to that
+// first opening.
+const loadMenu = () => import('./KineticMenu');
+type Menu = Awaited<ReturnType<typeof loadMenu>>['default'];
 
 export default function Topbar() {
-  const [isOpen, setIsOpen] = useState(false);
-  const { content, locale, selectLocale } = usePortfolioContent();
-  const { navItems, profile, ui } = content;
+  const [open, setOpen] = useState(false);
+  const [Menu, setMenu] = useState<Menu | null>(null);
+  const { content } = usePortfolioContent();
+  const { profile, ui } = content;
+  const buttonRef = useRef<HTMLButtonElement>(null);
 
+  // Resolves true once the menu can render (false if its chunk could not load).
+  const prepare = useCallback(
+    () => loadMenu().then((module) => { setMenu(() => module.default); return true; }, () => false),
+    [],
+  );
+  const prefetch = useCallback(() => void prepare(), [prepare]);
+
+  // Not before the eager images are in: the window's `load` comes before the hero photo has
+  // arrived, and on a slow connection the chunk would share its bandwidth.
   useEffect(() => {
-    if (!isOpen) return;
-    const onKeyDown = (event: KeyboardEvent) => {
-      if (event.key === 'Escape') setIsOpen(false);
-    };
-    window.addEventListener('keydown', onKeyDown);
-    return () => window.removeEventListener('keydown', onKeyDown);
-  }, [isOpen]);
+    const eager = [...document.images].filter((img) => !img.complete && img.loading !== 'lazy');
+    void Promise.all(eager.map((img) => img.decode().catch(() => undefined))).then(() =>
+      (window.requestIdleCallback ?? ((cb: () => void) => window.setTimeout(cb, 1500)))(prefetch),
+    );
+  }, [prefetch]);
 
-  const closeMenu = () => setIsOpen(false);
+  const close = useCallback(() => {
+    setOpen(false);
+    buttonRef.current?.focus();
+  }, []);
 
   return (
-    <header className={`topbar ${isOpen ? 'topbar--open' : ''}`}>
+    <header className={`topbar ${open ? 'topbar--menu' : ''}`}>
       <div className="topbar__inner">
-        <a className="brand" href="#home" onClick={closeMenu} data-calm="2" aria-label={`${profile.name} — ${ui.navigation.home}`}>
+        <a className="brand" href="#home" data-calm="2" aria-label={`${profile.name} — ${ui.navigation.home}`} onClick={() => open && close()}>
           <span className="brand__mark" aria-hidden="true"><i /><i /><i /><i /></span>
           <span className="brand__name">{profile.firstName} {profile.lastName}</span>
         </a>
-        <nav className="topbar__nav" aria-label={ui.navigation.mainLabel} data-calm="2">
-          {navItems.map((item) => <a key={item.href} href={item.href}>{item.label}</a>)}
-        </nav>
-        <LanguageSwitcher
-          className="topbar__languages"
-          label={ui.navigation.languageLabel}
-          locale={locale}
-          onSelect={selectLocale}
-        />
+        {/* "Menu +" in the top right on every breakpoint; replaces the inline links and the old mobile menu. */}
         <button
-          className="topbar__menu"
+          ref={buttonRef}
+          className="menu-btn"
           type="button"
           data-calm="2"
-          aria-label={isOpen ? ui.navigation.closeMenu : ui.navigation.openMenu}
-          aria-expanded={isOpen}
-          aria-controls="mobile-navigation"
-          onClick={() => setIsOpen((open) => !open)}
+          aria-expanded={open}
+          aria-controls="site-menu"
+          aria-label={open ? ui.navigation.closeMenu : ui.navigation.openMenu}
+          onPointerEnter={prefetch}
+          onFocus={prefetch}
+          onClick={() => {
+            if (open) close();
+            else void prepare().then((ready) => ready && setOpen(true));
+          }}
         >
-          {isOpen ? <X aria-hidden="true" /> : <Menu aria-hidden="true" />}
+          <span className="menu-btn__label">
+            <span aria-hidden={open}>{ui.navigation.menu}</span>
+            <span aria-hidden={!open}>{ui.navigation.close}</span>
+          </span>
+          <span className="menu-btn__icon" aria-hidden="true" />
         </button>
       </div>
-      <div className={`mobile-nav ${isOpen ? 'mobile-nav--open' : ''}`} id="mobile-navigation">
-        <nav aria-label={ui.navigation.mobileLabel}>
-          {navItems.map((item) => <a key={item.href} href={item.href} onClick={closeMenu}>{item.label}</a>)}
-          <LanguageSwitcher
-            className="mobile-nav__languages"
-            label={ui.navigation.languageLabel}
-            locale={locale}
-            onSelect={(nextLocale) => {
-              selectLocale(nextLocale);
-              closeMenu();
-            }}
-          />
-        </nav>
-      </div>
+      {Menu && <Menu open={open} onClose={close} buttonRef={buttonRef} />}
     </header>
   );
 }

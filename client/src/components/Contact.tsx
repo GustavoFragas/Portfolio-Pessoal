@@ -11,12 +11,13 @@ export default function Contact() {
   const sectionRef = useRef<HTMLElement>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
 
-  // The wall comes back as the closing bookend: same tiles, no photo.
+  // The wall comes back as the closing bookend: same tiles, no photo, reassembling
+  // from paper as the section scrolls in (the mirror of the hero dissolve).
   useLayoutEffect(() => {
     const section = sectionRef.current;
     const canvas = canvasRef.current;
     if (!section || !canvas) return;
-    const wall = createPixelWall(canvas, { mode: 'wall', motion: !reduced });
+    const wall = createPixelWall(canvas, { mode: 'wall', motion: !reduced, assemble: !reduced });
     if (!wall) {
       section.dataset.wall = 'off';
       return;
@@ -39,7 +40,19 @@ export default function Contact() {
     const schedule = () => {
       if (!raf) raf = requestAnimationFrame(relayout);
     };
+    let scrollRaf = 0;
+    const updateProgress = () => {
+      scrollRaf = 0;
+      if (reduced) return wall.setProgress(1);
+      const top = section.getBoundingClientRect().top;
+      wall.setProgress(Math.min(1, Math.max(0, (window.innerHeight - top) / (window.innerHeight * 0.85))));
+    };
+    const onScroll = () => {
+      if (!scrollRaf) scrollRaf = requestAnimationFrame(updateProgress);
+    };
+    updateProgress();
     relayout();
+    window.addEventListener('scroll', onScroll, { passive: true });
 
     const resizeObserver = new ResizeObserver(schedule);
     resizeObserver.observe(section);
@@ -56,6 +69,8 @@ export default function Contact() {
 
     return () => {
       cancelAnimationFrame(raf);
+      cancelAnimationFrame(scrollRaf);
+      window.removeEventListener('scroll', onScroll);
       wall.destroy();
       resizeObserver.disconnect();
       intersection.disconnect();
@@ -75,7 +90,6 @@ export default function Contact() {
       <canvas className="contact__canvas" ref={canvasRef} aria-hidden="true" />
       <div className="contact__inner">
         <div className="contact__copy">
-          <p className="kicker kicker--wall" data-calm="2">{ui.contact.kicker}</p>
           <h2 id="contact-title" data-calm="2">{ui.contact.title}</h2>
           <p className="contact__lead" data-calm="2">{ui.contact.description}</p>
         </div>

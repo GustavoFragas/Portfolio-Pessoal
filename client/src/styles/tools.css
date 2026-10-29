@@ -1,0 +1,105 @@
+/* Ferramentas (Rodada 6C): each group's tools are the drawer's stack tiles (.tech-chips in index.css),
+   then, where a project's own stack names one of them, "visto em → 01 · 02" with a link per project.
+   On the section's navy (--surface-alt): chip text (--text on --surface-tint) 10.3:1; the numbers
+   (--accent-soft) 8.8:1; the label (--text-soft) 9.3:1. */
+
+.tools__chips {
+  margin-top: 0.85rem;
+}
+
+/* The drawer's three marks in its order (TechDrawer's CHIP_TONES); every third keeps --mark. */
+.tools__chips li:nth-child(3n + 1) {
+  --c: var(--wall-pink);
+}
+
+.tools__chips li:nth-child(3n + 2) {
+  --c: var(--wall-pink-soft);
+}
+
+.tools__seen {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  column-gap: 0.15rem;
+  margin-top: 0.65rem;
+  color: var(--text-soft);
+  font-size: 0.875rem;
+  font-weight: 650;
+}
+
+.tools__seen-label {
+  margin-right: 0.3rem;
+}
+
+/* The project numbers in the cards' own type (wide, heavy), as links: 28 px targets. */
+.tools__seen a {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 1.75rem;
+  min-height: 1.75rem;
+  color: var(--accent-soft);
+  font-size: 0.9375rem;
+  font-stretch: 125%;
+  font-weight: 820;
+  text-decoration: underline;
+  text-decoration-thickness: 2px;
+  text-underline-offset: 0.2em;
+}
+
+.tools__seen a:hover {
+  color: var(--text);
+}
+
+/* Phones (< 760 px): the tiles a step smaller and tighter, only in this section (the drawer's .tech-chips
+   keep index.css's size). Text 13 px, same colours; the project numbers keep 24 px boxes, with a larger
+   touch area around them. Each group is its title, tiles and "visto em" (the sentence shows from 760 px). */
+@media (max-width: 759px) {
+  .tools .tools__row h3 + p {
+    display: none;
+  }
+
+  .tools .tools__chips {
+    gap: 0.3rem;
+    margin-top: 0.7rem;
+  }
+
+  .tools .tools__chips li {
+    gap: 0.35rem;
+    padding: 0.25rem 0.5rem 0.25rem 0.4rem;
+    font-size: 0.8125rem;
+    line-height: 1.3;
+  }
+
+  .tools .tools__chips li::before {
+    width: 0.55rem;
+    height: 0.55rem;
+  }
+
+  .tools .tools__seen {
+    margin-top: 0.45rem;
+  }
+
+  .tools .tools__seen a {
+    position: relative;
+    min-width: 1.5rem;
+    min-height: 1.5rem;
+  }
+
+  /* Touch area (P3-1): an invisible box 44 px tall around each number, 10 px out on the outer sides and
+     4 px toward a neighbour (half the 8 px between them, so two never overlap). Nothing drawn moves:
+     the number, its underline and the focus ring keep the 24 px box. */
+  .tools .tools__seen a::after {
+    content: "";
+    position: absolute;
+    inset: -10px -4px;
+  }
+
+  .tools .tools__seen a:first-of-type::after {
+    left: -10px;
+  }
+
+  .tools .tools__seen a:last-of-type::after {
+    right: -10px;
+  }
+}
