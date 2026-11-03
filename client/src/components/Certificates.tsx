@@ -86,6 +86,13 @@ function CredentialTile({ item, index, copy, motion, assemble }: { item: Credent
     drag.current = null;
     if (!d || !d.moved) return;
     swallowClick.current = event.type === 'pointerup';
+    // Only the click this pointerup dispatches belongs to the drag; a later keyboard or screen reader
+    // click has no pointerdown to clear the flag.
+    if (swallowClick.current) {
+      window.setTimeout(() => {
+        swallowClick.current = false;
+      });
+    }
     const ry = d.startRy + (event.clientX - d.x) * 0.75;
     base.current = Math.round(ry / 180) * 180;
     const nowFlipped = Math.abs(Math.round(base.current / 180)) % 2 === 1;

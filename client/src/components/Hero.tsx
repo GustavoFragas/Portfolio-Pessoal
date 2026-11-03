@@ -292,19 +292,36 @@ export default function Hero() {
 
     // The wall paints the portrait <img> itself, so it reuses that one download, whichever file srcset picked.
     // decode() hands it over loaded, decoded and in a later task: the first paint never waits for the wall.
+    // No photo to paint (failed load) or no canvas memory to paint it (iOS): the plain portrait stays.
+    const dropWall = () => {
+      wall?.destroy();
+      wall = null;
+      applyState('off');
+      scheduleLayout();
+    };
     const takePhoto = () => {
       if (disposed || !wall) return;
-      if (!photo.naturalWidth) {
-        wall.destroy();
-        wall = null;
-        applyState('off');
-        scheduleLayout();
-        return;
+      if (!photo.naturalWidth) return dropWall();
+      try {
+        wall.setPhoto(photo);
+      } catch {
+        return dropWall();
       }
-      wall.setPhoto(photo);
       if (motion && lastProgress <= 0.01 && wall.startEntry()) applyState('entering');
     };
-    if (wall) photo.decode().then(takePhoto, takePhoto);
+    // decode() also rejects when srcset swaps files mid-load (resize, zoom): then decide once that file settles.
+    const takeSettled = () => {
+      photo.removeEventListener('load', takeSettled);
+      photo.removeEventListener('error', takeSettled);
+      takePhoto();
+    };
+    if (wall) {
+      photo.decode().then(takePhoto, () => {
+        if (photo.complete) return takePhoto();
+        photo.addEventListener('load', takeSettled);
+        photo.addEventListener('error', takeSettled);
+      });
+    }
 
     const local = (event: PointerEvent): [number, number] => {
       const box = canvas.getBoundingClientRect();
@@ -363,6 +380,8 @@ export default function Hero() {
       cancelAnimationFrame(scrollRaf);
       cancelAnimationFrame(layoutRaf);
       wall?.destroy();
+      photo.removeEventListener('load', takeSettled);
+      photo.removeEventListener('error', takeSettled);
       resizeObserver.disconnect();
       intersection.disconnect();
       document.removeEventListener('visibilitychange', syncActive);
