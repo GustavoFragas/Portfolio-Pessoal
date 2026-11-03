@@ -48,7 +48,7 @@
    tools as chips and "visto em", 1141 and 2247, and Trajetória with the rewritten leadership block,
    2604 and 2601; in the 6C adjustments: Ferramentas with smaller tiles on phones, 1872 at 390, and
    Formação, 1300 and 1703; in the 6C final fixes: Ferramentas on phones without each group's sentence,
-   1362 at 390). */
+   1362 at 390; in Rodada 7 (P3-9): Credenciais on phones with two tiles per row, 1365 at 390). */
 #trajetoria,
 #ferramentas,
 #formacao,
@@ -65,7 +65,7 @@
   #trajetoria { contain-intrinsic-block-size: auto 2600px; }
   #ferramentas { contain-intrinsic-block-size: auto 1360px; }
   #formacao { contain-intrinsic-block-size: auto 1700px; }
-  #credenciais { contain-intrinsic-block-size: auto 1600px; }
+  #credenciais { contain-intrinsic-block-size: auto 1365px; }
 }
 
 html.cv-off :is(#trajetoria, #ferramentas, #formacao, #credenciais) {

@@ -11,6 +11,11 @@ import { useReducedMotion } from './pixelWall/useReducedMotion';
 type WallState = 'loading' | 'entering' | 'idle' | 'static' | 'off';
 
 const PORTRAIT_RATIO = 7 / 9;
+// The portrait crop (x 120–820, y 440–1340 of profile.jpg) as WebP. The preload in index.html repeats
+// both strings verbatim, so the browser picks the same file there and here (one download).
+const PORTRAIT_SRCSET = '/images/profile-portrait-480.webp 480w, /images/profile-portrait-700.webp 700w';
+// Upper bounds of the frame width: stacked layout (index.css) under 100vw minus two gutters, else 46%.
+const PORTRAIT_SIZES = '(max-width: 759px) calc(100vw - 40px), (max-aspect-ratio: 4/5) calc(100vw - 40px), 46vw';
 // Keep in sync with the engine and index.css: hero copy is gone at 0.18, the topbar turns to paper at 0.3.
 const TEXT_GONE = 0.18;
 const TOPBAR_PAPER = 0.3;
@@ -49,14 +54,18 @@ function HeroCreds({ flow = false, near, ref }: HeroCredsProps) {
       href="#credenciais"
       data-calm={flow ? undefined : '2'}
       ref={ref}
-      aria-label={`${hero.credsLabel}: ${hero.creds.map((c) => `${c.title} ${c.sub}`).join(', ')}. ${hero.credsMore}`}
     >
+      {/* Named by its own text, so the name always contains what is on screen (the full or the short
+          line, whichever the layout shows); the context and the commas are for screen readers only. The
+          spaces between the pieces are not rendered in these grid/flex boxes, but keep the words apart. */}
+      <span className="sr-only">{hero.credsLabel}: </span>
       {hero.creds.map((cred, index) => (
-        <span className="hero__cred" key={cred.title} aria-hidden="true">
+        <span className="hero__cred" key={cred.title}>
           {/* A small 3D badge: the art as front and back faces, slices masked by the art as its thickness.
               It only spins while the row says data-spin="on" (hero-badges.css). The <img> asks for the art
               in CORS mode, like the mask, so faces and slices share one download of the same file. */}
           <span
+            aria-hidden="true"
             className={`hero__cred-emblem ${cred.logo ? 'hero__cred-emblem--logo' : ''}`}
             data-badge={cred.art.split('/').pop()?.replace(/(-\d+)?\.\w+$/, '')}
             style={{ '--i': index, ...(near && { '--art': `url("${cred.art}")` }) } as CSSProperties}
@@ -81,12 +90,13 @@ function HeroCreds({ flow = false, near, ref }: HeroCredsProps) {
             </span>
           </span>
           <span className="hero__cred-text">
-            <strong>{cred.title}</strong>
-            <span>{cred.sub}</span>
+            <strong>{cred.title}</strong> <span>{cred.sub}</span>
           </span>
           <span className="hero__cred-short">{cred.short}</span>
+          <span className="sr-only">{index < hero.creds.length - 1 ? ', ' : '. '}</span>{' '}
         </span>
       ))}
+      <span className="sr-only">{hero.credsMore}</span>
     </a>
   );
 }
@@ -102,6 +112,7 @@ export default function Hero() {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const frameBoxRef = useRef<HTMLDivElement>(null);
   const frameRef = useRef<HTMLDivElement>(null);
+  const portraitRef = useRef<HTMLImageElement>(null);
   const actionsRef = useRef<HTMLDivElement>(null);
   const credsRef = useRef<HTMLAnchorElement>(null);
   const flowCredsRef = useRef<HTMLAnchorElement>(null);
@@ -153,10 +164,11 @@ export default function Hero() {
     const canvas = canvasRef.current;
     const frameBox = frameBoxRef.current;
     const frame = frameRef.current;
+    const photo = portraitRef.current;
     const actions = actionsRef.current;
     const creds = credsRef.current;
     const aboutSlot = aboutSlotRef.current;
-    if (!story || !stage || !heroBox || !canvas || !frameBox || !frame || !actions || !creds || !aboutSlot) return;
+    if (!story || !stage || !heroBox || !canvas || !frameBox || !frame || !photo || !actions || !creds || !aboutSlot) return;
 
     const motion = !reduced;
     let disposed = false;
@@ -278,23 +290,21 @@ export default function Hero() {
 
     relayout();
 
-    if (wall) {
-      const photo = new Image();
-      photo.decoding = 'async';
-      photo.onload = () => {
-        if (disposed || !wall) return;
-        wall.setPhoto(photo);
-        if (motion && lastProgress <= 0.01 && wall.startEntry()) applyState('entering');
-      };
-      photo.onerror = () => {
-        if (disposed) return;
-        wall?.destroy();
+    // The wall paints the portrait <img> itself, so it reuses that one download, whichever file srcset picked.
+    // decode() hands it over loaded, decoded and in a later task: the first paint never waits for the wall.
+    const takePhoto = () => {
+      if (disposed || !wall) return;
+      if (!photo.naturalWidth) {
+        wall.destroy();
         wall = null;
         applyState('off');
         scheduleLayout();
-      };
-      photo.src = image;
-    }
+        return;
+      }
+      wall.setPhoto(photo);
+      if (motion && lastProgress <= 0.01 && wall.startEntry()) applyState('entering');
+    };
+    if (wall) photo.decode().then(takePhoto, takePhoto);
 
     const local = (event: PointerEvent): [number, number] => {
       const box = canvas.getBoundingClientRect();
@@ -382,10 +392,13 @@ export default function Hero() {
               <div className="story__frame" ref={frameRef}>
                 <div className="story__crop">
                   <img
+                    ref={portraitRef}
                     src={image}
+                    srcSet={PORTRAIT_SRCSET}
+                    sizes={PORTRAIT_SIZES}
                     alt={ui.hero.portraitAlt}
-                    width={1200}
-                    height={1600}
+                    width={700}
+                    height={900}
                     decoding="async"
                     fetchPriority="high"
                   />

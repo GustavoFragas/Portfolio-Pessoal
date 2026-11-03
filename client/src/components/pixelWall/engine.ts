@@ -67,8 +67,9 @@ type Options = {
 type Flip = { x: number; y: number; size: number; from: string; to: string; t: number; back: string };
 type Breather = { index: number; to: number; start: number };
 
-// Crop of the original 1200×1600 photo that leaves the AWS logo out.
-const CROP = { x: 120, y: 440, w: 700, h: 900 } as const;
+// The portrait files are already the crop of the original 1200×1600 photo that leaves the AWS logo out
+// (x 120–820, y 440–1340), at 700×900 or smaller; the engine always works on a 700×900 copy.
+const CROP = { w: 700, h: 900 } as const;
 const PORTRAIT_RATIO = CROP.w / CROP.h;
 const LEVELS = [1, 2, 3, 4, 6] as const;
 // Story resolution: rest composite, then T/4, T/6 and finally the photo itself.
@@ -291,7 +292,7 @@ export function createPixelWall(canvas: HTMLCanvasElement, options: Options): Pi
       const cropCtx = context2d(cropCanvas);
       cropCtx.imageSmoothingEnabled = true;
       cropCtx.imageSmoothingQuality = 'high';
-      cropCtx.drawImage(photo, CROP.x, CROP.y, CROP.w, CROP.h, 0, 0, CROP.w, CROP.h);
+      cropCtx.drawImage(photo, 0, 0, CROP.w, CROP.h);
     }
 
     const applyMask = (target: HTMLCanvasElement) => {

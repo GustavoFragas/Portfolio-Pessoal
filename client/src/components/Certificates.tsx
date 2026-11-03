@@ -5,6 +5,7 @@ import type { Credential } from '../data/portfolioLocales';
 import { hash2 } from './pixelWall/tiles';
 import { useReducedMotion } from './pixelWall/useReducedMotion';
 import TileReveal from './TileReveal';
+import '../styles/credentials.css';
 
 const ASSEMBLE_SIDE = 6;
 const ASSEMBLE_COLORS = ['var(--wall-pink)', 'var(--wall-navy)', 'var(--wall-ink)', 'var(--wall-pink)', 'var(--wall-pink-soft)'];
@@ -75,6 +76,8 @@ function CredentialTile({ item, index, copy, motion, assemble }: { item: Credent
     apply(-v * 22, base.current + u * 28, true);
   };
   const onPointerDown = (event: ReactPointerEvent<HTMLLIElement>) => {
+    // A touch drag ends without a click, so a flag left by it would eat the next tap.
+    swallowClick.current = false;
     if (!motion || (event.pointerType === 'mouse' && event.button !== 0)) return;
     drag.current = { x: event.clientX, startRy: base.current, moved: false };
   };

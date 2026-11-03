@@ -624,6 +624,9 @@ html.menu-open {
   inset: 0 auto auto 0;
   width: 100%;
   height: 100%;
+  /* Hero.tsx sizes the frame and measures it right away; under reduced motion the global 0.01ms
+     transition would hand that measure the old box. */
+  transition: none;
 }
 
 .story__crop {
@@ -634,13 +637,12 @@ html.menu-open {
   background: var(--wall-navy);
 }
 
-/* Same crop as the canvas: x 120–820, y 440–1340 of the 1200×1600 original. */
+/* The portrait files are already the canvas crop (x 120–820, y 440–1340 of the 1200×1600 original). */
 .story__crop img {
   position: absolute;
-  top: -48.8889%;
-  left: -17.1429%;
-  width: 171.4286%;
-  height: 177.7778%;
+  inset: 0;
+  width: 100%;
+  height: 100%;
   max-width: none;
 }
 

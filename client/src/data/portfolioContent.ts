@@ -5,7 +5,7 @@ export const profile = {
   firstName: 'Gustavo',
   lastName: 'Fragas',
   officialTitle: 'Desenvolvedor Pleno',
-  image: '/images/profile.jpg',
+  image: '/images/profile-portrait-700.webp',
   email: 'gustavofragascunha@gmail.com',
   phoneDisplay: '+55 11 98019-2710',
   phoneLink: 'https://wa.me/5511980192710',
