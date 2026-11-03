@@ -221,14 +221,14 @@ const ptUi = {
     close: 'Fechar',
   },
   experience: {
-    // The section's H2 (no kicker: it already says what the section is). out/2025 (intern) → out/2026
-    // (mid-level), the same dates as the climb. No-break space/hyphen keep "12 meses" (and
+    // The section's H2 (no kicker: it already says what the section is). out/2025 (intern) → mai/2026
+    // (mid-level), the same dates as the climb. No-break space/hyphen keep "7 meses" (and
     // "mid-level", "semi senior") on one line.
-    title: 'De estagiário a pleno em 12\u00a0meses',
+    title: 'De estagiário a pleno em 7\u00a0meses',
     openOfficialSite: 'abrir site oficial em nova guia',
     current: 'cargo atual',
     climbLabel: 'Na Alest',
-    climb: [['Estagiário', 'out/2025'], ['Júnior', 'mar/2026'], ['Pleno', 'out/2026']],
+    climb: [['Estagiário', 'out/2025'], ['Júnior', 'mar/2026'], ['Pleno', 'mai/2026']],
     beforeLabel: 'Antes da Alest',
     teamLead: 'Com o time da Alest:',
     sourceLabel: 'fonte',
@@ -388,11 +388,11 @@ const enUi: Ui = {
     close: 'Close',
   },
   experience: {
-    title: 'From intern to mid\u2011level in 12\u00a0months',
+    title: 'From intern to mid\u2011level in 7\u00a0months',
     openOfficialSite: 'open official website in a new tab',
     current: 'current role',
     climbLabel: 'At Alest',
-    climb: [['Intern', 'Oct 2025'], ['Junior', 'Mar 2026'], ['Mid-level', 'Oct 2026']],
+    climb: [['Intern', 'Oct 2025'], ['Junior', 'Mar 2026'], ['Mid-level', 'May 2026']],
     beforeLabel: 'Before Alest',
     teamLead: 'With the Alest team:',
     sourceLabel: 'source',
@@ -563,11 +563,11 @@ const esUi: Ui = {
     close: 'Cerrar',
   },
   experience: {
-    title: 'De pasante a semi\u00a0senior en 12\u00a0meses',
+    title: 'De pasante a semi\u00a0senior en 7\u00a0meses',
     openOfficialSite: 'abrir sitio oficial en una pestaña nueva',
     current: 'cargo actual',
     climbLabel: 'En Alest',
-    climb: [['Pasante', 'oct. 2025'], ['Junior', 'mar. 2026'], ['Semi Senior', 'oct. 2026']],
+    climb: [['Pasante', 'oct. 2025'], ['Junior', 'mar. 2026'], ['Semi Senior', 'may. 2026']],
     beforeLabel: 'Antes de Alest',
     teamLead: 'Con el equipo de Alest:',
     sourceLabel: 'fuente',
@@ -917,8 +917,8 @@ const esCapabilities: Capability[] = [
 ];
 
 const enExperiences: ExperienceItem[] = [
-  ['Oct 2026 – now', 'Alest', 'Mid-level Software Developer', ['Data and telemetry platforms, SaaS integrations and backend services.', 'Documentation, configuration, messaging, testing and validation alongside the tech lead.'], 'https://alest.com.br/'],
-  ['Mar 2026 – Oct 2026', 'Alest', 'Junior Software Developer', ['Hired full-time on March 30, 2026, after the internship.', 'Integrations, automation and data quality routines.'], 'https://alest.com.br/'],
+  ['May 2026 – now', 'Alest', 'Mid-level Software Developer', ['Data and telemetry platforms, SaaS integrations and backend services.', 'Documentation, configuration, messaging, testing and validation alongside the tech lead.'], 'https://alest.com.br/'],
+  ['Mar 2026 – May 2026', 'Alest', 'Junior Software Developer', ['Hired full-time on March 30, 2026, after the internship.', 'Integrations, automation and data quality routines.'], 'https://alest.com.br/'],
   ['Oct 2025 – Mar 2026', 'Alest', 'Software Development Intern', ['Support on internal integrations and automation with C#/.NET, TypeScript/Node.js and SaaS APIs.', 'Early stages of an internal telemetry and data platform.', 'DocuSign CLM flows focused on validation, traceability and error handling.'], 'https://alest.com.br/'],
   ['Aug 2025 – Oct 2025', 'Atento', 'Bilingual support in Spanish', ['Customer support in Spanish: communication, triage and request follow-up.'], 'https://atento.com/pb/atentonomundo/brasil'],
   ['Mar 2023 – Apr 2025', 'Argentina', 'Full-time volunteer service', ['Community work in a multicultural setting, speaking Spanish every day.', 'Visits, scheduling, following up with people and working with local teams.'], 'https://www.churchofjesuschrist.org/?lang=eng', 'Argentina — website of The Church of Jesus Christ of Latter-day Saints (opens in a new tab)'],
@@ -926,8 +926,8 @@ const enExperiences: ExperienceItem[] = [
 ];
 
 const esExperiences: ExperienceItem[] = [
-  ['oct. 2026 – hoy', 'Alest', 'Desarrollador Semi Senior', ['Plataformas de datos y telemetría, integraciones SaaS y servicios backend.', 'Documentación, configuración, mensajería, pruebas y validación junto al líder técnico.'], 'https://alest.com.br/'],
-  ['mar. 2026 – oct. 2026', 'Alest', 'Desarrollador Junior', ['Efectivo desde el 30/03/2026, después de la pasantía.', 'Integraciones, automatizaciones y rutinas de calidad de datos.'], 'https://alest.com.br/'],
+  ['may. 2026 – hoy', 'Alest', 'Desarrollador Semi Senior', ['Plataformas de datos y telemetría, integraciones SaaS y servicios backend.', 'Documentación, configuración, mensajería, pruebas y validación junto al líder técnico.'], 'https://alest.com.br/'],
+  ['mar. 2026 – may. 2026', 'Alest', 'Desarrollador Junior', ['Efectivo desde el 30/03/2026, después de la pasantía.', 'Integraciones, automatizaciones y rutinas de calidad de datos.'], 'https://alest.com.br/'],
   ['oct. 2025 – mar. 2026', 'Alest', 'Pasante de Desarrollo de Software', ['Apoyo en integraciones y automatizaciones internas con C#/.NET, TypeScript/Node.js y APIs SaaS.', 'Primeras etapas de una plataforma interna de telemetría y datos.', 'Flows en DocuSign CLM con foco en validación, trazabilidad y manejo de errores.'], 'https://alest.com.br/'],
   ['ago. 2025 – oct. 2025', 'Atento', 'Soporte bilingüe en español', ['Atención y soporte a clientes en español: comunicación, triaje y seguimiento de solicitudes.'], 'https://atento.com/pb/atentonomundo/brasil'],
   ['mar. 2023 – abr. 2025', 'Argentina', 'Servicio voluntario de tiempo completo', ['Trabajo comunitario en un contexto multicultural, hablando español todos los días.', 'Visitas, agenda, acompañamiento de personas y colaboración con equipos locales.'], 'https://www.churchofjesuschrist.org/?lang=spa', 'Argentina — sitio de La Iglesia de Jesucristo de los Santos de los Últimos Días (se abre en una pestaña nueva)'],

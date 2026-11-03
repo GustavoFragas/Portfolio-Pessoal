@@ -173,8 +173,8 @@ export const capabilities = [
 ] as const;
 
 export const experiences = [
-  ['out/2026 – hoje', 'Alest', 'Desenvolvedor Pleno', ['Evolução de plataformas de dados e telemetria, integrações SaaS e serviços backend.', 'Documentação, configuração, mensageria, testes e validação junto com a liderança técnica.'], 'https://alest.com.br/'],
-  ['mar/2026 – out/2026', 'Alest', 'Desenvolvedor Júnior', ['Efetivado em 30/03/2026, depois do estágio.', 'Integrações, automações e rotinas de qualidade de dados.'], 'https://alest.com.br/'],
+  ['mai/2026 – hoje', 'Alest', 'Desenvolvedor Pleno', ['Evolução de plataformas de dados e telemetria, integrações SaaS e serviços backend.', 'Documentação, configuração, mensageria, testes e validação junto com a liderança técnica.'], 'https://alest.com.br/'],
+  ['mar/2026 – mai/2026', 'Alest', 'Desenvolvedor Júnior', ['Efetivado em 30/03/2026, depois do estágio.', 'Integrações, automações e rotinas de qualidade de dados.'], 'https://alest.com.br/'],
   ['out/2025 – mar/2026', 'Alest', 'Estagiário de Desenvolvimento de Software', ['Apoio em integrações e automações internas com C#/.NET, TypeScript/Node.js e APIs SaaS.', 'Primeiras etapas de uma plataforma interna de telemetria e dados.', 'Flows no DocuSign CLM com foco em validação, rastreabilidade e tratamento de erro.'], 'https://alest.com.br/'],
   ['ago/2025 – out/2025', 'Atento', 'Suporte bilíngue em espanhol', ['Atendimento e suporte a clientes em espanhol: comunicação, triagem e acompanhamento de solicitações.'], 'https://atento.com/pb/atentonomundo/brasil'],
   // The link goes to the official site; its accessible name says where it leads (and contains the visible text).
